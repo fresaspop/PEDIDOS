@@ -7,6 +7,9 @@
 <meta name="description" content="Postres de fresas personalizados en Cotuí, RD. Pide por WhatsApp.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase (panel de administrador) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 <style>
 /* =========================================================
    FRESAS POP — CONFIGURACIÓN VISUAL
@@ -38,6 +41,15 @@ h1,h2,h3,h4,.brand-font{font-family:'Baloo 2',sans-serif;}
 button{font-family:inherit; cursor:pointer;}
 img{max-width:100%; display:block;}
 ::selection{background:var(--principal); color:#fff;}
+.oferta-banner{
+  background:var(--principal); color:#fff; text-align:center;
+  font-weight:600; font-size:13.5px; padding:10px 16px; line-height:1.4;
+}
+.oferta-banner strong{font-weight:700;}
+.agotado-tag{
+  display:inline-block; font-size:10px; font-weight:700; letter-spacing:.3px;
+  background:var(--gris); color:#fff; padding:3px 8px; border-radius:20px; margin-left:6px;
+}
 
 /* ---------- HEADER ---------- */
 .header{
@@ -530,13 +542,27 @@ const CONFIG = {
   ]
 };
 
-// ---- Datos del personalizador ----
-const TAMANOS = [
+// ---- Conexión a Firebase (panel de administrador) ----
+const firebaseConfig = {
+  apiKey: "AIzaSyDr190z0obWeyDmm2UY6_5rZ_PqXUr883E",
+  authDomain: "adminfresaspop.firebaseapp.com",
+  projectId: "adminfresaspop",
+  storageBucket: "adminfresaspop.firebasestorage.app",
+  messagingSenderId: "840834985196",
+  appId: "1:840834985196:web:28f8fa890ace7ac3dc89c9"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const MENU_DOC = db.collection('menu_data').doc('main');
+const OFERTAS_COL = db.collection('ofertas');
+
+// ---- Datos del personalizador (valores por defecto / respaldo sin conexión) ----
+const DEFAULT_TAMANOS = [
   {id:'12oz', label:'12 onzas', price:350, img:IMG.laClasica},
   {id:'9oz', label:'9 onzas', price:250, img:IMG.balance},
   {id:'canasta', label:'Canasta Pop', price:150, img:IMG.canastaPop},
 ];
-const BASES = [
+const DEFAULT_BASES = [
   {id:'dulce_leche', label:'Dulce de leche', extra:0},
   {id:'leche_cond', label:'Leche condensada', extra:0},
   {id:'syrup_caramelo', label:'Syrup de caramelo', extra:0},
@@ -545,18 +571,18 @@ const BASES = [
   {id:'choco_derretido', label:'Chocolate derretido', extra:50},
   {id:'sin_base', label:'Sin base', extra:0},
 ];
-const CREMAS = [
+const DEFAULT_CREMAS = [
   {id:'tradicional', label:'Crema tradicional', extra:0},
   {id:'choco', label:'Choco Crema', extra:0},
   {id:'coco', label:'Coco Crema', extra:50},
 ];
-const FRUTAS = [
+const DEFAULT_FRUTAS = [
   {id:'fresa', label:'Fresa', extra:0},
   {id:'mango', label:'Mango', extra:0},
   {id:'mixto', label:'Mixto', extra:0, soloVasos:true},
 ];
 // toppings gratis + premium combinados en un solo selector de elección única
-const TOPPINGS = [
+const DEFAULT_TOPPINGS = [
   {id:'galletas', label:'Galletas de choco', extra:0},
   {id:'granola', label:'Granola', extra:0},
   {id:'cono', label:'Cono triturado', extra:0},
@@ -566,7 +592,7 @@ const TOPPINGS = [
   {id:'kataifi', label:'Kataifi', extra:30},
   {id:'sin_topping', label:'Sin topping', extra:0},
 ];
-const EXTRAS = [
+const DEFAULT_EXTRAS = [
   {id:'ex_dulce_leche', label:'Dulce de leche 2oz', extra:25},
   {id:'ex_leche_cond', label:'L. condensada 2oz', extra:25},
   {id:'ex_pistacho', label:'Pistacho 2oz', extra:100},
@@ -574,7 +600,7 @@ const EXTRAS = [
 ];
 
 // ---- Favoritas (recetas fijas) ----
-const FAVORITAS = [
+const DEFAULT_FAVORITAS = [
   {id:'la_clasica', nombre:'La Clásica', desc:'Dulce de leche + crema tradicional + galletas de choco', img:IMG.laClasica,
     toppingDefault:'galletas', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
@@ -599,7 +625,7 @@ const FAVORITAS = [
 ];
 
 // ---- Premium ----
-const PREMIUM = [
+const DEFAULT_PREMIUM = [
   {id:'fresas_dubai', nombre:'Fresas Dubái', desc:'Fresas frescas, crema de pistacho con trozos de pistacho, chocolate derretido y kataifi dorado y crujiente.', img:IMG.dubai,
     sizes:[{id:'12oz',label:'12 oz',price:700},{id:'9oz',label:'9 oz',price:550}]},
   {id:'pistacho_pop', nombre:'Pistacho Pop', desc:'Nuestra crema de pistacho premium, pura y cremosa.', img:null,
@@ -611,9 +637,20 @@ const PREMIUM = [
 ];
 
 // ---- Otros postres ----
-const OTROS = [
+const DEFAULT_OTROS = [
   {id:'brownie', nombre:'Brownie', desc:'Brownie de chocolate individual.', img:null, price:75},
 ];
+
+// ---- Variables activas (se actualizan con los datos de Firebase si existen) ----
+let TAMANOS = DEFAULT_TAMANOS;
+let BASES = DEFAULT_BASES;
+let CREMAS = DEFAULT_CREMAS;
+let FRUTAS = DEFAULT_FRUTAS;
+let TOPPINGS = DEFAULT_TOPPINGS;
+let EXTRAS = DEFAULT_EXTRAS;
+let FAVORITAS = DEFAULT_FAVORITAS;
+let PREMIUM = DEFAULT_PREMIUM;
+let OTROS = DEFAULT_OTROS;
 
 /* =========================================================
    ESTADO
@@ -1064,8 +1101,8 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   cart.forEach((item, idx)=>{
     msg += `${idx+1}. ${item.cantidad}x ${item.nombre} — ${money(item.precioUnit*item.cantidad)}\n`;
     if(item.detalles.length){
-      item.detalles.forEach((d, di)=>{
-        msg += `   ${di+1}. ${d}\n`;
+      item.detalles.forEach((d)=>{
+        msg += `   • ${d}\n`;
       });
     }
     msg += `\n`;
@@ -1111,14 +1148,90 @@ function renderInfo(){
 }
 
 /* =========================================================
-   INIT
+   OFERTAS (banner superior)
    ========================================================= */
-renderPersonalizador();
-renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
-renderCardList('premiumList', PREMIUM, premSize, 'Agregar');
-renderOtros();
-renderCart();
-renderInfo();
+async function renderOfertas(){
+  try{
+    const snap = await OFERTAS_COL.where('activa','==',true).get();
+    const wrap = document.getElementById('ofertaBanner');
+    if(!wrap) return;
+    if(snap.empty){ wrap.innerHTML=''; wrap.style.display='none'; return; }
+    const textos = [];
+    snap.forEach(doc=> textos.push(doc.data().texto));
+    wrap.innerHTML = textos.map(t=>`<div>🎉 <strong>${t}</strong></div>`).join('');
+    wrap.style.display = 'block';
+  }catch(e){ console.warn('No se pudieron cargar las ofertas', e); }
+}
+
+/* =========================================================
+   CARGA DE DATOS (Firebase) + INIT
+   ========================================================= */
+function construirSeedInicial(){
+  const marcar = arr => arr.map(x=> ({...x, disponible:true}));
+  return {
+    tamanos: marcar(DEFAULT_TAMANOS).map(({img, ...r})=>r), // las imágenes de tamaño quedan fijas en el código
+    bases: marcar(DEFAULT_BASES),
+    cremas: marcar(DEFAULT_CREMAS),
+    frutas: marcar(DEFAULT_FRUTAS),
+    toppings: marcar(DEFAULT_TOPPINGS),
+    extras: marcar(DEFAULT_EXTRAS),
+    favoritas: marcar(DEFAULT_FAVORITAS).map(({img, ...r})=>r),
+    premium: marcar(DEFAULT_PREMIUM).map(({img, ...r})=>r),
+    otros: marcar(DEFAULT_OTROS).map(({img, ...r})=>r),
+  };
+}
+
+function fusionarConImagenLocal(remoto, local){
+  // conserva la imagen definida en el código (IMG.xxx) usando el id como referencia
+  if(!remoto) return [];
+  return remoto.filter(x=>x.disponible!==false).map(item=>{
+    const orig = local.find(l=>l.id===item.id);
+    return orig && orig.img ? {...item, img:orig.img} : item;
+  });
+}
+
+async function cargarDatosRemotos(){
+  try{
+    const snap = await MENU_DOC.get();
+    if(snap.exists){
+      const d = snap.data();
+      if(d.tamanos) TAMANOS = fusionarConImagenLocal(d.tamanos, DEFAULT_TAMANOS);
+      if(d.bases) BASES = d.bases.filter(x=>x.disponible!==false);
+      if(d.cremas) CREMAS = d.cremas.filter(x=>x.disponible!==false);
+      if(d.frutas) FRUTAS = d.frutas.filter(x=>x.disponible!==false);
+      if(d.toppings) TOPPINGS = d.toppings.filter(x=>x.disponible!==false);
+      if(d.extras) EXTRAS = d.extras.filter(x=>x.disponible!==false);
+      if(d.favoritas) FAVORITAS = fusionarConImagenLocal(d.favoritas, DEFAULT_FAVORITAS);
+      if(d.premium) PREMIUM = fusionarConImagenLocal(d.premium, DEFAULT_PREMIUM);
+      if(d.otros) OTROS = fusionarConImagenLocal(d.otros, DEFAULT_OTROS);
+    } else {
+      await MENU_DOC.set(construirSeedInicial());
+    }
+  }catch(e){
+    console.warn('No se pudo conectar con el panel de administrador, usando datos locales', e);
+  }
+
+  // reconstruir estados que dependen de los arreglos ya actualizados
+  FAVORITAS.forEach(f=>{ if(!(f.id in favSize)) favSize[f.id]=f.sizes[0].id; if(!(f.id in favTopping)) favTopping[f.id]=f.toppingDefault; });
+  PREMIUM.forEach(p=>{ if(!(p.id in premSize)) premSize[p.id]=p.sizes[0].id; });
+  OTROS.forEach(o=>{ if(!(o.id in otrosQty)) otrosQty[o.id]=0; });
+  if(TAMANOS.length && !TAMANOS.find(t=>t.id===custom.tamano)) custom.tamano = TAMANOS[0].id;
+  if(BASES.length && !BASES.find(b=>b.id===custom.base)) custom.base = BASES[0].id;
+  if(CREMAS.length && !CREMAS.find(c=>c.id===custom.crema)) custom.crema = CREMAS[0].id;
+  if(FRUTAS.length && !FRUTAS.find(f=>f.id===custom.fruta)) custom.fruta = FRUTAS[0].id;
+  if(TOPPINGS.length && !TOPPINGS.find(t=>t.id===custom.topping)) custom.topping = TOPPINGS[0].id;
+
+  renderPersonalizador();
+  renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
+  renderCardList('premiumList', PREMIUM, premSize, 'Agregar');
+  renderOtros();
+  renderCart();
+  renderInfo();
+  renderOfertas();
+}
+
+document.body.insertAdjacentHTML('afterbegin', '<div id="ofertaBanner" class="oferta-banner" style="display:none;"></div>');
+cargarDatosRemotos();
 </script>
 </body>
 </html>
