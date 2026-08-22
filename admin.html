@@ -144,6 +144,11 @@ input:checked + .slider:before{transform:translateX(20px);}
 
     <!-- CATEGORIAS -->
     <div class="tab-panel" id="panel-categorias">
+      <div class="section-title">Orden y visibilidad</div>
+      <p class="empty-note" style="padding:0 0 10px;">Usa las flechas para reordenar cómo se ven en el sitio. Renombra o muestra/oculta cualquier categoría.</p>
+      <div id="ordenCategoriasContainer"></div>
+
+      <div class="section-title" style="margin-top:8px;">Categorías nuevas</div>
       <p class="empty-note" style="padding:6px 0 14px;">Crea nuevas secciones para tu menú (ej. Bebidas) con sus propios productos.</p>
       <div id="categoriasContainer"></div>
       <button class="btn-add" onclick="abrirModalCategoria(null)">+ Crear nueva categoría</button>
@@ -172,6 +177,19 @@ const MENU_DOC = db.collection('menu_data').doc('main');
 const OFERTAS_COL = db.collection('ofertas');
 
 const ADMIN_PASSWORD = "pf321NIMDA";
+
+function normalizarUrlImagen(url){
+  if(!url) return url;
+  url = url.trim();
+  // Google Drive: convierte distintos formatos de link a uno que sirve como imagen directa
+  let m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if(!m) m = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+  if(!m) m = url.match(/[?&]id=([^&]+)/);
+  if(m && m[1]){
+    return `https://lh3.googleusercontent.com/d/${m[1]}`;
+  }
+  return url;
+}
 
 let menu = null; // documento completo cargado desde Firestore
 
@@ -215,10 +233,23 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 });
 
 /* ---------- CARGA / GUARDADO ---------- */
+const FIXED_TABS = [
+  {key:'favoritas', defaultLabel:'Las favoritas'},
+  {key:'personalizada', defaultLabel:'Personalizada'},
+  {key:'premium', defaultLabel:'Premium'},
+  {key:'otros', defaultLabel:'Otros postres'},
+];
+
 async function cargarMenu(){
   const snap = await MENU_DOC.get();
-  menu = snap.exists ? snap.data() : {tamanos:[],bases:[],cremas:[],frutas:[],toppings:[],extras:[],favoritas:[],premium:[],otros:[],faq:[],categoriasExtra:[]};
+  menu = snap.exists ? snap.data() : {tamanos:[],bases:[],cremas:[],frutas:[],toppings:[],extras:[],favoritas:[],premium:[],otros:[],faq:[],categoriasExtra:[],categoriasOrden:[],categoriasOcultas:[],categoriasLabels:{}};
   ['tamanos','bases','cremas','frutas','toppings','extras','favoritas','premium','otros','faq','categoriasExtra'].forEach(k=>{ if(!menu[k]) menu[k]=[]; });
+  if(!menu.categoriasOrden || !menu.categoriasOrden.length) menu.categoriasOrden = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id));
+  if(!menu.categoriasOcultas) menu.categoriasOcultas = [];
+  if(!menu.categoriasLabels) menu.categoriasLabels = {};
+  // agrega al orden cualquier categoría nueva que aún no esté registrada
+  const todasLasClaves = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id));
+  todasLasClaves.forEach(k=>{ if(!menu.categoriasOrden.includes(k)) menu.categoriasOrden.push(k); });
   renderTodo();
   cargarOfertas();
 }
@@ -358,16 +389,20 @@ function abrirModalProducto(catKey, idx){
   const esNuevo = idx===null;
   const item = esNuevo ? {nombre:'', desc:'', price: catKey==='otros'?0:undefined, sizes: catKey!=='otros'?[{id:'unico',label:'Único',price:0}]:undefined, disponible:true, img:''} : menu[catKey][idx];
   const usaTamanos = catKey!=='otros';
+  const img12 = (item.sizes||[]).find(s=>s.id==='12oz')?.img || '';
+  const img9 = (item.sizes||[]).find(s=>s.id==='9oz')?.img || '';
   const modal = document.getElementById('modalContent');
   modal.innerHTML = `
     <h3>${esNuevo?'Agregar producto':'Editar producto'}</h3>
     <div class="field"><label>Nombre</label><input id="f_nombre" value="${item.nombre||''}"></div>
     <div class="field"><label>Descripción</label><textarea id="f_desc" rows="2">${item.desc||''}</textarea></div>
-    <div class="field"><label>Foto (pega el link de la imagen)</label><input id="f_img" placeholder="https://..." value="${item.img||''}"></div>
-    <p class="item-sub" style="margin:-6px 0 10px;">Sube tu foto a un sitio como imgur.com y pega aquí el link. Deja vacío para quitar la foto.</p>
+    <div class="field"><label>Foto general (pega el link de la imagen)</label><input id="f_img" placeholder="https://..." value="${item.img||''}"></div>
+    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si no pones una foto específica por tamaño abajo. Sube tu foto a imgur.com (recomendado) o pega un link de Google Drive — deja vacío para quitarla.</p>
     ${usaTamanos ? `
       <div class="field"><label>Precio 12 oz (RD$)</label><input id="f_p12" type="number" value="${(item.sizes||[]).find(s=>s.id==='12oz')?.price ?? ''}"></div>
+      <div class="field"><label>Foto 12 oz (opcional, link de imagen)</label><input id="f_img12" placeholder="https://..." value="${img12}"></div>
       <div class="field"><label>Precio 9 oz (RD$, opcional)</label><input id="f_p9" type="number" value="${(item.sizes||[]).find(s=>s.id==='9oz')?.price ?? ''}"></div>
+      <div class="field"><label>Foto 9 oz (opcional, link de imagen)</label><input id="f_img9" placeholder="https://..." value="${img9}"></div>
     ` : `
       <div class="field"><label>Precio (RD$)</label><input id="f_price" type="number" value="${item.price ?? ''}"></div>
     `}
@@ -381,7 +416,7 @@ function abrirModalProducto(catKey, idx){
 async function guardarProducto(catKey, idx){
   const nombre = document.getElementById('f_nombre').value.trim();
   const desc = document.getElementById('f_desc').value.trim();
-  const img = document.getElementById('f_img').value.trim();
+  const img = normalizarUrlImagen(document.getElementById('f_img').value.trim());
   if(!nombre){ showToast('Falta el nombre'); return; }
   let nuevo;
   if(catKey==='otros'){
@@ -390,9 +425,11 @@ async function guardarProducto(catKey, idx){
   } else {
     const p12 = document.getElementById('f_p12').value;
     const p9 = document.getElementById('f_p9').value;
+    const img12 = normalizarUrlImagen(document.getElementById('f_img12').value.trim());
+    const img9 = normalizarUrlImagen(document.getElementById('f_img9').value.trim());
     const sizes = [];
-    if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12)});
-    if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9)});
+    if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12), img: img12||null});
+    if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9), img: img9||null});
     if(!sizes.length){ showToast('Agrega al menos un precio'); return; }
     nuevo = {id: idx!==null ? menu[catKey][idx].id : 'p_'+Date.now(), nombre, desc, sizes, img: img||null,
       toppingDefault: menu[catKey][idx]?.toppingDefault, cortesia: menu[catKey][idx]?.cortesia||false, disponible:true};
@@ -605,8 +642,119 @@ async function guardarFaq(idx){
   showToast('Guardado');
 }
 
+/* ---------- ORDEN Y VISIBILIDAD DE CATEGORÍAS ---------- */
+function catKeyLabel(key){
+  const fijo = FIXED_TABS.find(f=>f.key===key);
+  if(fijo){
+    const raw = menu.categoriasLabels[key];
+    if(typeof raw === 'string') return raw;
+    return (raw && raw.nombre) || fijo.defaultLabel;
+  }
+  const cat = menu.categoriasExtra.find(c=>'extra_'+c.id===key);
+  return cat ? cat.nombre : key;
+}
+
+function catKeyDesc(key){
+  const fijo = FIXED_TABS.find(f=>f.key===key);
+  if(fijo){
+    const raw = menu.categoriasLabels[key];
+    if(raw && typeof raw === 'object' && raw.desc !== undefined) return raw.desc;
+    return fijo.defaultDesc;
+  }
+  const cat = menu.categoriasExtra.find(c=>'extra_'+c.id===key);
+  return cat ? (cat.descripcion || '') : '';
+}
+
+function renderOrdenCategorias(){
+  const cont = document.getElementById('ordenCategoriasContainer');
+  if(!cont) return;
+  cont.innerHTML = '';
+  const orden = menu.categoriasOrden;
+  orden.forEach((key, idx)=>{
+    const esFija = FIXED_TABS.some(f=>f.key===key);
+    const oculta = menu.categoriasOcultas.includes(key);
+    const row = document.createElement('div');
+    row.className = 'card card-row';
+    row.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; flex:1;">
+        <div style="display:flex; flex-direction:column;">
+          <button class="small-btn btn-edit" style="padding:2px 8px;" ${idx===0?'disabled':''}>▲</button>
+          <button class="small-btn btn-edit" style="padding:2px 8px; margin-top:4px;" ${idx===orden.length-1?'disabled':''}>▼</button>
+        </div>
+        <div class="item-name">${catKeyLabel(key)}${esFija?'':' <span class="item-sub">(personalizada)</span>'}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button class="small-btn btn-edit" id="renombrar_${idx}">Renombrar</button>
+        ${esFija ? `<label class="switch"><input type="checkbox" id="ocultar_${idx}" ${oculta?'':'checked'}><span class="slider"></span></label>` : ''}
+      </div>`;
+    const [upBtn, downBtn] = row.querySelectorAll('.btn-edit[style*="padding:2px"]');
+    upBtn.addEventListener('click', async ()=>{
+      if(idx===0) return;
+      [orden[idx-1], orden[idx]] = [orden[idx], orden[idx-1]];
+      await guardarMenu();
+      renderOrdenCategorias();
+      showToast('Orden actualizado');
+    });
+    downBtn.addEventListener('click', async ()=>{
+      if(idx===orden.length-1) return;
+      [orden[idx+1], orden[idx]] = [orden[idx], orden[idx+1]];
+      await guardarMenu();
+      renderOrdenCategorias();
+      showToast('Orden actualizado');
+    });
+    row.querySelector(`#renombrar_${idx}`).addEventListener('click', ()=> abrirModalRenombrar(key));
+    const chk = row.querySelector(`#ocultar_${idx}`);
+    if(chk){
+      chk.addEventListener('change', async (e)=>{
+        if(e.target.checked){
+          menu.categoriasOcultas = menu.categoriasOcultas.filter(k=>k!==key);
+        } else {
+          menu.categoriasOcultas.push(key);
+        }
+        await guardarMenu();
+        showToast(e.target.checked ? 'Categoría visible' : 'Categoría oculta para los clientes');
+      });
+    }
+    cont.appendChild(row);
+  });
+}
+
+function abrirModalRenombrar(key){
+  const esFija = FIXED_TABS.some(f=>f.key===key);
+  const nombreActual = catKeyLabel(key);
+  const descActual = catKeyDesc(key);
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <h3>Renombrar categoría</h3>
+    <div class="field"><label>Nombre</label><input id="f_renombrar" value="${nombreActual}"></div>
+    <div class="field"><label>Descripción corta (se ve debajo del nombre)</label><input id="f_renombrar_desc" value="${descActual}" placeholder="Ej. Combinaciones ya creadas"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarRenombrar('${key}', ${esFija})">Guardar</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('active');
+}
+
+async function guardarRenombrar(key, esFija){
+  const nuevoNombre = document.getElementById('f_renombrar').value.trim();
+  const nuevaDesc = document.getElementById('f_renombrar_desc').value.trim();
+  if(!nuevoNombre){ showToast('Escribe un nombre'); return; }
+  if(esFija){
+    menu.categoriasLabels[key] = {nombre: nuevoNombre, desc: nuevaDesc};
+  } else {
+    const cat = menu.categoriasExtra.find(c=>'extra_'+c.id===key);
+    if(cat){ cat.nombre = nuevoNombre; cat.descripcion = nuevaDesc; }
+  }
+  await guardarMenu();
+  cerrarModal();
+  renderOrdenCategorias();
+  renderCategorias();
+  showToast('Guardado');
+}
+
 /* ---------- CATEGORÍAS EXTRA ---------- */
 function renderCategorias(){
+  renderOrdenCategorias();
   const cont = document.getElementById('categoriasContainer');
   cont.innerHTML = '';
   if(!menu.categoriasExtra.length){
@@ -629,7 +777,11 @@ function renderCategorias(){
     card.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalCategoria(catIdx));
     card.querySelector('.btn-del').addEventListener('click', async ()=>{
       if(confirm(`¿Eliminar la categoría "${cat.nombre}" y todos sus productos?`)){
+        const claveOrden = 'extra_'+cat.id;
         menu.categoriasExtra.splice(catIdx,1);
+        menu.categoriasOrden = menu.categoriasOrden.filter(k=>k!==claveOrden);
+        menu.categoriasOcultas = menu.categoriasOcultas.filter(k=>k!==claveOrden);
+        delete menu.categoriasLabels[claveOrden];
         await guardarMenu();
         renderCategorias();
         showToast('Categoría eliminada');
@@ -672,11 +824,12 @@ function renderCategorias(){
 
 function abrirModalCategoria(idx){
   const esNuevo = idx===null;
-  const item = esNuevo ? {nombre:''} : menu.categoriasExtra[idx];
+  const item = esNuevo ? {nombre:'', descripcion:''} : menu.categoriasExtra[idx];
   const modal = document.getElementById('modalContent');
   modal.innerHTML = `
     <h3>${esNuevo?'Nueva categoría':'Editar categoría'}</h3>
     <div class="field"><label>Nombre de la categoría (ej. Bebidas)</label><input id="f_cat_nombre" value="${item.nombre||''}"></div>
+    <div class="field"><label>Descripción corta (se ve debajo del nombre)</label><input id="f_cat_desc" value="${item.descripcion||''}" placeholder="Ej. Refrescantes y frías"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
       <button class="btn-save" onclick="guardarCategoria(${esNuevo?'null':idx})">Guardar</button>
@@ -686,11 +839,15 @@ function abrirModalCategoria(idx){
 
 async function guardarCategoria(idx){
   const nombre = document.getElementById('f_cat_nombre').value.trim();
+  const descripcion = document.getElementById('f_cat_desc').value.trim();
   if(!nombre){ showToast('Escribe un nombre'); return; }
   if(idx!==null){
     menu.categoriasExtra[idx].nombre = nombre;
+    menu.categoriasExtra[idx].descripcion = descripcion;
   } else {
-    menu.categoriasExtra.push({id:'cat_'+Date.now(), nombre, items:[]});
+    const nuevaCat = {id:'cat_'+Date.now(), nombre, descripcion, items:[]};
+    menu.categoriasExtra.push(nuevaCat);
+    menu.categoriasOrden.push('extra_'+nuevaCat.id);
   }
   await guardarMenu();
   cerrarModal();
@@ -703,14 +860,19 @@ function abrirModalProductoCategoria(catIdx, prodIdx){
   const esNuevo = prodIdx===null;
   const cat = menu.categoriasExtra[catIdx];
   const item = esNuevo ? {nombre:'', desc:'', img:'', sizes:[]} : cat.items[prodIdx];
+  const img12 = (item.sizes||[]).find(s=>s.id==='12oz')?.img || '';
+  const img9 = (item.sizes||[]).find(s=>s.id==='9oz')?.img || '';
   const modal = document.getElementById('modalContent');
   modal.innerHTML = `
     <h3>${esNuevo?'Agregar producto':'Editar producto'} — ${cat.nombre}</h3>
     <div class="field"><label>Nombre</label><input id="f_cp_nombre" value="${item.nombre||''}"></div>
     <div class="field"><label>Descripción</label><textarea id="f_cp_desc" rows="2">${item.desc||''}</textarea></div>
-    <div class="field"><label>Foto (pega el link de la imagen)</label><input id="f_cp_img" placeholder="https://..." value="${item.img||''}"></div>
+    <div class="field"><label>Foto general (pega el link de la imagen)</label><input id="f_cp_img" placeholder="https://..." value="${item.img||''}"></div>
+    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si no pones foto específica por tamaño. Imgur.com (recomendado) o Google Drive.</p>
     <div class="field"><label>Precio 12 oz (RD$)</label><input id="f_cp_p12" type="number" value="${(item.sizes||[]).find(s=>s.id==='12oz')?.price ?? ''}"></div>
+    <div class="field"><label>Foto 12 oz (opcional)</label><input id="f_cp_img12" placeholder="https://..." value="${img12}"></div>
     <div class="field"><label>Precio 9 oz (RD$, opcional)</label><input id="f_cp_p9" type="number" value="${(item.sizes||[]).find(s=>s.id==='9oz')?.price ?? ''}"></div>
+    <div class="field"><label>Foto 9 oz (opcional)</label><input id="f_cp_img9" placeholder="https://..." value="${img9}"></div>
     <p class="item-sub" style="margin:-4px 0 10px;">Si tu producto no se mide en onzas, deja el precio de 12 oz como precio único.</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
@@ -723,13 +885,15 @@ async function guardarProductoCategoria(catIdx, prodIdx){
   const cat = menu.categoriasExtra[catIdx];
   const nombre = document.getElementById('f_cp_nombre').value.trim();
   const desc = document.getElementById('f_cp_desc').value.trim();
-  const img = document.getElementById('f_cp_img').value.trim();
+  const img = normalizarUrlImagen(document.getElementById('f_cp_img').value.trim());
+  const img12 = normalizarUrlImagen(document.getElementById('f_cp_img12').value.trim());
+  const img9 = normalizarUrlImagen(document.getElementById('f_cp_img9').value.trim());
   const p12 = document.getElementById('f_cp_p12').value;
   const p9 = document.getElementById('f_cp_p9').value;
   if(!nombre){ showToast('Falta el nombre'); return; }
   const sizes = [];
-  if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12)});
-  if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9)});
+  if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12), img: img12||null});
+  if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9), img: img9||null});
   if(!sizes.length){ showToast('Agrega al menos un precio'); return; }
   const nuevo = {id: prodIdx!==null ? cat.items[prodIdx].id : 'p_'+Date.now(), nombre, desc, img: img||null, sizes, disponible:true};
   if(prodIdx!==null){ nuevo.disponible = cat.items[prodIdx].disponible!==false; cat.items[prodIdx] = nuevo; } else { cat.items.push(nuevo); }
