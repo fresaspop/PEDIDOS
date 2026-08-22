@@ -385,24 +385,68 @@ function renderProductos(){
   });
 }
 
+/* ---------- EDITOR GENÉRICO DE TAMAÑOS (reutilizable en cualquier producto) ---------- */
+let currentModalSizes = [];
+
+function slugify(text){
+  return text.toString().toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'') || 'sz';
+}
+
+function renderSizeRowsUI(){
+  const cont = document.getElementById('sizeRowsContainer');
+  if(!cont) return;
+  cont.innerHTML = currentModalSizes.map((s, i)=>`
+    <div class="card" style="margin-bottom:8px; padding:10px;">
+      <div style="display:flex; gap:8px; align-items:flex-end;">
+        <div class="field" style="flex:1; margin-bottom:0;"><label>Nombre del tamaño</label><input class="sz-label" data-i="${i}" value="${s.label||''}" placeholder="Ej. 16 oz, Plato Dubái, Paquete x6"></div>
+        <div class="field" style="width:88px; margin-bottom:0;"><label>Precio</label><input class="sz-price" data-i="${i}" type="number" value="${s.price??''}"></div>
+        <button class="small-btn btn-del sz-remove" data-i="${i}" style="height:38px;">✕</button>
+      </div>
+      <div class="field" style="margin-top:8px; margin-bottom:0;"><label>Foto de este tamaño (opcional)</label><input class="sz-img" data-i="${i}" value="${s.img||''}" placeholder="https://..."></div>
+    </div>`).join('');
+  cont.querySelectorAll('.sz-label').forEach(inp=> inp.addEventListener('input', e=>{ currentModalSizes[Number(e.target.dataset.i)].label = e.target.value; }));
+  cont.querySelectorAll('.sz-price').forEach(inp=> inp.addEventListener('input', e=>{ currentModalSizes[Number(e.target.dataset.i)].price = Number(e.target.value)||0; }));
+  cont.querySelectorAll('.sz-img').forEach(inp=> inp.addEventListener('input', e=>{ currentModalSizes[Number(e.target.dataset.i)].img = e.target.value; }));
+  cont.querySelectorAll('.sz-remove').forEach(btn=> btn.addEventListener('click', ()=>{
+    currentModalSizes.splice(Number(btn.dataset.i),1);
+    renderSizeRowsUI();
+  }));
+}
+
+function agregarSizeRow(){
+  currentModalSizes.push({id:null, label:'', price:0, img:''});
+  renderSizeRowsUI();
+}
+
+function recogerSizesDesdeUI(){
+  return currentModalSizes
+    .filter(s=> (s.label||'').trim())
+    .map(s=>({
+      id: s.id || slugify(s.label),
+      label: s.label.trim(),
+      price: Number(s.price)||0,
+      img: s.img ? normalizarUrlImagen(s.img.trim()) : null,
+    }));
+}
+
 function abrirModalProducto(catKey, idx){
   const esNuevo = idx===null;
-  const item = esNuevo ? {nombre:'', desc:'', price: catKey==='otros'?0:undefined, sizes: catKey!=='otros'?[{id:'unico',label:'Único',price:0}]:undefined, disponible:true, img:''} : menu[catKey][idx];
+  const item = esNuevo ? {nombre:'', desc:'', price: catKey==='otros'?0:undefined, sizes: catKey!=='otros'?[]:undefined, disponible:true, img:''} : menu[catKey][idx];
   const usaTamanos = catKey!=='otros';
-  const img12 = (item.sizes||[]).find(s=>s.id==='12oz')?.img || '';
-  const img9 = (item.sizes||[]).find(s=>s.id==='9oz')?.img || '';
+  currentModalSizes = usaTamanos ? (item.sizes||[]).map(s=>({...s})) : [];
   const modal = document.getElementById('modalContent');
   modal.innerHTML = `
     <h3>${esNuevo?'Agregar producto':'Editar producto'}</h3>
     <div class="field"><label>Nombre</label><input id="f_nombre" value="${item.nombre||''}"></div>
     <div class="field"><label>Descripción</label><textarea id="f_desc" rows="2">${item.desc||''}</textarea></div>
     <div class="field"><label>Foto general (pega el link de la imagen)</label><input id="f_img" placeholder="https://..." value="${item.img||''}"></div>
-    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si no pones una foto específica por tamaño abajo. Sube tu foto a imgur.com (recomendado) o pega un link de Google Drive — deja vacío para quitarla.</p>
+    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si un tamaño no tiene foto propia. Postimages.org o ImgBB.com (recomendados) — deja vacío para quitarla.</p>
     ${usaTamanos ? `
-      <div class="field"><label>Precio 12 oz (RD$)</label><input id="f_p12" type="number" value="${(item.sizes||[]).find(s=>s.id==='12oz')?.price ?? ''}"></div>
-      <div class="field"><label>Foto 12 oz (opcional, link de imagen)</label><input id="f_img12" placeholder="https://..." value="${img12}"></div>
-      <div class="field"><label>Precio 9 oz (RD$, opcional)</label><input id="f_p9" type="number" value="${(item.sizes||[]).find(s=>s.id==='9oz')?.price ?? ''}"></div>
-      <div class="field"><label>Foto 9 oz (opcional, link de imagen)</label><input id="f_img9" placeholder="https://..." value="${img9}"></div>
+      <label class="topping-label" style="display:block; margin-bottom:6px;">Tamaños y precios</label>
+      <div id="sizeRowsContainer"></div>
+      <button type="button" class="small-btn btn-edit" style="margin-bottom:12px;" onclick="agregarSizeRow()">+ Agregar tamaño</button>
     ` : `
       <div class="field"><label>Precio (RD$)</label><input id="f_price" type="number" value="${item.price ?? ''}"></div>
     `}
@@ -411,6 +455,7 @@ function abrirModalProducto(catKey, idx){
       <button class="btn-save" onclick="guardarProducto('${catKey}', ${esNuevo?'null':idx})">Guardar</button>
     </div>`;
   document.getElementById('overlay').classList.add('active');
+  if(usaTamanos) renderSizeRowsUI();
 }
 
 async function guardarProducto(catKey, idx){
@@ -423,14 +468,8 @@ async function guardarProducto(catKey, idx){
     const price = Number(document.getElementById('f_price').value)||0;
     nuevo = {id: idx!==null ? menu[catKey][idx].id : 'p_'+Date.now(), nombre, desc, price, img: img||null, disponible:true};
   } else {
-    const p12 = document.getElementById('f_p12').value;
-    const p9 = document.getElementById('f_p9').value;
-    const img12 = normalizarUrlImagen(document.getElementById('f_img12').value.trim());
-    const img9 = normalizarUrlImagen(document.getElementById('f_img9').value.trim());
-    const sizes = [];
-    if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12), img: img12||null});
-    if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9), img: img9||null});
-    if(!sizes.length){ showToast('Agrega al menos un precio'); return; }
+    const sizes = recogerSizesDesdeUI();
+    if(!sizes.length){ showToast('Agrega al menos un tamaño'); return; }
     nuevo = {id: idx!==null ? menu[catKey][idx].id : 'p_'+Date.now(), nombre, desc, sizes, img: img||null,
       toppingDefault: menu[catKey][idx]?.toppingDefault, cortesia: menu[catKey][idx]?.cortesia||false, disponible:true};
     if(idx!==null) nuevo.disponible = menu[catKey][idx].disponible!==false;
@@ -446,9 +485,47 @@ async function guardarProducto(catKey, idx){
 function renderIngredientes(){
   const cont = document.getElementById('ingContainer');
   cont.innerHTML = '';
+
+  // Sección especial: Tamaños de Personalizada (tienen precio y foto propia, no "costo extra")
+  const titleTam = document.createElement('div');
+  titleTam.className = 'section-title';
+  titleTam.textContent = 'Tamaños (paso "Personalizada")';
+  cont.appendChild(titleTam);
+  (menu.tamanos||[]).forEach((item, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-row">
+        <div>
+          <div class="item-name">${item.label}</div>
+          <div class="item-sub">RD$${item.price}</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="small-btn btn-edit">Editar</button>
+          <button class="small-btn btn-del">Eliminar</button>
+        </div>
+      </div>`;
+    card.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalTamano(idx));
+    card.querySelector('.btn-del').addEventListener('click', async ()=>{
+      if(confirm(`¿Eliminar el tamaño "${item.label}"?`)){
+        menu.tamanos.splice(idx,1);
+        await guardarMenu();
+        renderTodo();
+        showToast('Eliminado');
+      }
+    });
+    cont.appendChild(card);
+  });
+  const addTamBtn = document.createElement('button');
+  addTamBtn.className = 'btn-add';
+  addTamBtn.textContent = '+ Agregar tamaño (ej. 16 oz, Plato Dubái, Paquete)';
+  addTamBtn.addEventListener('click', ()=> abrirModalTamano(null));
+  cont.appendChild(addTamBtn);
+
   CATS.filter(c=>c.key!=='tamanos').forEach(cat=>{
     const title = document.createElement('div');
     title.className = 'section-title';
+    title.style.marginTop = '22px';
     title.textContent = cat.label;
     cont.appendChild(title);
     (menu[cat.key]||[]).forEach((item, idx)=>{
@@ -482,6 +559,40 @@ function renderIngredientes(){
     addBtn.addEventListener('click', ()=> abrirModalIngrediente(cat.key, null));
     cont.appendChild(addBtn);
   });
+}
+
+function abrirModalTamano(idx){
+  const esNuevo = idx===null;
+  const item = esNuevo ? {label:'', price:0, img:''} : menu.tamanos[idx];
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <h3>${esNuevo?'Agregar tamaño':'Editar tamaño'}</h3>
+    <div class="field"><label>Nombre (ej. 16 oz, Plato Dubái, Paquete x6)</label><input id="f_tam_label" value="${item.label||''}"></div>
+    <div class="field"><label>Precio (RD$)</label><input id="f_tam_price" type="number" value="${item.price ?? ''}"></div>
+    <div class="field"><label>Foto (opcional)</label><input id="f_tam_img" placeholder="https://..." value="${item.img||''}"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" onclick="guardarTamano(${esNuevo?'null':idx})">Guardar</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('active');
+}
+
+async function guardarTamano(idx){
+  const label = document.getElementById('f_tam_label').value.trim();
+  const price = Number(document.getElementById('f_tam_price').value)||0;
+  const img = normalizarUrlImagen(document.getElementById('f_tam_img').value.trim());
+  if(!label){ showToast('Falta el nombre'); return; }
+  if(idx!==null){
+    menu.tamanos[idx].label = label;
+    menu.tamanos[idx].price = price;
+    menu.tamanos[idx].img = img || null;
+  } else {
+    menu.tamanos.push({id:slugify(label), label, price, img: img||null, disponible:true});
+  }
+  await guardarMenu();
+  cerrarModal();
+  renderTodo();
+  showToast('Guardado');
 }
 
 function abrirModalIngrediente(catKey, idx){
@@ -685,7 +796,7 @@ function renderOrdenCategorias(){
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
         <button class="small-btn btn-edit" id="renombrar_${idx}">Renombrar</button>
-        ${esFija ? `<label class="switch"><input type="checkbox" id="ocultar_${idx}" ${oculta?'':'checked'}><span class="slider"></span></label>` : ''}
+        <label class="switch"><input type="checkbox" id="ocultar_${idx}" ${oculta?'':'checked'}><span class="slider"></span></label>
       </div>`;
     const [upBtn, downBtn] = row.querySelectorAll('.btn-edit[style*="padding:2px"]');
     upBtn.addEventListener('click', async ()=>{
@@ -860,25 +971,24 @@ function abrirModalProductoCategoria(catIdx, prodIdx){
   const esNuevo = prodIdx===null;
   const cat = menu.categoriasExtra[catIdx];
   const item = esNuevo ? {nombre:'', desc:'', img:'', sizes:[]} : cat.items[prodIdx];
-  const img12 = (item.sizes||[]).find(s=>s.id==='12oz')?.img || '';
-  const img9 = (item.sizes||[]).find(s=>s.id==='9oz')?.img || '';
+  currentModalSizes = (item.sizes||[]).map(s=>({...s}));
   const modal = document.getElementById('modalContent');
   modal.innerHTML = `
     <h3>${esNuevo?'Agregar producto':'Editar producto'} — ${cat.nombre}</h3>
     <div class="field"><label>Nombre</label><input id="f_cp_nombre" value="${item.nombre||''}"></div>
     <div class="field"><label>Descripción</label><textarea id="f_cp_desc" rows="2">${item.desc||''}</textarea></div>
     <div class="field"><label>Foto general (pega el link de la imagen)</label><input id="f_cp_img" placeholder="https://..." value="${item.img||''}"></div>
-    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si no pones foto específica por tamaño. Imgur.com (recomendado) o Google Drive.</p>
-    <div class="field"><label>Precio 12 oz (RD$)</label><input id="f_cp_p12" type="number" value="${(item.sizes||[]).find(s=>s.id==='12oz')?.price ?? ''}"></div>
-    <div class="field"><label>Foto 12 oz (opcional)</label><input id="f_cp_img12" placeholder="https://..." value="${img12}"></div>
-    <div class="field"><label>Precio 9 oz (RD$, opcional)</label><input id="f_cp_p9" type="number" value="${(item.sizes||[]).find(s=>s.id==='9oz')?.price ?? ''}"></div>
-    <div class="field"><label>Foto 9 oz (opcional)</label><input id="f_cp_img9" placeholder="https://..." value="${img9}"></div>
-    <p class="item-sub" style="margin:-4px 0 10px;">Si tu producto no se mide en onzas, deja el precio de 12 oz como precio único.</p>
+    <p class="item-sub" style="margin:-6px 0 10px;">Se usa si un tamaño no tiene foto propia. Postimages.org o ImgBB.com (recomendados).</p>
+    <label class="topping-label" style="display:block; margin-bottom:6px;">Tamaños y precios</label>
+    <div id="sizeRowsContainer"></div>
+    <button type="button" class="small-btn btn-edit" style="margin-bottom:12px;" onclick="agregarSizeRow()">+ Agregar tamaño</button>
+    <p class="item-sub" style="margin:-4px 0 10px;">Si tu producto tiene un solo precio, agrega un único tamaño (ej. "Único").</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
       <button class="btn-save" onclick="guardarProductoCategoria(${catIdx}, ${esNuevo?'null':prodIdx})">Guardar</button>
     </div>`;
   document.getElementById('overlay').classList.add('active');
+  renderSizeRowsUI();
 }
 
 async function guardarProductoCategoria(catIdx, prodIdx){
@@ -886,15 +996,9 @@ async function guardarProductoCategoria(catIdx, prodIdx){
   const nombre = document.getElementById('f_cp_nombre').value.trim();
   const desc = document.getElementById('f_cp_desc').value.trim();
   const img = normalizarUrlImagen(document.getElementById('f_cp_img').value.trim());
-  const img12 = normalizarUrlImagen(document.getElementById('f_cp_img12').value.trim());
-  const img9 = normalizarUrlImagen(document.getElementById('f_cp_img9').value.trim());
-  const p12 = document.getElementById('f_cp_p12').value;
-  const p9 = document.getElementById('f_cp_p9').value;
   if(!nombre){ showToast('Falta el nombre'); return; }
-  const sizes = [];
-  if(p12!=='') sizes.push({id:'12oz', label:'12 oz', price:Number(p12), img: img12||null});
-  if(p9!=='') sizes.push({id:'9oz', label:'9 oz', price:Number(p9), img: img9||null});
-  if(!sizes.length){ showToast('Agrega al menos un precio'); return; }
+  const sizes = recogerSizesDesdeUI();
+  if(!sizes.length){ showToast('Agrega al menos un tamaño'); return; }
   const nuevo = {id: prodIdx!==null ? cat.items[prodIdx].id : 'p_'+Date.now(), nombre, desc, img: img||null, sizes, disponible:true};
   if(prodIdx!==null){ nuevo.disponible = cat.items[prodIdx].disponible!==false; cat.items[prodIdx] = nuevo; } else { cat.items.push(nuevo); }
   await guardarMenu();

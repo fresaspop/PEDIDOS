@@ -448,7 +448,7 @@ img{max-width:100%; display:block;}
   <!-- Paso 1: Tamaño -->
   <div class="step-card">
     <div class="step-head"><div class="step-num">1</div><h3>Elige el tamaño</h3></div>
-    <div class="opt-imgwrap"><img id="sizePreviewImg" src="" alt="Vista previa"></div>
+    <div class="opt-imgwrap" id="sizePreviewWrap"><img id="sizePreviewImg" src="" alt="Vista previa"></div>
     <div class="opt-grid" id="sizeOpts"></div>
   </div>
 
@@ -762,7 +762,11 @@ function renderSizeOpts(){
     });
     cont.appendChild(btn);
   });
-  document.getElementById('sizePreviewImg').src = TAMANOS.find(t=>t.id===custom.tamano).img;
+  const tamActual = TAMANOS.find(t=>t.id===custom.tamano);
+  const previewWrap = document.getElementById('sizePreviewWrap');
+  previewWrap.innerHTML = tamActual && tamActual.img
+    ? `<img id="sizePreviewImg" src="${tamActual.img}" alt="Vista previa">`
+    : productImgHTML(null, 'Vista previa');
 }
 
 function toggleExtra(id){
@@ -1086,6 +1090,13 @@ function aplicarOrdenYEtiquetas(){
   // Asegura que cualquier clave que no esté en 'orden' (categoría nueva no guardada aún) se agregue al final
   const todasLasClaves = FIXED_TABS.map(f=>f.key).concat(CATEGORIAS_EXTRA.map(c=>'extra_'+c.id));
   todasLasClaves.forEach(k=>{ if(!orden.includes(k)) orden.push(k); });
+
+  // Visibilidad de las categorías nuevas (extra)
+  CATEGORIAS_EXTRA.forEach(cat=>{
+    const key = 'extra_'+cat.id;
+    const btn = document.querySelector(`.tab-btn[data-tab="${key}"]`);
+    if(btn) btn.style.display = ocultas.includes(key) ? 'none' : '';
+  });
 
   const tabsNav = document.getElementById('tabs');
   orden.forEach(key=>{
