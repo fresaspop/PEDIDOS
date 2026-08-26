@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fresas Pop — Mi tarjeta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#db5275; --accent-deep:#56091f; --rojo:#b62d11; --cream:#fff3f4;
+    --bg:#fff8f6; --surface:#ffffff; --border:#f0d6dc; --text:#34121b; --text-muted:#8a6570;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1{margin:0 0 8px;color:var(--accent-deep);text-align:center;font-size:1.3rem;}
+  p{margin:0 0 8px;}
+  main{max-width:420px;margin:0 auto;padding:24px 16px;}
+  .muted{color:var(--text-muted);font-size:0.9rem;text-align:center;}
+  .hidden{display:none !important;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:16px;}
+  input{font-family:inherit;font-size:1rem;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text);width:100%;margin-bottom:10px;}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:700;width:100%;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-wa{background:#25D366;color:#fff;margin-top:12px;}
+  .center{text-align:center;}
+
+  .loyalty-card{
+    background:linear-gradient(180deg,#fdd9e2,#fbcedb);
+    border-radius:18px;padding:18px 18px 14px;position:relative;overflow:hidden;
+    font-family:'Playfair Display',Georgia,serif;color:var(--accent-deep);
+    box-shadow:0 6px 18px rgba(86,9,31,0.12);margin-top:16px;
+  }
+  .loyalty-vip{position:absolute;top:14px;right:18px;font-size:0.8rem;font-style:italic;font-weight:600;}
+  .loyalty-name-row{background:#fff;border-radius:10px;padding:8px 12px;margin:20px 0 12px;font-size:1.15rem;font-weight:700;}
+  .loyalty-name-row span.lbl{font-size:0.75rem;font-weight:600;color:var(--text-muted);font-family:-apple-system,sans-serif;display:block;}
+  .loyalty-phone{font-size:0.8rem;opacity:0.75;margin:-8px 0 10px;font-family:-apple-system,sans-serif;text-align:left;}
+  .loyalty-rule{font-size:0.92rem;font-weight:600;text-align:center;margin-bottom:12px;line-height:1.35;}
+  .dot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
+  .dot{
+    aspect-ratio:1;border-radius:50%;background:#fff;border:2px solid var(--accent-deep);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:0.58rem;font-weight:700;color:var(--accent-deep);font-family:-apple-system,sans-serif;
+    line-height:1.05;padding:2px;
+  }
+  .dot.filled{background:var(--accent);border-color:var(--accent-deep);color:#fff;}
+  .loyalty-thanks{text-align:center;font-weight:700;font-size:1rem;margin:8px 0 10px;}
+  .loyalty-social{display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-family:-apple-system,sans-serif;margin-bottom:6px;}
+  .loyalty-msg{text-align:center;font-size:0.85rem;font-family:-apple-system,sans-serif;font-weight:700;margin-top:8px;}
+</style>
+</head>
+<body>
+<main>
+  <h1>🍓 Mi tarjeta Fresas Pop</h1>
+  <p class="muted">Escribe tu número de WhatsApp para ver tu tarjeta.</p>
+
+  <div class="card">
+    <input type="tel" id="phoneInput" placeholder="8091234567">
+    <button class="btn-primary" id="btnLookup">Ver mi tarjeta</button>
+  </div>
+
+  <div class="card hidden" id="notFoundCard">
+    <p class="center">No encontramos ese número. Revisa que esté bien escrito, o contáctanos por WhatsApp.</p>
+    <button class="btn-wa" id="btnWaHelp">Escribir por WhatsApp</button>
+  </div>
+
+  <div class="loyalty-card hidden" id="resultCard">
+    <div class="loyalty-vip">Cliente VIP</div>
+    <div class="loyalty-name-row"><span class="lbl">Nombre</span><span id="resName"></span></div>
+    <div class="loyalty-phone" id="resPhone"></div>
+    <div class="loyalty-rule">En tu 5ta compra gira la ruleta pop, y en la décima<br>¡una Canasta Pop, totalmente GRATIS!</div>
+    <div class="dot-grid" id="dotGrid"></div>
+    <div class="loyalty-thanks">¡Gracias por preferirnos!</div>
+    <div class="loyalty-social">
+      <span>📷 Instagram @fresaspop</span>
+      <span>💬 WhatsApp 829-707-6263</span>
+      <span>🎵 TikTok @fresaspop1</span>
+    </div>
+    <div class="loyalty-msg" id="resMsg"></div>
+  </div>
+</main>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyDr190z0obWeyDmm2UY6_5rZ_PqXUr883E",
+  authDomain: "adminfresaspop.firebaseapp.com",
+  projectId: "adminfresaspop",
+  storageBucket: "adminfresaspop.firebasestorage.app",
+  messagingSenderId: "840834985196",
+  appId: "1:840834985196:web:28f8fa890ace7ac3dc89c9"
+};
+const PUNTOS_POR_GIRO = 5;
+const PUNTOS_CICLO = 10;
+const PREMIO_CICLO = "Canasta Pop gratis";
+const WHATSAPP_NEGOCIO = "18297076263";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const $ = (sel) => document.querySelector(sel);
+
+function normalizePhone(raw){
+  const digits = String(raw||'').replace(/\D/g,'');
+  if (digits.length === 10) return '1' + digits;
+  return digits;
+}
+function waLink(number, text){
+  return 'https://wa.me/' + number + '?text=' + encodeURIComponent(text);
+}
+function cyclePos(points){
+  if (points<=0) return 0;
+  return points % PUNTOS_CICLO === 0 ? PUNTOS_CICLO : points % PUNTOS_CICLO;
+}
+
+$('#btnWaHelp').addEventListener('click', ()=>{
+  window.open(waLink(WHATSAPP_NEGOCIO, 'Hola, quisiera consultar mi tarjeta de Fresas Pop 🍓'), '_blank');
+});
+
+$('#phoneInput').addEventListener('keydown', (e)=>{ if (e.key==='Enter') lookup(); });
+$('#btnLookup').addEventListener('click', lookup);
+
+async function lookup(){
+  $('#notFoundCard').classList.add('hidden');
+  $('#resultCard').classList.add('hidden');
+  const phone = normalizePhone($('#phoneInput').value);
+  if (!phone){ return; }
+  try {
+    const snap = await getDocs(collection(db,'loyaltyCustomers'));
+    const clients = snap.docs.map(d=>d.data());
+    const client = clients.find(c => normalizePhone(c.phone) === phone);
+    if (!client){ $('#notFoundCard').classList.remove('hidden'); return; }
+
+    const points = client.points||0;
+    const pos = cyclePos(points);
+    const dotLabels = {3:'Ya casi', 5:'GIRA LA RULETA', 8:'Falta poco', 10:'🎁'};
+    $('#dotGrid').innerHTML = Array.from({length:10}, (_,i)=>{
+      const n = i+1;
+      const filled = n <= pos;
+      return `<div class="dot${filled?' filled':''}">${dotLabels[n]||''}</div>`;
+    }).join('');
+
+    $('#resName').textContent = client.name;
+    $('#resPhone').textContent = client.phone + ' · ' + points + ' compras en total';
+    $('#resMsg').textContent = pos === PUNTOS_CICLO
+      ? `¡Completaste tu tarjeta! Ganaste: ${PREMIO_CICLO} 🎁 — reclámalo por WhatsApp.`
+      : pos === PUNTOS_POR_GIRO
+        ? '¡Ya puedes girar la ruleta de premios! 🎉 Escríbenos por WhatsApp.'
+        : `Te faltan ${PUNTOS_CICLO - pos} compra(s) para completar tu tarjeta.`;
+    $('#resultCard').classList.remove('hidden');
+  } catch(err){
+    console.error(err);
+    $('#notFoundCard').classList.remove('hidden');
+  }
+}
+</script>
+</body>
+</html>

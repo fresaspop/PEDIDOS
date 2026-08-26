@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Fresas Pop — Fidelidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
   :root{
     --accent:#db5275;
@@ -51,14 +54,31 @@
   main{max-width:520px;margin:0 auto;padding:16px;}
   .setup-box{max-width:420px;margin:14vh auto;padding:20px;}
   .muted{color:var(--text-muted);font-size:0.88rem;}
-  .client-card{border-bottom:1px solid var(--border);padding:12px 0;}
-  .client-card:last-child{border-bottom:none;}
-  .client-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-  .client-name{font-weight:700;}
-  .client-phone{color:var(--text-muted);font-size:0.85rem;}
-  .points-bar{background:var(--cream);border-radius:999px;height:8px;overflow:hidden;margin:8px 0;}
-  .points-bar-fill{background:var(--accent);height:100%;border-radius:999px;}
-  .client-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .client-card{margin-bottom:16px;}
+  .loyalty-card{
+    background:linear-gradient(180deg,#fdd9e2,#fbcedb);
+    border-radius:18px;padding:18px 18px 14px;position:relative;overflow:hidden;
+    font-family:'Playfair Display',Georgia,serif;color:var(--accent-deep);
+    box-shadow:0 6px 18px rgba(86,9,31,0.12);
+  }
+  .loyalty-vip{position:absolute;top:14px;right:18px;font-size:0.8rem;font-style:italic;font-weight:600;color:var(--accent-deep);}
+  .loyalty-name-row{background:#fff;border-radius:10px;padding:8px 12px;margin:20px 0 12px;font-size:1.15rem;font-weight:700;}
+  .loyalty-name-row span.lbl{font-size:0.75rem;font-weight:600;color:var(--text-muted);font-family:-apple-system,sans-serif;display:block;}
+  .loyalty-phone{font-size:0.8rem;color:var(--accent-deep);opacity:0.75;margin:-8px 0 10px;font-family:-apple-system,sans-serif;}
+  .loyalty-rule{font-size:0.92rem;font-weight:600;text-align:center;margin-bottom:12px;line-height:1.35;}
+  .dot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
+  .dot{
+    aspect-ratio:1;border-radius:50%;background:#fff;border:2px solid var(--accent-deep);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-size:0.58rem;font-weight:700;color:var(--accent-deep);font-family:-apple-system,sans-serif;
+    line-height:1.05;padding:2px;
+  }
+  .dot.filled{background:var(--accent);border-color:var(--accent-deep);color:#fff;}
+  .loyalty-thanks{text-align:center;font-weight:700;font-size:1rem;margin:8px 0 10px;}
+  .loyalty-social{display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-family:-apple-system,sans-serif;color:var(--accent-deep);margin-bottom:6px;}
+  .loyalty-since{text-align:center;font-size:0.72rem;color:var(--accent-deep);opacity:0.7;font-family:-apple-system,sans-serif;}
+  .client-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .btn-count{padding:10px 14px;}
   .link-box{background:var(--cream);border-radius:10px;padding:10px;margin-top:8px;font-size:0.8rem;word-break:break-all;}
   .prize-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);}
   .prize-item:last-child{border-bottom:none;}
@@ -165,16 +185,24 @@ const SITE_PASSWORD = "fresaspop2026";
    Se cargan UNA sola vez con el botón de abajo. Después, edita/agrega/quita
    premios directamente en la lista. */
 const SEED_PRIZES = [
-  "🍓 Fresa Pop 9oz gratis",
-  "🎉 10% de descuento en tu próxima compra",
-  "🥄 Topping premium gratis",
-  "🎁 Extra 2oz gratis",
-  "🔄 Vuelve a girar la próxima vez",
+  "🍫 Nutella Gratis",
+  "🧺 Canastita Gratis",
+  "🍓 Extra Toppings",
+  "💀 Gracias por participar",
+  "🏆 25% de descuento",
+  "💀 Gracias por participar",
+  "🍪 Intenta de nuevo",
+  "💀 Gracias por participar",
 ];
 
-const PUNTOS_POR_GIRO = 5; // cada cuántas compras se desbloquea la ruleta
+const PUNTOS_POR_GIRO = 5;  // en esta compra de cada ciclo de 10 se desbloquea la ruleta
+const PUNTOS_CICLO = 10;    // en esta compra se completa la tarjeta y gana el premio garantizado
+const PREMIO_CICLO = "Canasta Pop gratis"; // premio garantizado al completar la tarjeta (compra 10)
 const RULETA_URL = "ruleta.html"; // cambia esto si subes ruleta.html a otra carpeta/ruta
+const MIS_PUNTOS_URL = "mis-puntos.html"; // página pública donde el cliente consulta sus puntos
 const WHATSAPP_NEGOCIO = "18297076263"; // tu número, con código de país, sin +
+const IG_HANDLE = "@fresaspop";
+const TIKTOK_HANDLE = "@fresaspop1";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -270,6 +298,14 @@ function bootApp(){
 
   $('#searchBox').addEventListener('input', renderClients);
 
+  // Posición dentro del ciclo actual de 10 (1-10). El total de compras
+  // (points) nunca se pierde/reinicia -- solo la tarjeta visual da la
+  // vuelta cada 10, como una tarjeta física nueva.
+  function cyclePos(points){
+    if (points<=0) return 0;
+    return points % PUNTOS_CICLO === 0 ? PUNTOS_CICLO : points % PUNTOS_CICLO;
+  }
+
   function renderClients(){
     $('#clientCount').textContent = state.clients.length;
     const q = $('#searchBox').value.trim().toLowerCase();
@@ -280,19 +316,37 @@ function bootApp(){
     if (list.length===0){ el.innerHTML = '<p class="muted">Nadie registrado todavía.</p>'; return; }
     el.innerHTML = list.map(c=>{
       const points = c.points||0;
-      const toNext = PUNTOS_POR_GIRO - (points % PUNTOS_POR_GIRO || PUNTOS_POR_GIRO);
-      const pct = Math.round(((points % PUNTOS_POR_GIRO) / PUNTOS_POR_GIRO) * 100);
-      const eligible = points>0 && points % PUNTOS_POR_GIRO === 0;
+      const pos = cyclePos(points);
+      const eligibleSpin = pos === PUNTOS_POR_GIRO;
+      const eligibleCiclo = pos === PUNTOS_CICLO;
+      const dotLabels = {3:'Ya casi', 5:'GIRA LA RULETA', 8:'Falta poco', 10:'🎁'};
+      const dots = Array.from({length:10}, (_,i)=>{
+        const n = i+1;
+        const filled = n <= pos;
+        return `<div class="dot${filled?' filled':''}">${dotLabels[n]||''}</div>`;
+      }).join('');
+      const since = c.createdAt && c.createdAt.toDate ? c.createdAt.toDate().toLocaleDateString('es-DO') : '';
       return `<div class="client-card" data-id="${c.id}">
-        <div class="client-top">
-          <div><div class="client-name">${c.name}</div><div class="client-phone">${c.phone}</div></div>
-          <span class="pill good">${points} compras</span>
+        <div class="loyalty-card">
+          <div class="loyalty-vip">Cliente VIP</div>
+          <div class="loyalty-name-row"><span class="lbl">Nombre</span>${c.name}</div>
+          <div class="loyalty-phone">${c.phone} · ${points} compras en total</div>
+          <div class="loyalty-rule">En tu 5ta compra gira la ruleta pop, y en la décima<br>¡una Canasta Pop, totalmente GRATIS!</div>
+          <div class="dot-grid">${dots}</div>
+          <div class="loyalty-thanks">¡Gracias por preferirnos!</div>
+          <div class="loyalty-social">
+            <span>📷 Instagram ${IG_HANDLE}</span>
+            <span>💬 WhatsApp ${WHATSAPP_NEGOCIO.replace(/^1(\d{3})(\d{3})(\d{4})$/,'$1-$2-$3')}</span>
+            <span>🎵 TikTok ${TIKTOK_HANDLE}</span>
+          </div>
+          ${since ? `<div class="loyalty-since">Cliente desde: ${since}</div>` : ''}
         </div>
-        <div class="points-bar"><div class="points-bar-fill" style="width:${pct}%;"></div></div>
-        <div class="muted" style="font-size:0.78rem;">${eligible ? '¡Ya puede girar la ruleta! 🎉' : toNext + ' compra(s) más para la ruleta'}</div>
         <div class="client-actions">
+          <button class="btn-ghost btn-count act-minuspoint">−1</button>
           <button class="btn-primary act-addpoint">+1 compra</button>
-          ${eligible ? '<button class="btn-secondary act-genlink">🎡 Generar link de ruleta</button>' : ''}
+          ${eligibleSpin ? '<button class="btn-secondary act-genlink">🎡 Generar link de ruleta</button>' : ''}
+          ${eligibleCiclo ? '<button class="btn-secondary act-sendciclo">🎁 Avisar premio de la tarjeta</button>' : ''}
+          <button class="btn-wa act-sendstatus">📲 Enviar estado</button>
           <button class="btn-ghost act-delclient">Eliminar</button>
         </div>
         <div class="linkbox-slot"></div>
@@ -309,14 +363,26 @@ function bootApp(){
         await updateDoc(doc(db,'loyaltyCustomers',id), {points:(client.points||0)+1});
         await loadClients();
       });
+      card.querySelector('.act-minuspoint').addEventListener('click', async ()=>{
+        await updateDoc(doc(db,'loyaltyCustomers',id), {points: Math.max(0,(client.points||0)-1)});
+        await loadClients();
+      });
       const genBtn = card.querySelector('.act-genlink');
       if (genBtn) genBtn.addEventListener('click', ()=> generateSpinLink(client, card));
+      const cicloBtn = card.querySelector('.act-sendciclo');
+      if (cicloBtn) cicloBtn.addEventListener('click', ()=> sendCicloPrize(client));
+      card.querySelector('.act-sendstatus').addEventListener('click', ()=> sendStatus(client));
       card.querySelector('.act-delclient').addEventListener('click', async ()=>{
         if (!confirm('¿Eliminar a '+client.name+' de la lista?')) return;
         await deleteDoc(doc(db,'loyaltyCustomers',id));
         await loadClients();
       });
     });
+  }
+
+  function sendCicloPrize(client){
+    const msg = `¡Felicidades ${client.name}! 🎁 Completaste tu tarjeta de Fresas Pop (10 compras) y ganaste: ${PREMIO_CICLO}. ¡Gracias por preferirnos! 🍓`;
+    window.open(waLink(client.phone, msg), '_blank');
   }
 
   async function generateSpinLink(client, card){
@@ -338,6 +404,18 @@ function bootApp(){
     slot.querySelector('.act-copy').addEventListener('click', async ()=>{
       try { await navigator.clipboard.writeText(link); } catch(e){}
     });
+  }
+
+  function sendStatus(client){
+    const points = client.points||0;
+    const pos = cyclePos(points);
+    const misPuntosLink = new URL(MIS_PUNTOS_URL, location.href).toString();
+    let situacion;
+    if (pos === PUNTOS_CICLO) situacion = `¡completaste tu tarjeta y ganaste ${PREMIO_CICLO}! 🎁`;
+    else if (pos === PUNTOS_POR_GIRO) situacion = '¡ya puedes girar la ruleta de premios! 🎉';
+    else situacion = `te faltan ${PUNTOS_CICLO - pos} compra(s) para completar tu tarjeta actual.`;
+    const msg = `¡Hola ${client.name}! 🍓 Llevas ${points} compras en total en Fresas Pop y ${situacion} Revisa tu tarjeta cuando quieras aquí: ${misPuntosLink}`;
+    window.open(waLink(client.phone, msg), '_blank');
   }
 
   /* ------------------------- PREMIOS ------------------------- */
