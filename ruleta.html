@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fresas Pop — Ruleta de premios</title>
+<style>
+  :root{
+    --accent:#db5275; --accent-deep:#56091f; --rojo:#b62d11; --cream:#fff3f4;
+    --bg:#fff8f6; --surface:#ffffff; --border:#f0d6dc; --text:#34121b; --text-muted:#8a6570;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;}
+  h1,h2{margin:0 0 8px;color:var(--accent-deep);text-align:center;}
+  p{margin:0 0 8px;text-align:center;}
+  main{max-width:420px;margin:0 auto;padding:24px 16px;display:flex;flex-direction:column;align-items:center;}
+  .muted{color:var(--text-muted);font-size:0.9rem;}
+  .hidden{display:none !important;}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:999px;padding:14px 28px;font-size:1rem;font-weight:700;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:disabled{background:#d8b4bf;}
+  .btn-wa{background:#25D366;color:#fff;margin-top:14px;}
+  .wheel-wrap{position:relative;width:280px;height:280px;margin:24px auto;}
+  .wheel{width:100%;height:100%;border-radius:50%;border:8px solid var(--accent-deep);position:relative;overflow:hidden;transition:transform 4.5s cubic-bezier(.17,.67,.16,1);box-shadow:0 8px 24px rgba(86,9,31,0.25);}
+  .wheel-pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:22px solid var(--accent-deep);z-index:5;}
+  .wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:#fff;border:4px solid var(--accent-deep);z-index:4;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+  .seg-label{position:absolute;left:50%;top:50%;transform-origin:0 0;font-size:0.7rem;font-weight:700;color:#fff;width:120px;text-align:right;padding-right:10px;}
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;margin-top:16px;width:100%;}
+  .result-card h2{font-size:1.3rem;}
+</style>
+</head>
+<body>
+<main>
+  <h1>🍓 Ruleta de premios</h1>
+
+  <section id="screen-loading"><p class="muted">Cargando...</p></section>
+
+  <section id="screen-invalid" class="hidden">
+    <p>Este link no es válido o ya expiró. Pide uno nuevo por WhatsApp. 🍓</p>
+  </section>
+
+  <section id="screen-used" class="hidden">
+    <p>Ya usaste esta ruleta — ¡gracias por participar!</p>
+    <div class="result-card" id="usedResultCard" style="display:none;">
+      <p class="muted">Tu premio fue:</p>
+      <h2 id="usedPrizeText"></h2>
+    </div>
+  </section>
+
+  <section id="screen-spin" class="hidden">
+    <p id="greeting"></p>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer"></div>
+      <div class="wheel" id="wheel"></div>
+      <div class="wheel-center">🍓</div>
+    </div>
+    <button class="btn-primary" id="btnSpin">Girar la ruleta</button>
+  </section>
+
+  <section id="screen-result" class="hidden">
+    <div class="result-card">
+      <p class="muted">¡Felicidades! Ganaste:</p>
+      <h2 id="resultPrizeText"></h2>
+      <p class="muted">Envíanos este resultado por WhatsApp para reclamarlo.</p>
+      <button class="btn-wa" id="btnSendWa">Enviar resultado por WhatsApp</button>
+    </div>
+  </section>
+
+</main>
+
+<script type="module">
+/* =========================================================================
+   FRESAS POP — RULETA DE PREMIOS (página pública)
+   Se abre con un link de un solo uso generado desde fidelidad.html
+   (?t=ID del token). Después de girar, marca el token como usado para que
+   no se pueda volver a girar con el mismo link.
+   ========================================================================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDr190z0obWeyDmm2UY6_5rZ_PqXUr883E",
+  authDomain: "adminfresaspop.firebaseapp.com",
+  projectId: "adminfresaspop",
+  storageBucket: "adminfresaspop.firebasestorage.app",
+  messagingSenderId: "840834985196",
+  appId: "1:840834985196:web:28f8fa890ace7ac3dc89c9"
+};
+const WHATSAPP_NEGOCIO = "18297076263"; // número de Fresas Pop, con código de país, sin +
+const WHEEL_COLORS = ['#db5275','#56091f','#b62d11','#f2a4b6','#8a6570','#e88ba0'];
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const $ = (sel) => document.querySelector(sel);
+
+function show(name){
+  ['loading','invalid','used','spin','result'].forEach(s=>{
+    $('#screen-'+s).classList.toggle('hidden', s!==name);
+  });
+}
+
+function waLink(number, text){
+  return 'https://wa.me/' + number + '?text=' + encodeURIComponent(text);
+}
+
+const params = new URLSearchParams(location.search);
+const token = params.get('t');
+
+(async function init(){
+  if (!token) { show('invalid'); return; }
+  try {
+    const spinRef = doc(db, 'loyaltySpins', token);
+    const spinSnap = await getDoc(spinRef);
+    if (!spinSnap.exists()) { show('invalid'); return; }
+    const spin = spinSnap.data();
+
+    if (spin.used) {
+      show('used');
+      if (spin.prizeWon) {
+        $('#usedResultCard').style.display = 'block';
+        $('#usedPrizeText').textContent = spin.prizeWon;
+      }
+      return;
+    }
+
+    const prizesSnap = await getDocs(collection(db,'loyaltyPrizes'));
+    const prizes = prizesSnap.docs.map(d=>d.data()).filter(p=>p.active!==false);
+    if (prizes.length === 0) { show('invalid'); return; }
+
+    $('#greeting').textContent = `¡Hola ${spin.customerName||''}! Toca el botón para girar.`;
+    buildWheel(prizes);
+    show('spin');
+
+    let spinning = false;
+    $('#btnSpin').addEventListener('click', async ()=>{
+      if (spinning) return;
+      spinning = true;
+      $('#btnSpin').disabled = true;
+
+      const n = prizes.length;
+      const winnerIdx = Math.floor(Math.random()*n);
+      const segAngle = 360/n;
+      // ángulo para que el puntero (arriba) caiga en el centro del segmento ganador
+      const targetAngle = 360*6 - (winnerIdx*segAngle + segAngle/2);
+      $('#wheel').style.transform = `rotate(${targetAngle}deg)`;
+
+      setTimeout(async ()=>{
+        const prizeWon = prizes[winnerIdx].name;
+        try {
+          await updateDoc(spinRef, { used:true, prizeWon, usedAt: new Date() });
+        } catch(e){ /* si falla el guardado igual mostramos el resultado */ }
+        $('#resultPrizeText').textContent = prizeWon;
+        show('result');
+        const msg = `¡Hola! Soy ${spin.customerName||''} 🎉 En la ruleta de Fresas Pop gané: ${prizeWon}`;
+        $('#btnSendWa').addEventListener('click', ()=>{
+          window.open(waLink(WHATSAPP_NEGOCIO, msg), '_blank');
+        });
+      }, 4600);
+    });
+  } catch(err){
+    console.error(err);
+    show('invalid');
+  }
+})();
+
+function buildWheel(prizes){
+  const wheel = $('#wheel');
+  const n = prizes.length;
+  const segAngle = 360/n;
+  let gradientParts = [];
+  prizes.forEach((p,i)=>{
+    const color = WHEEL_COLORS[i % WHEEL_COLORS.length];
+    gradientParts.push(`${color} ${i*segAngle}deg ${(i+1)*segAngle}deg`);
+  });
+  wheel.style.background = `conic-gradient(${gradientParts.join(',')})`;
+  prizes.forEach((p,i)=>{
+    const mid = i*segAngle + segAngle/2;
+    const label = document.createElement('div');
+    label.className = 'seg-label';
+    label.style.transform = `rotate(${mid}deg)`;
+    label.textContent = p.name.replace(/^[^\w\sáéíóúñÁÉÍÓÚÑ]+/u,'').trim();
+    wheel.appendChild(label);
+  });
+}
+</script>
+</body>
+</html>
