@@ -1266,6 +1266,10 @@ function renderCart(){
     <input type="text" class="form-input" id="nombreInput" placeholder="¿Cómo te llamas?">
   </div>
   <div class="form-group">
+    <label class="form-label">Tu WhatsApp</label>
+    <input type="tel" class="form-input" id="telefonoInput" placeholder="8091234567">
+  </div>
+  <div class="form-group">
     <label class="form-label">Notas / aclaraciones (opcional)</label>
     <textarea class="form-textarea" id="notasInput" placeholder="Ej. sin fresa en la base, tocar antes de entregar, etc."></textarea>
   </div>`;
@@ -1330,12 +1334,15 @@ function renderCart(){
 
   // restore field values if user typed then re-render triggered elsewhere (kept simple: fields reset on cart qty change, acceptable)
   const nombreInput = document.getElementById('nombreInput');
+  const telefonoInput = document.getElementById('telefonoInput');
   const notasInput = document.getElementById('notasInput');
   const billeteInput = document.getElementById('billeteInput');
   if(nombreInput) nombreInput.value = orderState.nombre || '';
+  if(telefonoInput) telefonoInput.value = orderState.telefono || '';
   if(notasInput) notasInput.value = orderState.notas || '';
   if(billeteInput) billeteInput.value = orderState.billete || '';
   if(nombreInput) nombreInput.addEventListener('input', e=> orderState.nombre = e.target.value);
+  if(telefonoInput) telefonoInput.addEventListener('input', e=> orderState.telefono = e.target.value);
   if(notasInput) notasInput.addEventListener('input', e=> orderState.notas = e.target.value);
   if(billeteInput) billeteInput.addEventListener('input', e=> orderState.billete = e.target.value);
 }
@@ -1353,7 +1360,9 @@ function showToast(msg){
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   if(cart.length===0) return;
   const nombre = (orderState.nombre||'').trim();
+  const telefono = (orderState.telefono||'').trim();
   if(!nombre){ showToast('Por favor escribe tu nombre'); document.getElementById('nombreInput')?.focus(); return; }
+  if(!telefono){ showToast('Por favor escribe tu WhatsApp'); document.getElementById('telefonoInput')?.focus(); return; }
   if(!orderState.delivery){ showToast('Indica si deseas delivery'); return; }
   if(!orderState.pago){ showToast('Elige un método de pago'); return; }
   if(orderState.pago==='efectivo' && !(orderState.billete||'').trim()){ showToast('Indica con qué billete pagarás'); return; }
@@ -1392,7 +1401,40 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
 
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
+
+  // Se registra (o actualiza) al cliente en la tarjeta de fidelidad, sin
+  // bloquear ni retrasar el envío del pedido por WhatsApp. Los puntos NO
+  // se suman aquí solas -- eso se hace a mano desde fidelidad.html cuando
+  // se confirma la compra.
+  registrarClienteFidelidad(nombre, telefono);
 });
+
+/* =========================================================
+   TARJETA DE FIDELIDAD — registrar cliente al hacer un pedido
+   (no suma compras, solo guarda nombre + WhatsApp para que ya
+   aparezca en fidelidad.html)
+   ========================================================= */
+function normalizarTelefonoFidelidad(raw){
+  const digits = String(raw||'').replace(/\D/g,'');
+  if(digits.length===10) return '1'+digits; // asume República Dominicana
+  return digits;
+}
+async function registrarClienteFidelidad(nombre, telefonoRaw){
+  try{
+    const phone = normalizarTelefonoFidelidad(telefonoRaw);
+    if(!phone) return;
+    const snap = await db.collection('loyaltyCustomers').where('phone','==',phone).limit(1).get();
+    if(!snap.empty){
+      await snap.docs[0].ref.update({name: nombre});
+    } else {
+      await db.collection('loyaltyCustomers').add({
+        name: nombre, phone, points: 0, createdAt: firebase.firestore.Timestamp.now(),
+      });
+    }
+  } catch(err){
+    console.error('No se pudo registrar en la tarjeta de fidelidad', err);
+  }
+}
 
 /* =========================================================
    MAS INFORMACION / FOOTER

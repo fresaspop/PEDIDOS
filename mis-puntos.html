@@ -28,26 +28,32 @@
   .center{text-align:center;}
 
   .loyalty-card{
-    background:linear-gradient(180deg,#fdd9e2,#fbcedb);
-    border-radius:18px;padding:18px 18px 14px;position:relative;overflow:hidden;
+    background:linear-gradient(150deg,#fff6f8,#fde2ea 65%,#fbd6e2);
+    border:1px solid #f6c9d6;
+    border-radius:24px;padding:24px 20px 18px;position:relative;overflow:hidden;
     font-family:'Playfair Display',Georgia,serif;color:var(--accent-deep);
-    box-shadow:0 6px 18px rgba(86,9,31,0.12);margin-top:16px;
+    box-shadow:0 10px 28px rgba(86,9,31,0.10);margin-top:16px;text-align:center;
   }
-  .loyalty-vip{position:absolute;top:14px;right:18px;font-size:0.8rem;font-style:italic;font-weight:600;}
-  .loyalty-name-row{background:#fff;border-radius:10px;padding:8px 12px;margin:20px 0 12px;font-size:1.15rem;font-weight:700;}
-  .loyalty-name-row span.lbl{font-size:0.75rem;font-weight:600;color:var(--text-muted);font-family:-apple-system,sans-serif;display:block;}
-  .loyalty-phone{font-size:0.8rem;opacity:0.75;margin:-8px 0 10px;font-family:-apple-system,sans-serif;text-align:left;}
-  .loyalty-rule{font-size:0.92rem;font-weight:600;text-align:center;margin-bottom:12px;line-height:1.35;}
-  .dot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
+  .loyalty-badge{
+    display:inline-flex;align-items:center;gap:6px;margin:0 auto 14px;
+    background:#fff;border:1px solid #f0c3d2;border-radius:999px;
+    padding:5px 16px;font-size:0.68rem;font-weight:700;letter-spacing:.12em;
+    color:var(--accent);font-family:-apple-system,sans-serif;text-transform:uppercase;
+  }
+  .loyalty-name{font-size:1.35rem;font-weight:700;margin-bottom:2px;}
+  .loyalty-phone{font-size:0.78rem;opacity:0.6;margin-bottom:14px;font-family:-apple-system,sans-serif;}
+  .loyalty-divider{width:56px;height:1px;background:linear-gradient(90deg,transparent,#e8a9bd,transparent);margin:0 auto 14px;position:relative;}
+  .loyalty-divider::after{content:'✦';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fde7ee;color:#e8a9bd;font-size:0.65rem;padding:0 6px;}
+  .loyalty-rule{font-size:0.85rem;font-style:italic;font-weight:500;text-align:center;margin-bottom:16px;line-height:1.4;opacity:0.85;}
+  .dot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:8px;}
   .dot{
-    aspect-ratio:1;border-radius:50%;background:#fff;border:2px solid var(--accent-deep);
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    font-size:0.58rem;font-weight:700;color:var(--accent-deep);font-family:-apple-system,sans-serif;
-    line-height:1.05;padding:2px;
+    aspect-ratio:1;border-radius:50%;background:#fff;border:1.5px solid #f0c3d2;
+    display:flex;align-items:center;justify-content:center;font-size:1.05rem;
+    color:#f0c3d2;box-shadow:inset 0 1px 2px rgba(86,9,31,0.05);
   }
-  .dot.filled{background:var(--accent);border-color:var(--accent-deep);color:#fff;}
-  .loyalty-thanks{text-align:center;font-weight:700;font-size:1rem;margin:8px 0 10px;}
-  .loyalty-social{display:flex;flex-direction:column;gap:3px;font-size:0.78rem;font-family:-apple-system,sans-serif;margin-bottom:6px;}
+  .dot.filled{background:#fff0f4;border-color:var(--accent);}
+  .dot-caption{font-size:0.66rem;font-family:-apple-system,sans-serif;color:var(--accent-deep);opacity:0.55;margin-bottom:14px;letter-spacing:.02em;}
+  .loyalty-thanks{text-align:center;font-style:italic;font-weight:600;font-size:0.95rem;margin-bottom:6px;}
   .loyalty-msg{text-align:center;font-size:0.85rem;font-family:-apple-system,sans-serif;font-weight:700;margin-top:8px;}
 </style>
 </head>
@@ -67,17 +73,14 @@
   </div>
 
   <div class="loyalty-card hidden" id="resultCard">
-    <div class="loyalty-vip">Cliente VIP</div>
-    <div class="loyalty-name-row"><span class="lbl">Nombre</span><span id="resName"></span></div>
+    <div class="loyalty-badge">🍓 Cliente VIP</div>
+    <div class="loyalty-name" id="resName"></div>
     <div class="loyalty-phone" id="resPhone"></div>
-    <div class="loyalty-rule">En tu 5ta compra gira la ruleta pop, y en la décima<br>¡una Canasta Pop, totalmente GRATIS!</div>
+    <div class="loyalty-divider"></div>
+    <div class="loyalty-rule">En tu 5ta compra gira la ruleta pop, y en la 10ma<br>¡una Canasta Pop, totalmente gratis!</div>
     <div class="dot-grid" id="dotGrid"></div>
+    <div class="dot-caption">5 = gira la ruleta &nbsp;·&nbsp; 10 = premio garantizado</div>
     <div class="loyalty-thanks">¡Gracias por preferirnos!</div>
-    <div class="loyalty-social">
-      <span>📷 Instagram @fresaspop</span>
-      <span>💬 WhatsApp 829-707-6263</span>
-      <span>🎵 TikTok @fresaspop1</span>
-    </div>
     <div class="loyalty-msg" id="resMsg"></div>
   </div>
 </main>
@@ -136,11 +139,10 @@ async function lookup(){
 
     const points = client.points||0;
     const pos = cyclePos(points);
-    const dotLabels = {3:'Ya casi', 5:'GIRA LA RULETA', 8:'Falta poco', 10:'🎁'};
     $('#dotGrid').innerHTML = Array.from({length:10}, (_,i)=>{
       const n = i+1;
       const filled = n <= pos;
-      return `<div class="dot${filled?' filled':''}">${dotLabels[n]||''}</div>`;
+      return `<div class="dot${filled?' filled':''}">${filled?'🍓':''}</div>`;
     }).join('');
 
     $('#resName').textContent = client.name;
