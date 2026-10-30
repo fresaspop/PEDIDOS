@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
 <style>
 :root{
   --principal:#db5275;
@@ -109,6 +110,7 @@ input:checked + .slider:before{transform:translateX(20px);}
     <button class="tab-btn" data-tab="ingredientes">Ingredientes</button>
     <button class="tab-btn" data-tab="ofertas">Ofertas</button>
     <button class="tab-btn" data-tab="faq">Preguntas frecuentes</button>
+    <button class="tab-btn" data-tab="clientes">Clientes</button>
     <button class="tab-btn" data-tab="categorias">Categorías</button>
   </div>
 
@@ -140,6 +142,16 @@ input:checked + .slider:before{transform:translateX(20px);}
     <div class="tab-panel" id="panel-faq">
       <div id="faqContainer"></div>
       <button class="btn-add" onclick="abrirModalFaq(null)">+ Agregar pregunta</button>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="tab-panel" id="panel-clientes">
+      <div class="field"><label>Buscar por número de WhatsApp</label>
+        <div style="display:flex; gap:8px;"><input id="cliTel" type="tel" inputmode="tel" placeholder="829-555-1234"><button class="small-btn btn-edit" onclick="buscarCliente()">Buscar</button></div>
+      </div>
+      <div id="cliDetalle"></div>
+      <div class="section-title">Pedidos por confirmar</div>
+      <div id="cliPendientes"></div>
     </div>
 
     <!-- CATEGORIAS -->
@@ -176,7 +188,8 @@ const db = firebase.firestore();
 const MENU_DOC = db.collection('menu_data').doc('main');
 const OFERTAS_COL = db.collection('ofertas');
 
-const ADMIN_PASSWORD = "pf321NIMDA";
+const auth = firebase.auth();
+const ADMIN_EMAIL = "admin@fresaspop.com"; // solo identifica la cuenta; la contraseña la guarda Firebase
 
 function normalizarUrlImagen(url){
   if(!url) return url;
@@ -202,25 +215,22 @@ function showToast(msg){
 /* ---------- LOGIN ---------- */
 function intentarLogin(){
   const val = document.getElementById('passInput').value;
-  if(val === ADMIN_PASSWORD){
-    sessionStorage.setItem('fp_admin_ok','1');
+  document.getElementById('loginError').textContent = '';
+  auth.signInWithEmailAndPassword(ADMIN_EMAIL, val).catch(()=>{
+    document.getElementById('loginError').textContent = 'Contraseña incorrecta';
+  });
+}
+function cerrarSesion(){
+  auth.signOut().then(()=> location.reload());
+}
+document.getElementById('passInput').addEventListener('keydown', e=>{ if(e.key==='Enter') intentarLogin(); });
+auth.onAuthStateChanged(user=>{
+  if(user){
     document.getElementById('loginBox').style.display='none';
     document.getElementById('adminApp').style.display='block';
     cargarMenu();
-  } else {
-    document.getElementById('loginError').textContent = 'Contraseña incorrecta';
   }
-}
-function cerrarSesion(){
-  sessionStorage.removeItem('fp_admin_ok');
-  location.reload();
-}
-document.getElementById('passInput').addEventListener('keydown', e=>{ if(e.key==='Enter') intentarLogin(); });
-if(sessionStorage.getItem('fp_admin_ok')==='1'){
-  document.getElementById('loginBox').style.display='none';
-  document.getElementById('adminApp').style.display='block';
-  cargarMenu();
-}
+});
 
 /* ---------- TABS ---------- */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -252,6 +262,7 @@ async function cargarMenu(){
   todasLasClaves.forEach(k=>{ if(!menu.categoriasOrden.includes(k)) menu.categoriasOrden.push(k); });
   renderTodo();
   cargarOfertas();
+  cargarPendientes();
 }
 async function guardarMenu(){
   await MENU_DOC.set(menu);
@@ -649,6 +660,7 @@ async function cargarOfertas(){
       <div class="card-row">
         <div style="flex:1;">
           <div class="item-name">${o.texto}</div>
+          ${o.beneficio?`<div class="item-sub">${o.beneficio}</div>`:''}
         </div>
         <label class="switch">
           <input type="checkbox" ${o.activa?'checked':''}>
@@ -680,6 +692,9 @@ function abrirModalOferta(){
     <div class="field"><label>Texto que verán tus clientes</label>
       <textarea id="f_oferta_texto" rows="2" placeholder="Ej: 20% OFF en Fresas Dubái este fin de semana"></textarea>
     </div>
+    <div class="field"><label>¿Cuál es el beneficio? (se le explica al cliente)</label>
+      <textarea id="f_oferta_beneficio" rows="2" placeholder="Ej: Del 5 al 7 de diciembre, las Fresas Dubái 12oz cuestan RD$600"></textarea>
+    </div>
     <p class="item-sub" style="margin:-4px 0 10px;">Nota: esto muestra un aviso en el sitio. Si el descuento cambia un precio, recuerda también editarlo en la pestaña "Productos" o "Ingredientes".</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
@@ -691,7 +706,8 @@ function abrirModalOferta(){
 async function guardarOferta(){
   const texto = document.getElementById('f_oferta_texto').value.trim();
   if(!texto){ showToast('Escribe el texto de la oferta'); return; }
-  await OFERTAS_COL.add({texto, activa:true, creada: firebase.firestore.FieldValue.serverTimestamp()});
+  const beneficio = (document.getElementById('f_oferta_beneficio').value||'').trim();
+  await OFERTAS_COL.add({texto, beneficio, activa:true, creada: firebase.firestore.FieldValue.serverTimestamp()});
   cerrarModal();
   cargarOfertas();
   showToast('Oferta creada');
@@ -1006,6 +1022,96 @@ async function guardarProductoCategoria(catIdx, prodIdx){
   renderCategorias();
   renderDisponibilidad();
   showToast('Guardado');
+}
+
+/* ---------- CLIENTES / TARJETA DE FIDELIDAD ---------- */
+const CLIENTES = db.collection('clientes');
+function normTel(t){ let d=(t||'').replace(/\D/g,''); if(d.length===11 && d[0]==='1') d=d.slice(1); return d; }
+function hito(p){
+  if(p>0 && p%10===0) return '🎁 ¡Le toca su Canasta Pop gratis!';
+  if(p%10===5) return '🎡 ¡Le toca girar la ruleta!';
+  return '';
+}
+async function cargarPendientes(){
+  const cont = document.getElementById('cliPendientes');
+  if(!cont) return;
+  try{
+    const snap = await CLIENTES.where('pendientes','>',0).get();
+    if(snap.empty){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar.</p>'; return; }
+    cont.innerHTML = '';
+    snap.forEach(d=>{
+      const c = d.data();
+      const card = document.createElement('div');
+      card.className = 'card card-row';
+      card.style.cursor = 'pointer';
+      card.innerHTML = `<div><div class="item-name">${c.nombre||'Cliente'}</div><div class="item-sub">${c.telefono}</div></div><span class="item-name" style="color:var(--principal);">${c.pendientes} por confirmar</span>`;
+      card.addEventListener('click', ()=> abrirCliente(c.telefono));
+      cont.appendChild(card);
+    });
+  }catch(e){ cont.innerHTML = '<p class="empty-note">No se pudo cargar (revisa las reglas de Firestore).</p>'; }
+}
+function buscarCliente(){
+  const tel = normTel(document.getElementById('cliTel').value);
+  if(tel.length!==10){ showToast('Escribe el número de 10 dígitos'); return; }
+  abrirCliente(tel);
+}
+async function abrirCliente(tel){
+  const out = document.getElementById('cliDetalle');
+  document.getElementById('cliTel').value = tel;
+  out.innerHTML = '<p class="empty-note">Buscando...</p>';
+  const ref = CLIENTES.doc(tel);
+  const snap = await ref.get();
+  if(!snap.exists){ out.innerHTML = '<p class="empty-note">Ese número aún no tiene pedidos ni tarjeta.</p>'; return; }
+  const c = snap.data(), p = c.puntos||0, ciclo = (p>0 && p%10===0) ? 10 : p%10;
+  let stamps = '';
+  for(let i=1;i<=10;i++) stamps += `<span style="display:inline-flex;width:28px;height:28px;margin:2px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;${i<=ciclo?'background:var(--principal);color:#fff;':'border:2px dashed #eed3d8;color:var(--gris);'}">${i===5?'🎡':(i===10?'🎁':i)}</span>`;
+  const ped = await ref.collection('pedidos').orderBy('fecha','desc').limit(20).get();
+  let lista = '';
+  ped.forEach(d=>{
+    const o = d.data(); const f = o.fecha&&o.fecha.toDate ? o.fecha.toDate().toLocaleString('es-DO',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}) : '';
+    const items = (o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ');
+    lista += `<div class="card" style="margin-bottom:8px;"><div class="item-name">${f} · RD$${o.total}</div><div class="item-sub">${items}</div>
+      <div style="margin-top:8px; display:flex; gap:6px; align-items:center; justify-content:flex-end;">
+        ${o.estado==='pendiente' ? `<button class="small-btn btn-edit" onclick="confirmarPedido('${tel}','${d.id}')">✅ Confirmar compra</button><button class="small-btn btn-del" onclick="cancelarPedido('${tel}','${d.id}')">Cancelar</button>` : `<span class="item-sub">${o.estado==='confirmado'?'✅ Confirmado':'✖ Cancelado'}</span>`}
+      </div></div>`;
+  });
+  const waMsg = encodeURIComponent(`Hiii ✨ ${c.nombre||'Pop'}! Tu tarjeta Pop: llevas ${p} compra(s) confirmada(s)${c.pendientes?` y ${c.pendientes} por confirmar`:''}. ¡Gracias por ser Pop! 🍓`);
+  out.innerHTML = `<div class="card">
+      <div class="item-name">${c.nombre||'Cliente'} · ${c.telefono}</div>
+      <div style="margin:8px 0;">${stamps}</div>
+      <div class="item-sub">Confirmadas: <b>${p}</b> · Por confirmar: <b>${c.pendientes||0}</b></div>
+      ${hito(p)?`<div class="item-name" style="margin-top:6px;color:var(--principal);">${hito(p)}</div>`:''}
+      <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="small-btn btn-edit" onclick="ajustarPuntos('${tel}',1)">+1 compra</button>
+        <button class="small-btn btn-del" onclick="ajustarPuntos('${tel}',-1)">−1 compra</button>
+        <a class="small-btn btn-edit" style="text-decoration:none;" target="_blank" href="https://wa.me/1${tel}?text=${waMsg}">Enviar estado por WhatsApp</a>
+      </div></div>
+    <div class="section-title">Pedidos</div>${lista || '<p class="empty-note">Sin pedidos.</p>'}`;
+}
+async function confirmarPedido(tel, pid){
+  const ref = CLIENTES.doc(tel);
+  const c = (await ref.get()).data();
+  const nuevo = (c.puntos||0)+1;
+  await ref.collection('pedidos').doc(pid).update({estado:'confirmado'});
+  await ref.update({puntos: nuevo, pendientes: Math.max(0,(c.pendientes||0)-1)});
+  showToast(hito(nuevo) || 'Compra confirmada');
+  abrirCliente(tel); cargarPendientes();
+}
+async function cancelarPedido(tel, pid){
+  if(!confirm('¿Cancelar este pedido? No sumará punto.')) return;
+  const ref = CLIENTES.doc(tel);
+  const c = (await ref.get()).data();
+  await ref.collection('pedidos').doc(pid).update({estado:'cancelado'});
+  await ref.update({pendientes: Math.max(0,(c.pendientes||0)-1)});
+  abrirCliente(tel); cargarPendientes();
+}
+async function ajustarPuntos(tel, delta){
+  const ref = CLIENTES.doc(tel);
+  const c = (await ref.get()).data();
+  const nuevo = Math.max(0,(c.puntos||0)+delta);
+  await ref.update({puntos: nuevo});
+  showToast(delta>0 ? (hito(nuevo)||'+1 compra') : '−1 compra');
+  abrirCliente(tel);
 }
 </script>
 </body>
