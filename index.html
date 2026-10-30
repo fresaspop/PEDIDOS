@@ -503,6 +503,7 @@ img{max-width:100%; display:block;}
   <div class="step-card">
     <div class="step-head"><div class="step-num">+</div><h3>Extras 2 oz (opcional)</h3></div>
     <div class="opt-grid" id="extraOpts"></div>
+    <div class="topping-select-wrap" id="extraToppingWrap" style="margin-top:12px;"></div>
   </div>
 
   <div class="price-bar">
@@ -630,7 +631,7 @@ const OFERTAS_COL = db.collection('ofertas');
 const DEFAULT_TAMANOS = [
   {id:'12oz', label:'12 onzas', price:350, img:IMG.laClasica},
   {id:'9oz', label:'9 onzas', price:250, img:IMG.balance},
-  {id:'canasta', label:'Canasta Pop', price:150, img:IMG.canastaPop},
+  {id:'canasta', label:'Canasta Pop', price:200, img:IMG.canastaPop},
 ];
 const DEFAULT_BASES = [
   {id:'dulce_leche', label:'Dulce de leche', extra:0},
@@ -692,10 +693,10 @@ const DEFAULT_FAVORITAS = [
   {id:'canasta_pop', nombre:'Canasta Pop', desc:'Crema tradicional + dulce de leche + granola', img:IMG.canastaPop,
     toppingDefault:'granola', cortesia:false,
     variantes:[
-      {key:'cremaCanasta', label:'Elige tu crema', msgLabel:'Crema', source:'cremas'},
+      {key:'cremaCanasta', label:'Elige tu crema', msgLabel:'Crema', source:'cremas', gratis:true},
       {key:'baseCanasta', label:'¿Quieres base de pistacho?', msgLabel:'Base', source:'basePistacho'},
     ],
-    sizes:[{id:'unico',label:'Canasta Pop',price:150}]},
+    sizes:[{id:'unico',label:'Canasta Pop',price:200}]},
 ];
 
 // ---- Premium ----
@@ -799,7 +800,8 @@ function calcCustomPrice(){
   const fr = FRUTAS.find(x=>x.id===custom.fruta);
   const tp = TOPPINGS.find(x=>x.id===custom.topping);
   const cortesia = CORTESIA_BASE_IDS.includes(b.id); // base premium (pistacho) = regalo
-  total += b.extra + (cortesia ? 0 : c.extra) + fr.extra;
+  const cremaGratis = cortesia || custom.tamano==='canasta'; // en Canasta Pop la crema no se cobra
+  total += b.extra + (cremaGratis ? 0 : c.extra) + fr.extra;
   let toppingExtra = tp.extra;
   if(cortesia && cortesiaCubre(tp)) toppingExtra = 0;
   total += toppingExtra;
@@ -813,7 +815,7 @@ function calcCustomPrice(){
 
 function renderPersonalizador(){
   renderSizeOpts();
-  const czNow = calcCustomPrice().cortesia;
+  const czNow = calcCustomPrice().cortesia || custom.tamano==='canasta';
   const cremasView = CREMAS.map(c=> (czNow && c.extra>0) ? {...c, extra:0, label:c.label+' 🎁 gratis'} : c);
   const disabledBase = [];
   renderOptGroup(document.getElementById('baseOpts'), BASES, custom.base, id=>{custom.base=id; renderPersonalizador();});
@@ -844,12 +846,23 @@ function renderPersonalizador(){
 
   const extraCont = document.getElementById('extraOpts');
   extraCont.innerHTML = '';
-  allExtras().forEach(opt=>{
+  EXTRAS.forEach(opt=>{
     const btn = document.createElement('button');
     btn.className = 'opt' + (custom.extras.includes(opt.id)?' selected':'');
     btn.innerHTML = opt.label + ` <span class="extra">+${opt.extra}</span>`;
     btn.addEventListener('click', ()=> toggleExtra(opt.id));
     extraCont.appendChild(btn);
+  });
+  const topWrap = document.getElementById('extraToppingWrap');
+  const tops = extraToppings();
+  const selTop = custom.extras.find(id=>id.startsWith('extop_')) || '';
+  topWrap.innerHTML = `<label class="topping-label">Topping extra (2 oz)</label>
+    <select class="topping-select"><option value="">Sin topping extra</option>
+    ${tops.map(t=>`<option value="${t.id}" ${t.id===selTop?'selected':''}>${t.nombre} (+${t.extra})</option>`).join('')}</select>`;
+  topWrap.querySelector('select').addEventListener('change', e=>{
+    custom.extras = custom.extras.filter(id=>!id.startsWith('extop_'));
+    if(e.target.value) custom.extras.push(e.target.value);
+    renderPersonalizador();
   });
 
   document.getElementById('customTotal').textContent = money(total * custom.cantidad);
@@ -908,12 +921,13 @@ function toppingExtraFor(toppingId, cortesiaAplica){
 }
 
 // Extras de 2 oz: los de la lista + un extra por cada topping disponible
-function allExtras(){
-  const tops = TOPPINGS.filter(t=>t.id!=='sin_topping').map(t=>({
-    id:'extop_'+t.id, label:'Extra '+t.label+' 2oz', extra: t.id==='kataifi' ? EXTRA_KATAIFI_PRECIO : EXTRA_TOPPING_PRECIO
+const EXTRA_TOPPING_EXCLUIDOS = ['sin_topping','chispas_color','cono'];
+function extraToppings(){
+  return TOPPINGS.filter(t=>!EXTRA_TOPPING_EXCLUIDOS.includes(t.id)).map(t=>({
+    id:'extop_'+t.id, nombre:t.label, label:'Extra '+t.label+' 2oz', extra: t.id==='kataifi' ? EXTRA_KATAIFI_PRECIO : EXTRA_TOPPING_PRECIO
   }));
-  return EXTRAS.concat(tops);
 }
+function allExtras(){ return EXTRAS.concat(extraToppings()); }
 
 function resolveVariante(v){
   if(v.source==='cremas') return CREMAS.map(c=>({id:c.id,label:c.label,extra:c.extra}));
@@ -954,7 +968,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
       });
     }
     const premiumSel = (p.variantes||[]).some(v=> CORTESIA_BASE_IDS.includes(itemVariantes[p.id][v.key]));
-    const varExtraOf = (v,o)=> (premiumSel && v.source==='cremas') ? 0 : (o ? o.extra : 0);
+    const varExtraOf = (v,o)=> ((premiumSel || v.gratis) && v.source==='cremas') ? 0 : (o ? o.extra : 0);
     const varianteExtra = (p.variantes||[]).reduce((sum,v)=>{
       const opt = vOpts[v.key].find(o=>o.id===itemVariantes[p.id][v.key]);
       return sum + varExtraOf(v,opt);
@@ -986,7 +1000,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
         <div class="variante-wrap">
           <label class="topping-label">${v.label}</label>
           <div class="variante-row">
-            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); const tag = ex ? ' (+'+ex+')' : ((premiumSel && v.source==='cremas' && o.extra>0) ? ' 🎁 gratis' : ''); return `<button class="variante-chip${itemVariantes[p.id][v.key]===o.id?' selected':''}" data-key="${v.key}" data-opt="${o.id}">${o.label}${tag}</button>`; }).join('')}
+            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); const tag = ex ? ' (+'+ex+')' : (((premiumSel || v.gratis) && v.source==='cremas' && o.extra>0) ? ' 🎁 gratis' : ''); return `<button class="variante-chip${itemVariantes[p.id][v.key]===o.id?' selected':''}" data-key="${v.key}" data-opt="${o.id}">${o.label}${tag}</button>`; }).join('')}
           </div>
         </div>`).join('');
     }
@@ -1076,7 +1090,23 @@ function renderExtrasStandalone(containerId){
   const cont = document.getElementById(containerId);
   if(!cont) return;
   cont.innerHTML = '';
-  allExtras().forEach(ex=>{
+  const tops = extraToppings();
+  if(tops.length){
+    const w = document.createElement('div');
+    w.className = 'extra-mini-card';
+    w.innerHTML = `<select class="topping-select" style="flex:1; margin:0;">${tops.map(t=>`<option value="${t.id}">Topping extra: ${t.nombre} 2oz</option>`).join('')}</select>
+      <span class="extra-mini-price"></span><button class="extra-mini-btn">+</button>`;
+    const sel = w.querySelector('select'), pr = w.querySelector('.extra-mini-price');
+    const upd = ()=>{ const t = tops.find(x=>x.id===sel.value); pr.textContent = money(t.extra); };
+    sel.addEventListener('change', upd); upd();
+    w.querySelector('.extra-mini-btn').addEventListener('click', ()=>{
+      const t = tops.find(x=>x.id===sel.value);
+      addToCart({uid:uid(), nombre:'Topping extra: '+t.nombre+' 2oz', detalles:[], cantidad:1, precioUnit:t.extra});
+      renderCart(); showToast('Agregado al carrito');
+    });
+    cont.appendChild(w);
+  }
+  EXTRAS.forEach(ex=>{
     const wrap = document.createElement('div');
     wrap.className = 'extra-mini-card';
     wrap.innerHTML = `
@@ -1325,7 +1355,7 @@ function renderCart(){
     <div class="cash-note" id="cashNote">
       <label class="form-label" style="margin-top:10px;">¿Cómo pagarás en efectivo?</label>
       <div class="choice-row">
-        <button class="choice-btn" id="efBillete">Con un billete</button>
+        <button class="choice-btn" id="efBillete">Necesito cambio</button>
         <button class="choice-btn" id="efExacto">Tengo el dinero exacto</button>
       </div>
       <div id="billeteBox" style="display:${orderState.efectivoTipo==='billete'?'block':'none'}; margin-top:8px;">

@@ -92,13 +92,16 @@ input:checked + .slider:before{transform:translateX(20px);}
 <div id="loginBox">
   <h2 class="brand">🍓 Fresas Pop</h2>
   <p style="color:var(--gris); font-size:13px;">Panel de administrador</p>
-  <input type="password" id="passInput" placeholder="Contraseña">
+  <input type="email" id="emailInput" placeholder="Correo del administrador" autocomplete="username">
+  <input type="password" id="passInput" placeholder="Contraseña" autocomplete="current-password" style="margin-top:0;">
   <button onclick="intentarLogin()">Entrar</button>
   <div id="loginError"></div>
+  <a href="#" onclick="olvideClave(); return false;" style="font-size:12.5px; color:var(--principal);">¿Olvidaste tu contraseña?</a>
 </div>
 
 <div id="adminApp" style="display:none;">
   <header>
+    <button class="logout-btn" style="right:auto; left:14px;" onclick="abrirModalPassword()">Contraseña</button>
     <button class="logout-btn" onclick="cerrarSesion()">Salir</button>
     <h1 class="brand">Panel de administrador</h1>
     <p>Fresas Pop</p>
@@ -110,7 +113,7 @@ input:checked + .slider:before{transform:translateX(20px);}
     <button class="tab-btn" data-tab="ingredientes">Ingredientes</button>
     <button class="tab-btn" data-tab="ofertas">Ofertas</button>
     <button class="tab-btn" data-tab="faq">Preguntas frecuentes</button>
-    <button class="tab-btn" data-tab="clientes">Clientes</button>
+    <button class="tab-btn" data-tab="clientes">Fidelidad</button>
     <button class="tab-btn" data-tab="categorias">Categorías</button>
   </div>
 
@@ -146,12 +149,14 @@ input:checked + .slider:before{transform:translateX(20px);}
 
     <!-- CLIENTES -->
     <div class="tab-panel" id="panel-clientes">
-      <div class="field"><label>Buscar por número de WhatsApp</label>
-        <div style="display:flex; gap:8px;"><input id="cliTel" type="tel" inputmode="tel" placeholder="829-555-1234"><button class="small-btn btn-edit" onclick="buscarCliente()">Buscar</button></div>
+      <div class="section-title" style="margin-top:4px;">Pedidos por confirmar</div>
+      <p class="empty-note" style="padding:0 0 10px;">Cuando entregues un pedido, toca "Confirmar" y se le suma la compra a su tarjeta.</p>
+      <div id="cliPendientes"></div>
+      <div class="section-title">Buscar una tarjeta</div>
+      <div class="field">
+        <div style="display:flex; gap:8px;"><input id="cliTel" type="tel" inputmode="tel" placeholder="Número de WhatsApp"><button class="small-btn btn-edit" onclick="buscarCliente()">Buscar</button></div>
       </div>
       <div id="cliDetalle"></div>
-      <div class="section-title">Pedidos por confirmar</div>
-      <div id="cliPendientes"></div>
     </div>
 
     <!-- CATEGORIAS -->
@@ -189,7 +194,7 @@ const MENU_DOC = db.collection('menu_data').doc('main');
 const OFERTAS_COL = db.collection('ofertas');
 
 const auth = firebase.auth();
-const ADMIN_EMAIL = "admin@fresaspop.com"; // solo identifica la cuenta; la contraseña la guarda Firebase
+const ADMIN_EMAIL_DEFAULT = "admin@fresaspop.com";
 
 function normalizarUrlImagen(url){
   if(!url) return url;
@@ -206,19 +211,63 @@ function normalizarUrlImagen(url){
 
 let menu = null; // documento completo cargado desde Firestore
 
-function showToast(msg){
+function showToast(msg, ms){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=> t.classList.remove('show'), 1800);
+  setTimeout(()=> t.classList.remove('show'), ms || 1800);
 }
 
 /* ---------- LOGIN ---------- */
+document.getElementById('emailInput').value = localStorage.getItem('fp_admin_email') || ADMIN_EMAIL_DEFAULT;
+function errorAuth(e){
+  const c = (e && e.code) || '';
+  if(c.includes('user-not-found')) return 'Ese correo no existe en Firebase (Authentication → Usuarios).';
+  if(c.includes('wrong-password') || c.includes('invalid-credential') || c.includes('invalid-login')) return 'Correo o contraseña incorrectos.';
+  if(c.includes('operation-not-allowed')) return 'Falta activar "Correo/contraseña" en Firebase → Authentication.';
+  if(c.includes('too-many-requests')) return 'Demasiados intentos. Espera unos minutos.';
+  if(c.includes('network')) return 'Sin conexión. Revisa tu internet.';
+  return 'No se pudo entrar ('+(c||'error')+').';
+}
 function intentarLogin(){
+  const email = document.getElementById('emailInput').value.trim();
   const val = document.getElementById('passInput').value;
   document.getElementById('loginError').textContent = '';
-  auth.signInWithEmailAndPassword(ADMIN_EMAIL, val).catch(()=>{
-    document.getElementById('loginError').textContent = 'Contraseña incorrecta';
+  auth.signInWithEmailAndPassword(email, val).then(()=>{ localStorage.setItem('fp_admin_email', email); }).catch(e=>{
+    document.getElementById('loginError').textContent = errorAuth(e);
   });
+}
+function olvideClave(){
+  const email = document.getElementById('emailInput').value.trim();
+  if(!email){ document.getElementById('loginError').textContent = 'Escribe tu correo primero.'; return; }
+  auth.sendPasswordResetEmail(email).then(()=>{
+    document.getElementById('loginError').textContent = 'Listo: te enviamos un correo para crear una contraseña nueva (si el correo es real).';
+  }).catch(e=>{ document.getElementById('loginError').textContent = errorAuth(e); });
+}
+function abrirModalPassword(){
+  document.getElementById('modalContent').innerHTML = `
+    <h3>Cambiar contraseña</h3>
+    <div class="field"><label>Contraseña actual</label><input id="pw_actual" type="password" autocomplete="current-password"></div>
+    <div class="field"><label>Contraseña nueva (mínimo 6 caracteres)</label><input id="pw_nueva" type="password" autocomplete="new-password"></div>
+    <div class="field"><label>Repite la nueva</label><input id="pw_nueva2" type="password" autocomplete="new-password"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-save" onclick="cambiarPassword()">Cambiar</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('active');
+}
+async function cambiarPassword(){
+  const actual = document.getElementById('pw_actual').value;
+  const nueva = document.getElementById('pw_nueva').value;
+  const nueva2 = document.getElementById('pw_nueva2').value;
+  if(nueva.length < 6){ showToast('La nueva debe tener al menos 6 caracteres'); return; }
+  if(nueva !== nueva2){ showToast('Las contraseñas nuevas no coinciden'); return; }
+  try{
+    const user = auth.currentUser;
+    await user.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(user.email, actual));
+    await user.updatePassword(nueva);
+    cerrarModal();
+    showToast('Contraseña cambiada ✅', 2500);
+  }catch(e){ showToast(errorAuth(e), 3000); }
 }
 function cerrarSesion(){
   auth.signOut().then(()=> location.reload());
@@ -1037,15 +1086,29 @@ async function cargarPendientes(){
   if(!cont) return;
   try{
     const snap = await CLIENTES.where('pendientes','>',0).get();
-    if(snap.empty){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar.</p>'; return; }
-    cont.innerHTML = '';
-    snap.forEach(d=>{
+    if(snap.empty){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>'; return; }
+    const filas = [];
+    for(const d of snap.docs){
       const c = d.data();
+      const ps = await CLIENTES.doc(d.id).collection('pedidos').where('estado','==','pendiente').get();
+      ps.forEach(pd=> filas.push({tel:d.id, c, id:pd.id, o:pd.data()}));
+    }
+    filas.sort((x,y)=> ((y.o.fecha&&y.o.fecha.seconds)||0) - ((x.o.fecha&&x.o.fecha.seconds)||0));
+    if(!filas.length){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>'; return; }
+    cont.innerHTML = '';
+    filas.forEach(f=>{
+      const fecha = f.o.fecha&&f.o.fecha.toDate ? f.o.fecha.toDate().toLocaleString('es-DO',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}) : '';
+      const items = (f.o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ');
       const card = document.createElement('div');
-      card.className = 'card card-row';
-      card.style.cursor = 'pointer';
-      card.innerHTML = `<div><div class="item-name">${c.nombre||'Cliente'}</div><div class="item-sub">${c.telefono}</div></div><span class="item-name" style="color:var(--principal);">${c.pendientes} por confirmar</span>`;
-      card.addEventListener('click', ()=> abrirCliente(c.telefono));
+      card.className = 'card';
+      card.innerHTML = `<div class="item-name">${f.c.nombre||'Cliente'} · ${f.tel}</div>
+        <div class="item-sub">${fecha} · RD$${f.o.total}</div><div class="item-sub">${items}</div>
+        <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="small-btn btn-edit" data-act="ok">✅ Confirmar</button>
+          <button class="small-btn btn-del" data-act="no">Cancelar</button>
+        </div>`;
+      card.querySelector('[data-act="ok"]').addEventListener('click', ()=> confirmarPedido(f.tel, f.id));
+      card.querySelector('[data-act="no"]').addEventListener('click', ()=> cancelarPedido(f.tel, f.id));
       cont.appendChild(card);
     });
   }catch(e){ cont.innerHTML = '<p class="empty-note">No se pudo cargar (revisa las reglas de Firestore).</p>'; }
@@ -1094,8 +1157,9 @@ async function confirmarPedido(tel, pid){
   const nuevo = (c.puntos||0)+1;
   await ref.collection('pedidos').doc(pid).update({estado:'confirmado'});
   await ref.update({puntos: nuevo, pendientes: Math.max(0,(c.pendientes||0)-1)});
-  showToast(hito(nuevo) || 'Compra confirmada');
-  abrirCliente(tel); cargarPendientes();
+  showToast('✅ Confirmado' + (hito(nuevo) ? ' · ' + hito(nuevo) : ''), hito(nuevo) ? 4500 : 1800);
+  cargarPendientes();
+  if(document.getElementById('cliDetalle').innerHTML) abrirCliente(tel);
 }
 async function cancelarPedido(tel, pid){
   if(!confirm('¿Cancelar este pedido? No sumará punto.')) return;
@@ -1103,7 +1167,8 @@ async function cancelarPedido(tel, pid){
   const c = (await ref.get()).data();
   await ref.collection('pedidos').doc(pid).update({estado:'cancelado'});
   await ref.update({pendientes: Math.max(0,(c.pendientes||0)-1)});
-  abrirCliente(tel); cargarPendientes();
+  cargarPendientes();
+  if(document.getElementById('cliDetalle').innerHTML) abrirCliente(tel);
 }
 async function ajustarPuntos(tel, delta){
   const ref = CLIENTES.doc(tel);
