@@ -85,8 +85,9 @@ input:checked + .slider:before{transform:translateX(20px);}
 .stamp-row{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;}
 .stp{width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; border:1.5px dashed #eed3d8; color:var(--gris);}
 .stp.on{background:var(--principal); border:1.5px solid var(--principal); color:#fff;}
-.stp.pend{background:#8b5e3c; border:1.5px solid #8b5e3c; color:#fff; cursor:pointer; box-shadow:0 0 0 3px rgba(139,94,60,.18);}
-.pend-card{border-left:5px solid #8b5e3c; background:#fbf4ee;}
+.stp.pend{background:#f9d3dd; border:1.5px solid #f2a8bc; color:#a23a57; cursor:pointer; box-shadow:0 0 0 3px rgba(242,168,188,.35);}
+.pend-card{border-left:5px solid #f2a8bc; background:#fff5f8;}
+.tabs .tab-btn.dragging{box-shadow:0 6px 16px rgba(86,9,31,.25); transform:scale(1.06);}
 .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--vino); color:#fff; padding:10px 18px; border-radius:30px; font-size:13px; opacity:0; transition:.25s; pointer-events:none; z-index:100;}
 .toast.show{opacity:1;}
 .oferta-card{border-left:4px solid var(--principal);}
@@ -115,18 +116,18 @@ input:checked + .slider:before{transform:translateX(20px);}
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="productos">Productos</button>
+    <button class="tab-btn active" data-tab="clientes">Fidelidad</button>
+    <button class="tab-btn" data-tab="categorias">Categorías</button>
+    <button class="tab-btn" data-tab="productos">Productos</button>
     <button class="tab-btn" data-tab="ingredientes">Ingredientes</button>
     <button class="tab-btn" data-tab="ofertas">Ofertas</button>
     <button class="tab-btn" data-tab="faq">Preguntas frecuentes</button>
-    <button class="tab-btn" data-tab="clientes">Fidelidad</button>
-    <button class="tab-btn" data-tab="categorias">Categorías</button>
   </div>
 
   <div class="wrap">
 
     <!-- PRODUCTOS -->
-    <div class="tab-panel active" id="panel-productos">
+    <div class="tab-panel" id="panel-productos">
       <div id="prodContainer"></div>
     </div>
 
@@ -143,20 +144,34 @@ input:checked + .slider:before{transform:translateX(20px);}
 
     <!-- FAQ -->
     <div class="tab-panel" id="panel-faq">
+      <div class="section-title" style="margin-top:4px;">Textos de la página de pedidos</div>
+      <p class="empty-note" style="padding:0 0 10px;">Cambia cualquier texto de la página. Si dejas un campo vacío, se usa el texto original.</p>
+      <div id="textosContainer"></div>
+      <div class="section-title">Cuentas bancarias</div>
+      <div id="bancosContainer"></div>
+      <button class="small-btn btn-edit" style="margin:6px 0 10px;" onclick="agregarBanco()">+ Agregar cuenta</button>
+      <button class="btn-add" onclick="guardarTextos()">Guardar textos y cuentas</button>
+      <div class="section-title" style="margin-top:26px;">Preguntas frecuentes</div>
       <div id="faqContainer"></div>
       <button class="btn-add" onclick="abrirModalFaq(null)">+ Agregar pregunta</button>
     </div>
 
     <!-- CLIENTES -->
-    <div class="tab-panel" id="panel-clientes">
-      <div class="section-title" style="margin-top:4px;">Pedidos por confirmar</div>
-      <p class="empty-note" style="padding:0 0 10px;">Cuando entregues un pedido, toca "Confirmar" y se le suma la compra a su tarjeta.</p>
-      <div id="cliPendientes"></div>
-      <div class="section-title">Buscar una tarjeta</div>
-      <div class="field">
-        <div style="display:flex; gap:8px;"><input id="cliTel" type="tel" inputmode="tel" placeholder="Número de WhatsApp"><button class="small-btn btn-edit" onclick="buscarCliente()">Buscar</button></div>
-      </div>
+    <div class="tab-panel active" id="panel-clientes">
+      <div class="section-title" style="margin-top:4px;">Tarjetas de fidelidad</div>
+      <p class="empty-note" style="padding:0 0 10px;">Toca un círculo rosado para confirmar esa compra. Las tarjetas con compras por confirmar salen primero. Se ocultan tras 6 meses sin pedidos, pero se conservan.</p>
+      <div class="field"><input id="cliBuscar" placeholder="Buscar por nombre o número" oninput="renderTarjetas()"></div>
       <div id="cliDetalle"></div>
+      <div id="cliPendientes"></div>
+
+      <div class="section-title" style="margin-top:26px;">Ruleta de premios</div>
+      <p class="empty-note" style="padding:0 0 10px;">Edita los premios y su probabilidad. El cliente gira la ruleta al llegar a 5 compras confirmadas.</p>
+      <div id="ruletaEditor"></div>
+      <button class="small-btn btn-edit" style="margin:6px 0 10px;" onclick="agregarPremio()">+ Agregar premio</button>
+      <button class="btn-add" onclick="guardarRuleta()">Guardar premios</button>
+      <div class="field" style="margin-top:14px;"><label>Enlace de la ruleta (envíalo por WhatsApp)</label>
+        <div style="display:flex; gap:8px;"><input id="ruletaLink" readonly><button class="small-btn btn-edit" onclick="copiarEnlaceRuleta()">Copiar</button></div>
+      </div>
     </div>
 
     <!-- CATEGORIAS -->
@@ -317,7 +332,11 @@ async function cargarMenu(){
     menu.ordenExtrasInicial = true;
     guardarMenu();
   }
+  if(!menu.textos) menu.textos = {};
   renderTodo();
+  renderTextos();
+  renderRuletaEditor();
+  aplicarOrdenTabsAdmin();
   cargarOfertas();
   cargarPendientes();
 }
@@ -351,23 +370,32 @@ function renderTodo(){
 /* ---------- PRODUCTOS (favoritas / premium / otros) ---------- */
 
 /* ---------- ARRASTRAR PARA ORDENAR (mantener presionado) + INTERRUPTOR DE DISPONIBILIDAD ---------- */
-function sortable(container, itemSel, onDone){
-  let drag = null, timer = null, sx = 0, sy = 0;
+function sortable(container, itemSel, onDone, axis){
+  let drag = null, timer = null, sx = 0, sy = 0, suprimir = false;
   const items = ()=> [...container.querySelectorAll(itemSel)];
   const begin = el=>{ drag = el; el.classList.add('dragging'); if(navigator.vibrate) navigator.vibrate(25); };
-  const move = y=>{
-    const over = items().find(o=>{ if(o===drag) return false; const r=o.getBoundingClientRect(); return y>r.top && y<r.bottom; });
+  const move = pos=>{
+    const over = items().find(o=>{ if(o===drag) return false; const r=o.getBoundingClientRect(); return axis==='x' ? (pos>r.left && pos<r.right) : (pos>r.top && pos<r.bottom); });
     if(!over) return;
     const r = over.getBoundingClientRect();
-    container.insertBefore(drag, y < r.top + r.height/2 ? over : over.nextSibling);
+    const mid = axis==='x' ? r.left + r.width/2 : r.top + r.height/2;
+    container.insertBefore(drag, pos < mid ? over : over.nextSibling);
   };
-  const end = ()=>{ clearTimeout(timer); if(!drag) return; const el = drag; drag = null; el.classList.remove('dragging'); onDone(items()); };
+  const end = ()=>{
+    clearTimeout(timer); if(!drag) return;
+    const el = drag; drag = null; el.classList.remove('dragging');
+    suprimir = true; setTimeout(()=> suprimir = false, 350);
+    onDone(items());
+  };
   const pick = e=>{
     const el = e.target.closest(itemSel);
     if(!el || !container.contains(el)) return null;
-    if(e.target.closest('button,input,select,textarea,label,a,.stp')) return null;
+    const c = e.target.closest('button,input,select,textarea,label,a,.stp');
+    if(c && c !== el) return null;
     return el;
   };
+  const coord = t=> axis==='x' ? t.clientX : t.clientY;
+  container.addEventListener('click', e=>{ if(suprimir){ e.stopPropagation(); e.preventDefault(); } }, true);
   container.addEventListener('contextmenu', e=>{ if(e.target.closest(itemSel)) e.preventDefault(); });
   container.addEventListener('touchstart', e=>{
     const el = pick(e); if(!el) return;
@@ -379,14 +407,14 @@ function sortable(container, itemSel, onDone){
       if(Math.abs(e.touches[0].clientX-sx) > 8 || Math.abs(e.touches[0].clientY-sy) > 8) clearTimeout(timer);
       return;
     }
-    e.preventDefault(); move(e.touches[0].clientY);
+    e.preventDefault(); move(coord(e.touches[0]));
   }, {passive:false});
   container.addEventListener('touchend', end);
   container.addEventListener('touchcancel', end);
   container.addEventListener('mousedown', e=>{
     const el = pick(e); if(!el) return;
     timer = setTimeout(()=> begin(el), 380);
-    const mm = ev=>{ if(drag) move(ev.clientY); };
+    const mm = ev=>{ if(drag) move(coord(ev)); };
     const mu = ()=>{ document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); end(); };
     document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
   });
@@ -1014,13 +1042,14 @@ async function guardarProductoCategoria(catIdx, prodIdx){
 const CLIENTES = db.collection('clientes');
 function normTel(t){ let d=(t||'').replace(/\D/g,''); if(d.length===11 && d[0]==='1') d=d.slice(1); return d; }
 function hito(p){
-  if(p>0 && p%10===0) return '🎁 ¡Le toca su Canasta Pop gratis!';
-  if(p%10===5) return '🎡 ¡Le toca girar la ruleta!';
+  if(p>0 && p%10===0) return '🎁 ¡Tarjeta completa! Empieza una nueva';
+  if(p%10===5) return '🎡 ¡Ya puede girar la ruleta!';
+  if(p%10===9) return '🎁 Su próximo pedido lleva mini clásica de regalo';
   return '';
 }
 function slotsAdmin(tel, p, pend){
   const n = pend.length;
-  let s = (p>0 && p%10===0 && n===0) ? p-10 : Math.floor(p/10)*10;
+  let s = Math.floor(p/10)*10;          // al completar una tarjeta empieza una nueva
   let html = '';
   do{
     html += '<div class="stamp-row">';
@@ -1034,39 +1063,53 @@ function slotsAdmin(tel, p, pend){
   }while(s < p+n);
   return html;
 }
+let TARJETAS = [];
 async function cargarPendientes(){
   const cont = document.getElementById('cliPendientes');
   if(!cont) return;
   try{
-    const snap = await CLIENTES.where('pendientes','>',0).get();
-    if(snap.empty){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>'; return; }
-    cont.innerHTML = '';
+    const snap = await CLIENTES.orderBy('ultimoPedido','desc').limit(300).get();
+    const limite = Date.now() - 183*24*3600*1000;   // ~6 meses sin pedidos = tarjeta inactiva
+    TARJETAS = [];
     for(const d of snap.docs){
-      const c = d.data(), tel = d.id, p = c.puntos||0;
-      const ps = await CLIENTES.doc(tel).collection('pedidos').where('estado','==','pendiente').get();
-      const pend = [];
-      ps.forEach(pd=>{ const o = pd.data(); pend.push({id:pd.id, o, f:(o.fecha&&o.fecha.seconds)||0}); });
-      pend.sort((x,y)=> x.f - y.f);
-      if(!pend.length) continue;
-      const card = document.createElement('div');
-      card.className = 'card pend-card';
-      card.innerHTML = `<div class="item-name">${c.nombre||'Cliente'}</div><div class="item-sub">${c.telefono||tel}</div>
-        ${slotsAdmin(tel, p, pend)}
-        <div class="item-sub">Toca un círculo marrón para confirmar esa compra.</div>
-        ${pend.map((x,k)=>`<div class="item-sub" style="margin-top:4px;">Compra ${p+k+1}: ${(x.o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ')} · RD$${x.o.total} <a href="#" onclick="cancelarPedido('${tel}','${x.id}'); return false;" style="color:var(--rojo);">cancelar</a></div>`).join('')}`;
-      cont.appendChild(card);
+      const c = d.data(), tel = d.id;
+      const ult = (c.ultimoPedido && c.ultimoPedido.toMillis) ? c.ultimoPedido.toMillis() : 0;
+      if(!(c.pendientes>0) && ult && ult < limite) continue;
+      let pend = [];
+      if(c.pendientes>0){
+        const ps = await CLIENTES.doc(tel).collection('pedidos').where('estado','==','pendiente').get();
+        ps.forEach(pd=>{ const o = pd.data(); pend.push({id:pd.id, o, f:(o.fecha&&o.fecha.seconds)||0}); });
+        pend.sort((x,y)=> x.f - y.f);
+      }
+      TARJETAS.push({tel, c, pend, ult});
     }
-    if(!cont.children.length) cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>';
+    TARJETAS.sort((x,y)=> ((y.pend.length>0)-(x.pend.length>0)) || (y.ult - x.ult));
+    renderTarjetas();
   }catch(e){ cont.innerHTML = '<p class="empty-note">No se pudo cargar (revisa las reglas de Firestore).</p>'; }
 }
-function buscarCliente(){
-  const tel = normTel(document.getElementById('cliTel').value);
-  if(tel.length!==10){ showToast('Escribe el número de 10 dígitos'); return; }
-  abrirCliente(tel);
+function renderTarjetas(){
+  const cont = document.getElementById('cliPendientes');
+  const q = (document.getElementById('cliBuscar').value || '').toLowerCase().trim();
+  const qd = q.replace(/\D/g,'') || 'zzz';
+  const lista = TARJETAS.filter(t=> !q || (t.c.nombre||'').toLowerCase().includes(q) || t.tel.includes(qd));
+  cont.innerHTML = '';
+  if(!lista.length){ cont.innerHTML = '<p class="empty-note">No hay tarjetas para mostrar.</p>'; return; }
+  lista.forEach(t=>{
+    const c = t.c, p = c.puntos||0;
+    const card = document.createElement('div');
+    card.className = 'card' + (t.pend.length ? ' pend-card' : '');
+    const premio = (c.premio && !c.premio.usado) ? `<div class="item-sub">🎁 Premio sin usar: <b>${c.premio.nombre}</b></div>` : '';
+    card.innerHTML = `<div class="card-row"><div><div class="item-name">${c.nombre||'Cliente'}</div><div class="item-sub">${c.telefono||t.tel}${p>=10?' · Tarjetas completadas: '+Math.floor(p/10):''}</div></div>
+        <a href="#" class="small-btn btn-edit" style="text-decoration:none;" onclick="abrirCliente('${t.tel}'); window.scrollTo({top:0,behavior:'smooth'}); return false;">Ver</a></div>
+      ${slotsAdmin(t.tel, p, t.pend)}
+      ${premio}
+      ${t.pend.length ? '<div class="item-sub">Toca un círculo rosado para confirmar esa compra.</div>' : ''}
+      ${t.pend.map((x,k)=>`<div class="item-sub" style="margin-top:4px;">Compra ${p+k+1}: ${(x.o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ')} · RD$${x.o.total}${x.o.descuento?' (descuento premio -RD$'+x.o.descuento+')':''}${(x.o.regalos&&x.o.regalos.length)?'<br>🎁 '+x.o.regalos.join(' · '):''} <a href="#" onclick="cancelarPedido('${t.tel}','${x.id}'); return false;" style="color:var(--rojo);">cancelar</a></div>`).join('')}`;
+    cont.appendChild(card);
+  });
 }
 async function abrirCliente(tel){
   const out = document.getElementById('cliDetalle');
-  document.getElementById('cliTel').value = tel;
   out.innerHTML = '<p class="empty-note">Buscando...</p>';
   const ref = CLIENTES.doc(tel);
   const snap = await ref.get();
@@ -1090,6 +1133,7 @@ async function abrirCliente(tel){
       <div class="item-name">${c.nombre||'Cliente'} · ${c.telefono}</div>
       <div style="margin:8px 0;">${stamps}</div>
       <div class="item-sub">Confirmadas: <b>${p}</b> · Por confirmar: <b>${c.pendientes||0}</b></div>
+      ${c.premio ? `<div class="item-sub">🎡 Premio: <b>${c.premio.nombre}</b> (${c.premio.usado?'usado':'sin usar'})</div>` : ''}
       ${hito(p)?`<div class="item-name" style="margin-top:6px;color:var(--principal);">${hito(p)}</div>`:''}
       <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
         <button class="small-btn btn-edit" onclick="ajustarPuntos('${tel}',1)">+1 compra</button>
@@ -1124,6 +1168,142 @@ async function ajustarPuntos(tel, delta){
   await ref.update({puntos: nuevo});
   showToast(delta>0 ? (hito(nuevo)||'+1 compra') : '−1 compra');
   abrirCliente(tel);
+}
+
+/* ---------- RULETA (editor de premios) ---------- */
+const RULETA_DEFAULT = [
+  {id:'d50',  nombre:'Descuento $50 Dop 🤗',  tipo:'descuento', valor:50,  peso:20},
+  {id:'d100', nombre:'Descuento $100 Dop 😋', tipo:'descuento', valor:100, peso:20},
+  {id:'mini', nombre:'Mini clásica gratis 🤑', tipo:'mini', peso:20},
+  {id:'retry',nombre:'Vuelve a intentar ☠️',   tipo:'reintento', peso:20},
+  {id:'extra',nombre:'1 extra a elegir Gratis 🥰', tipo:'extra', peso:20},
+  {id:'nada', nombre:'Más suerte la próxima 🙈', tipo:'nada', peso:20},
+];
+let ruletaTmp = [];
+const TIPOS_PREMIO = [['descuento','Descuento en pesos'],['mini','Mini clásica gratis'],['extra','1 extra gratis a elegir'],['reintento','Vuelve a intentar (gira otra vez)'],['nada','Sin premio']];
+function renderRuletaEditor(){
+  ruletaTmp = (menu.ruleta && menu.ruleta.length ? menu.ruleta : RULETA_DEFAULT).map(x=>({...x}));
+  document.getElementById('ruletaLink').value = location.origin + location.pathname.replace(/admin\.html.*$/,'') + '?ruleta=1';
+  pintarRuleta();
+}
+function actualizarProbs(){
+  const tot = ruletaTmp.reduce((s,x)=> s + (Number(x.peso)||0), 0);
+  document.querySelectorAll('#ruletaEditor [data-prob]').forEach(el=>{
+    const x = ruletaTmp[Number(el.dataset.prob)];
+    el.textContent = tot ? ((Number(x.peso)||0)/tot*100).toFixed(1) + '%' : '0%';
+  });
+}
+function pintarRuleta(){
+  const cont = document.getElementById('ruletaEditor');
+  cont.innerHTML = '';
+  ruletaTmp.forEach((x,i)=>{
+    const card = document.createElement('div');
+    card.className = 'card'; card.style.padding = '10px';
+    card.innerHTML = `<div class="field" style="margin-bottom:8px;"><label>Nombre del premio</label><input class="rp-nombre"></div>
+      <div style="display:flex; gap:8px; align-items:flex-end;">
+        <div class="field" style="flex:1; margin-bottom:0;"><label>Tipo</label><select class="rp-tipo">${TIPOS_PREMIO.map(t=>`<option value="${t[0]}">${t[1]}</option>`).join('')}</select></div>
+        <div class="field rp-valor-wrap" style="width:84px; margin-bottom:0;"><label>Pesos</label><input class="rp-valor" type="number"></div>
+        <div class="field" style="width:70px; margin-bottom:0;"><label>Peso</label><input class="rp-peso" type="number"></div>
+        <div style="width:48px; text-align:center; font-size:12px; font-weight:700; color:var(--principal);" data-prob="${i}"></div>
+        <button class="small-btn btn-del rp-del" style="height:38px;">✕</button>
+      </div>`;
+    const n = card.querySelector('.rp-nombre'), t = card.querySelector('.rp-tipo'), v = card.querySelector('.rp-valor'), w = card.querySelector('.rp-peso');
+    n.value = x.nombre || ''; t.value = x.tipo; v.value = x.valor || ''; w.value = x.peso;
+    const vis = ()=>{ card.querySelector('.rp-valor-wrap').style.display = t.value==='descuento' ? '' : 'none'; };
+    vis();
+    n.addEventListener('input', ()=> x.nombre = n.value);
+    t.addEventListener('change', ()=>{ x.tipo = t.value; vis(); });
+    v.addEventListener('input', ()=> x.valor = Number(v.value)||0);
+    w.addEventListener('input', ()=>{ x.peso = Number(w.value)||0; actualizarProbs(); });
+    card.querySelector('.rp-del').addEventListener('click', ()=>{ ruletaTmp.splice(i,1); pintarRuleta(); });
+    cont.appendChild(card);
+  });
+  actualizarProbs();
+}
+function agregarPremio(){ ruletaTmp.push({id:'r_'+Date.now(), nombre:'', tipo:'nada', peso:20}); pintarRuleta(); }
+async function guardarRuleta(){
+  if(ruletaTmp.length < 2){ showToast('La ruleta necesita al menos 2 premios'); return; }
+  if(ruletaTmp.some(x=>!(x.nombre||'').trim())){ showToast('Todos los premios necesitan nombre'); return; }
+  if(!ruletaTmp.some(x=>Number(x.peso)>0)){ showToast('Algún premio debe tener peso mayor a 0'); return; }
+  menu.ruleta = ruletaTmp.map((x,i)=>({id:x.id||('r_'+Date.now()+i), nombre:x.nombre.trim(), tipo:x.tipo, valor:x.tipo==='descuento' ? (Number(x.valor)||0) : 0, peso:Number(x.peso)||0}));
+  await guardarMenu(); showToast('Premios guardados ✅');
+}
+function copiarEnlaceRuleta(){
+  const v = document.getElementById('ruletaLink').value;
+  (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(()=> showToast('Enlace copiado'), ()=>{ document.getElementById('ruletaLink').select(); showToast('Mantén presionado para copiar'); });
+}
+
+/* ---------- TEXTOS DE LA PÁGINA ---------- */
+const TEXTOS_CAT = [["Datos del negocio", "slogan", "Slogan (debajo del logo)", "Aquí se viene a ser feliz", 0], ["Datos del negocio", "horario", "Horario", "Miércoles a domingo, de 2:30 PM a 7:30 PM.", 1], ["Datos del negocio", "ubicacion", "Ubicación (texto)", "\"El Local Rosa\" — Calle Hostos, Cotuí, entre la GBC y Guadalupe, República Dominicana.", 1], ["Datos del negocio", "ubicacion_link", "Ubicación (enlace de Google Maps)", "https://maps.app.goo.gl/vyxMdkXAKkUXSp737", 0], ["Datos del negocio", "linktree", "Enlace de Linktree", "https://linktr.ee/Fresitaspop", 0], ["Datos del negocio", "instagram", "Enlace de Instagram", "https://www.instagram.com/fresaspop", 0], ["Datos del negocio", "whatsapp", "WhatsApp para pedidos (con código de país)", "18297076263", 0], ["Datos del negocio", "delivery_costo", "Costo del delivery (solo número)", "100", 0], ["Datos del negocio", "titular", "Titular de las cuentas", "Darianny Peguero G.", 0], ["Títulos de las secciones", "fav_titulo", "Favoritas: título", "Favoritas de Fresas Pop", 0], ["Títulos de las secciones", "fav_sub", "Favoritas: subtítulo", "Combinaciones ya creadas", 0], ["Títulos de las secciones", "pers_titulo", "Personalizada: título", "Combina tus Fresas Pop", 0], ["Títulos de las secciones", "pers_sub", "Personalizada: subtítulo", "Tú eliges, nosotros las preparamos", 0], ["Títulos de las secciones", "prem_titulo", "Premium: título", "Línea Premium", 0], ["Títulos de las secciones", "prem_sub", "Premium: subtítulo", "Dubái, chocolosas y más", 0], ["Títulos de las secciones", "otros_titulo", "Otros postres: título", "Otros postres", 0], ["Títulos de las secciones", "extras_titulo", "Extras: título", "Extras", 0], ["Títulos de las secciones", "extras_sub", "Extras: subtítulo", "Agrega un poco más a tu pedido", 0], ["Títulos de las secciones", "salsas_label", "Etiqueta de salsas", "Salsas (2 oz)", 0], ["Títulos de las secciones", "toppings_label", "Etiqueta de toppings", "Toppings (2 oz)", 0], ["Personalizada (pasos)", "paso_tamano", "Paso 1", "Elige el tamaño", 0], ["Personalizada (pasos)", "paso_base", "Paso 2", "Elige 1 base", 0], ["Personalizada (pasos)", "paso_crema", "Paso 3", "Elige tu crema", 0], ["Personalizada (pasos)", "paso_fruta", "Paso 4", "Elige tu fruta", 0], ["Personalizada (pasos)", "paso_topping", "Paso 5", "Elige 1 topping", 0], ["Personalizada (pasos)", "paso_cantidad", "Cantidad", "Cantidad", 0], ["Personalizada (pasos)", "paso_extras", "Extras", "Extras 2 oz (opcional)", 0], ["Personalizada (pasos)", "nota_mixto", "Nota de fruta mixta", "* Mixto solo disponible para vasos (no aplica a Canasta Pop)", 1], ["Personalizada (pasos)", "nota_cortesia", "Nota de regalo (base de pistacho)", "🎁 ¡De regalo! Con base de pistacho, la crema de coco y los toppings con costo (excepto Kataifi) no se cobran.", 1], ["Personalizada (pasos)", "btn_agregar_carrito", "Botón agregar", "Agregar al carrito", 0], ["Más información y pie de página", "info_titulo", "Título de Más información", "Más información", 0], ["Más información y pie de página", "linktree_texto", "Botón de Linktree", "Visita nuestro Linktree", 0], ["Más información y pie de página", "horario_titulo", "Título de horario", "🕒 Horario", 0], ["Más información y pie de página", "ubicacion_titulo", "Título de ubicación", "📍 Ubicación", 0], ["Más información y pie de página", "faq_titulo", "Título de preguntas frecuentes", "❓ Preguntas frecuentes", 0], ["Más información y pie de página", "footer_texto", "Texto del pie de página", "Cotuí, República Dominicana", 0], ["Carrito y pedido", "carrito_titulo", "Título del carrito", "Tu pedido", 0], ["Carrito y pedido", "carrito_vacio", "Carrito vacío", "Tu carrito está vacío 🍓", 0], ["Carrito y pedido", "delivery_pregunta", "Pregunta de delivery", "¿Deseas delivery?", 0], ["Carrito y pedido", "delivery_nota", "Aviso de delivery ({costo} = precio)", "🛵 RD${costo} aplica SOLO dentro de COTUÍ. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.", 1], ["Carrito y pedido", "delivery_ubicacion_nota", "Nota de ubicación", "📍 Debe enviar su ubicación actual para recibir su pedido.", 1], ["Carrito y pedido", "delivery_ubicacion_label", "Campo de ubicación", "Pega aquí el link de tu ubicación (opcional)", 0], ["Carrito y pedido", "horario_nota", "Nota de horario (sin delivery)", "🕢 Recuerde que estamos disponibles hasta las 7:30 p. m. para recibir y entregar pedidos.", 1], ["Carrito y pedido", "pago_titulo", "Título de método de pago", "Método de pago", 0], ["Carrito y pedido", "nota_transferencia", "Nota de transferencia (sin delivery)", "Los pedidos pagados por transferencia se preparan con prioridad y quedan listos para retirar. En caso de no poder pasar a recogerlo, será su responsabilidad.", 1], ["Carrito y pedido", "nota_contraentrega", "Nota de contra entrega (sin delivery)", "Los pedidos contra entrega se preparan y se mantienen reservados durante el horario de atención.", 1], ["Carrito y pedido", "nombre_label", "Campo de nombre", "Tu nombre", 0], ["Carrito y pedido", "tel_label", "Campo de teléfono", "Tu número de WhatsApp", 0], ["Carrito y pedido", "tel_ayuda", "Ayuda del teléfono", "Lo usamos para tu tarjeta de fidelidad y tu historial de pedidos.", 1], ["Carrito y pedido", "notas_label", "Campo de notas", "Notas / aclaraciones (opcional)", 0], ["Carrito y pedido", "btn_enviar", "Botón de enviar", "Enviar pedido por WhatsApp", 0], ["Mensaje de WhatsApp", "msg_saludo", "Saludo del mensaje", "¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:", 0], ["Mensaje de WhatsApp", "msg_ubicacion", "Aviso final de ubicación", "📍 Si eligió delivery, por favor envíe su ubicación actual.", 1], ["Mensaje de WhatsApp", "msg_comprobante", "Aviso final de comprobante", "🧾 Si pagó con transferencia, por favor envíe el comprobante.", 1], ["Fidelidad", "regalo10", "Mensaje del regalo (pedido 10)", "¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.", 1]];
+const BANCOS_DEFAULT = [
+  {nombre:'Banreservas', tipo:'Cuenta Corriente', numero:'9608639353'},
+  {nombre:'Banco Popular', tipo:'Cuenta Corriente', numero:'856525936'},
+  {nombre:'BHD', tipo:'Cuenta de Ahorros', numero:'41367120017'},
+];
+let bancosTmp = [];
+function renderTextos(){
+  const cont = document.getElementById('textosContainer');
+  cont.innerHTML = '';
+  const guardados = menu.textos || {};
+  let grupo = '';
+  TEXTOS_CAT.forEach(([g, key, label, def, multi])=>{
+    if(g !== grupo){
+      grupo = g;
+      const h = document.createElement('div'); h.className = 'section-title'; h.style.fontSize = '13.5px'; h.textContent = g; cont.appendChild(h);
+    }
+    const f = document.createElement('div'); f.className = 'field';
+    const l = document.createElement('label'); l.textContent = label;
+    const inp = document.createElement(multi ? 'textarea' : 'input');
+    if(multi) inp.rows = 2;
+    inp.dataset.key = key; inp.dataset.def = def;
+    inp.value = (guardados[key] !== undefined && guardados[key] !== '') ? guardados[key] : def;
+    f.appendChild(l); f.appendChild(inp); cont.appendChild(f);
+  });
+  bancosTmp = ((guardados.bancos && guardados.bancos.length) ? guardados.bancos : BANCOS_DEFAULT).map(b=>({...b}));
+  pintarBancos();
+}
+function pintarBancos(){
+  const cont = document.getElementById('bancosContainer');
+  cont.innerHTML = '';
+  bancosTmp.forEach((b,i)=>{
+    const card = document.createElement('div'); card.className = 'card'; card.style.padding = '10px';
+    card.innerHTML = `<div style="display:flex; gap:6px;"><div class="field" style="flex:1; margin-bottom:6px;"><label>Banco</label><input class="bk-n"></div><div class="field" style="flex:1; margin-bottom:6px;"><label>Tipo</label><input class="bk-t"></div></div>
+      <div style="display:flex; gap:6px; align-items:flex-end;"><div class="field" style="flex:1; margin-bottom:0;"><label>Número de cuenta</label><input class="bk-c"></div><button class="small-btn btn-del" style="height:38px;">✕</button></div>`;
+    const n = card.querySelector('.bk-n'), t = card.querySelector('.bk-t'), c = card.querySelector('.bk-c');
+    n.value = b.nombre; t.value = b.tipo; c.value = b.numero;
+    n.addEventListener('input', ()=> b.nombre = n.value); t.addEventListener('input', ()=> b.tipo = t.value); c.addEventListener('input', ()=> b.numero = c.value);
+    card.querySelector('.btn-del').addEventListener('click', ()=>{ bancosTmp.splice(i,1); pintarBancos(); });
+    cont.appendChild(card);
+  });
+}
+function agregarBanco(){ bancosTmp.push({nombre:'', tipo:'', numero:''}); pintarBancos(); }
+async function guardarTextos(){
+  const t = {};
+  document.querySelectorAll('#textosContainer [data-key]').forEach(el=>{
+    const v = el.value.trim();
+    if(v && v !== el.dataset.def) t[el.dataset.key] = v;     // solo se guardan los que cambiaron
+  });
+  const bancos = bancosTmp.filter(b=> (b.nombre||'').trim() && (b.numero||'').trim()).map(b=>({nombre:b.nombre.trim(), tipo:(b.tipo||'').trim(), numero:b.numero.trim()}));
+  if(JSON.stringify(bancos) !== JSON.stringify(BANCOS_DEFAULT) && bancos.length) t.bancos = bancos;
+  menu.textos = t;
+  await guardarMenu();
+  showToast('Textos guardados ✅ (se ven al recargar la página)', 2800);
+}
+
+/* ---------- ORDEN DE LAS PESTAÑAS DEL PANEL (mantén presionado y arrastra) ---------- */
+const ADMIN_TABS_DEFAULT = ['clientes','categorias','productos','ingredientes','ofertas','faq'];
+let tabsOrdenables = false;
+function aplicarOrdenTabsAdmin(){
+  const cont = document.querySelector('.tabs');
+  const orden = (menu.adminTabsOrden && menu.adminTabsOrden.length ? menu.adminTabsOrden : ADMIN_TABS_DEFAULT).slice();
+  ADMIN_TABS_DEFAULT.forEach(k=>{ if(!orden.includes(k)) orden.push(k); });
+  orden.forEach(k=>{ const b = cont.querySelector(`.tab-btn[data-tab="${k}"]`); if(b) cont.appendChild(b); });
+  const first = cont.querySelector('.tab-btn');
+  if(first && !cont.querySelector('.tab-btn.active')) first.click();
+  if(!tabsOrdenables){
+    tabsOrdenables = true;
+    sortable(cont, '.tab-btn', async els=>{ menu.adminTabsOrden = els.map(e=>e.dataset.tab); await guardarMenu(); showToast('Orden de pestañas guardado'); }, 'x');
+  }
 }
 </script>
 </body>
