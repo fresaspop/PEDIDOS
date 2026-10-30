@@ -845,7 +845,7 @@ function calcCustomPrice(){
 function renderPersonalizador(){
   renderSizeOpts();
   const czNow = calcCustomPrice().cortesia || custom.tamano==='canasta';
-  const cremasView = CREMAS.map(c=> (czNow && c.extra>0) ? {...c, extra:0, label:c.label+' 🎁 gratis'} : c);
+  const cremasView = CREMAS.map(c=> (czNow && c.extra>0) ? {...c, extra:0, label:c.label+' 🎁 Gratis'} : c);
   const disabledBase = [];
   renderOptGroup(document.getElementById('baseOpts'), BASES, custom.base, id=>{custom.base=id; renderPersonalizador();});
   renderOptGroup(document.getElementById('cremaOpts'), cremasView, custom.crema, id=>{custom.crema=id; renderPersonalizador();});
@@ -865,7 +865,7 @@ function renderPersonalizador(){
     btn.className = 'opt' + (opt.id===custom.topping?' selected':'');
     let priceShown = opt.extra;
     if(cortesia && cortesiaCubre(opt)) {
-      btn.innerHTML = opt.label + ` <span class="extra" style="text-decoration:line-through;opacity:.7;">+${opt.extra}</span> <span class="extra">Gratis</span>`;
+      btn.innerHTML = opt.label + ` <span class="extra" style="text-decoration:line-through;opacity:.7;">+${opt.extra}</span> <span class="extra">🎁 Gratis</span>`;
     } else {
       btn.innerHTML = opt.label + (opt.extra ? ` <span class="extra">+${opt.extra}</span>` : '');
     }
@@ -1029,7 +1029,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
           <select class="topping-select">
             ${TOPPINGS.map(t=>{
               const extra = p.toppingIncluido ? 0 : toppingExtraFor(t.id, cz);
-              const priceTag = extra>0 ? ` (+${extra})` : (!p.toppingIncluido && t.extra>0 && cortesiaActiva && cortesiaCubre(t) ? ' (gratis)' : '');
+              const priceTag = extra>0 ? ` (+${extra})` : (!p.toppingIncluido && t.extra>0 && cortesiaActiva && cortesiaCubre(t) ? ' 🎁 Gratis' : '');
               return `<option value="${t.id}" ${t.id===selTopping?'selected':''}>${t.label}${priceTag}</option>`;
             }).join('')}
           </select>
@@ -1043,13 +1043,13 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
         <div class="variante-wrap">
           <label class="topping-label">${v.label}</label>
           <select class="topping-select variante-select" data-key="${v.key}">
-            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); return `<option value="${o.id}" ${itemVariantes[p.id][v.key]===o.id?'selected':''}>${o.label}${ex?' (+'+ex+')':''}</option>`; }).join('')}
+            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); const libre = !ex && (premiumSel || v.gratis) && v.source==='cremas' && o.extra>0; return `<option value="${o.id}" ${itemVariantes[p.id][v.key]===o.id?'selected':''}>${o.label}${ex?' (+'+ex+')':''}${libre?' 🎁 Gratis':''}</option>`; }).join('')}
           </select>
         </div>` : `
         <div class="variante-wrap">
           <label class="topping-label">${v.label}</label>
           <div class="variante-row">
-            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); const tag = ex ? ' (+'+ex+')' : (((premiumSel || v.gratis) && v.source==='cremas' && o.extra>0) ? ' 🎁 gratis' : ''); return `<button class="variante-chip${itemVariantes[p.id][v.key]===o.id?' selected':''}" data-key="${v.key}" data-opt="${o.id}">${o.label}${tag}</button>`; }).join('')}
+            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); const tag = ex ? ' (+'+ex+')' : (((premiumSel || v.gratis) && v.source==='cremas' && o.extra>0) ? ' 🎁 Gratis' : ''); return `<button class="variante-chip${itemVariantes[p.id][v.key]===o.id?' selected':''}" data-key="${v.key}" data-opt="${o.id}">${o.label}${tag}</button>`; }).join('')}
           </div>
         </div>`).join('');
     }
