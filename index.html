@@ -52,9 +52,10 @@ img{max-width:100%; display:block;}
 .acct-overlay.open{display:flex;}
 .acct-sheet{background:#fff; width:100%; max-width:520px; border-radius:22px 22px 0 0; padding:20px 18px 26px; max-height:88vh; overflow-y:auto;}
 .acct-sheet h3{margin:0 0 4px; font-family:'Baloo 2',sans-serif; color:var(--vino);}
-.stamps{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:12px 0;}
-.stamp{aspect-ratio:1; border-radius:50%; border:2px dashed #f0d7dc; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--gris);}
-.stamp.on{background:var(--principal); border:2px solid var(--principal); color:#fff;}
+.stamps{display:grid; grid-template-columns:repeat(5,32px); gap:8px; margin:12px 0; justify-content:center;}
+.stamp{width:32px; height:32px; border-radius:50%; border:1.5px dashed #f0d7dc; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--gris);}
+.stamp.pend{background:#8b5e3c; border:1.5px solid #8b5e3c; color:#fff;}
+.stamp.on{background:var(--principal); border:1.5px solid var(--principal); color:#fff;}
 .acct-order{display:flex; justify-content:space-between; gap:8px; padding:9px 0; border-bottom:1px solid #f6e6e9; font-size:13px;}
 .badge{font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:12px; background:#f0e2e4; color:var(--vino); white-space:nowrap;}
 .badge.ok{background:#dff3e6; color:#1d7a43;}
@@ -440,6 +441,7 @@ img{max-width:100%; display:block;}
   <button class="tab-btn" data-tab="personalizada"><span class="tab-name">Personalizada</span><span class="tab-desc">Crea tu antojo</span></button>
   <button class="tab-btn" data-tab="premium"><span class="tab-name">Premium</span><span class="tab-desc">Dubái, chocolosas y más</span></button>
   <button class="tab-btn" data-tab="otros"><span class="tab-name">Otros postres</span><span class="tab-desc">Brownies y más</span></button>
+  <button class="tab-btn" data-tab="extras"><span class="tab-name">Extras</span><span class="tab-desc">Salsas y toppings 2 oz</span></button>
 </nav>
 <div class="tabs-arrow"><span class="tabs-arrow-text">más</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
 </div>
@@ -502,6 +504,7 @@ img{max-width:100%; display:block;}
 
   <div class="step-card">
     <div class="step-head"><div class="step-num">+</div><h3>Extras 2 oz (opcional)</h3></div>
+    <div class="topping-label" style="margin:0 0 6px;">Salsas (2 oz)</div>
     <div class="opt-grid" id="extraOpts"></div>
     <div class="topping-select-wrap" id="extraToppingWrap" style="margin-top:12px;"></div>
   </div>
@@ -516,9 +519,16 @@ img{max-width:100%; display:block;}
 <section class="tab-panel" id="panel-premium">
   <div class="section-title"><h2>Línea Premium</h2><p>Dubái, chocolosas y más</p></div>
   <div class="card-list" id="premiumList"></div>
+  <div class="section-title" style="margin-top:22px;"><h2>Extras</h2><p>Agrega un poco más a tu pedido</p></div>
+  <div id="premiumExtrasList" style="display:flex; flex-direction:column;"></div>
 </section>
 
 <!-- ================= TAB: OTROS POSTRES ================= -->
+<section class="tab-panel" id="panel-extras">
+  <div class="section-title"><h2>Extras</h2><p>Agrega un poco más a tu pedido</p></div>
+  <div id="extrasList" style="display:flex; flex-direction:column;"></div>
+</section>
+
 <section class="tab-panel" id="panel-otros">
   <div class="section-title"><h2>Otros postres</h2><p>&nbsp;</p></div>
   <div class="card-list" id="otrosList"></div>
@@ -693,8 +703,8 @@ const DEFAULT_FAVORITAS = [
   {id:'canasta_pop', nombre:'Canasta Pop', desc:'Crema tradicional + dulce de leche + granola', img:IMG.canastaPop,
     toppingDefault:'granola', cortesia:false,
     variantes:[
-      {key:'cremaCanasta', label:'Elige tu crema', msgLabel:'Crema', source:'cremas', gratis:true},
-      {key:'baseCanasta', label:'¿Quieres base de pistacho?', msgLabel:'Base', source:'basePistacho'},
+      {key:'cremaCanasta', label:'Elige tu crema', msgLabel:'Crema', source:'cremas', type:'select', gratis:true},
+      {key:'syrupCanasta', label:'Elige tu syrup', msgLabel:'Syrup', source:'syrupCanasta', type:'select'},
     ],
     sizes:[{id:'unico',label:'Canasta Pop',price:200}]},
 ];
@@ -846,7 +856,7 @@ function renderPersonalizador(){
 
   const extraCont = document.getElementById('extraOpts');
   extraCont.innerHTML = '';
-  EXTRAS.forEach(opt=>{
+  salsasOrdenadas().forEach(opt=>{
     const btn = document.createElement('button');
     btn.className = 'opt' + (custom.extras.includes(opt.id)?' selected':'');
     btn.innerHTML = opt.label + ` <span class="extra">+${opt.extra}</span>`;
@@ -856,7 +866,7 @@ function renderPersonalizador(){
   const topWrap = document.getElementById('extraToppingWrap');
   const tops = extraToppings();
   const selTop = custom.extras.find(id=>id.startsWith('extop_')) || '';
-  topWrap.innerHTML = `<label class="topping-label">Topping extra (2 oz)</label>
+  topWrap.innerHTML = `<label class="topping-label">Toppings (2 oz)</label>
     <select class="topping-select"><option value="">Sin topping extra</option>
     ${tops.map(t=>`<option value="${t.id}" ${t.id===selTop?'selected':''}>${t.nombre} (+${t.extra})</option>`).join('')}</select>`;
   topWrap.querySelector('select').addEventListener('change', e=>{
@@ -922,8 +932,17 @@ function toppingExtraFor(toppingId, cortesiaAplica){
 
 // Extras de 2 oz: los de la lista + un extra por cada topping disponible
 const EXTRA_TOPPING_EXCLUIDOS = ['sin_topping','chispas_color','cono'];
+const EXTRA_SALSAS_ORDEN = ['ex_pistacho','ex_nutella','ex_leche_cond','ex_dulce_leche'];
+const EXTRA_TOPPINGS_ORDEN = ['kataifi','granola','chispas_choco','galletas','coco_rallado'];
+let EXTRAS_ORDEN_MANUAL = false;   // true cuando la administradora ya ordenó los extras desde el panel
+function salsasOrdenadas(){
+  if(EXTRAS_ORDEN_MANUAL) return EXTRAS.slice();
+  const pos = e=>{ const i = EXTRA_SALSAS_ORDEN.indexOf(e.id); return i<0 ? 99 : i; };
+  return EXTRAS.slice().sort((a,b)=>pos(a)-pos(b));
+}
 function extraToppings(){
-  return TOPPINGS.filter(t=>!EXTRA_TOPPING_EXCLUIDOS.includes(t.id)).map(t=>({
+  const pos = t=>{ const i = EXTRA_TOPPINGS_ORDEN.indexOf(t.id); return i<0 ? 99 : i; };
+  return TOPPINGS.filter(t=>!EXTRA_TOPPING_EXCLUIDOS.includes(t.id)).slice().sort((a,b)=>pos(a)-pos(b)).map(t=>({
     id:'extop_'+t.id, nombre:t.label, label:'Extra '+t.label+' 2oz', extra: t.id==='kataifi' ? EXTRA_KATAIFI_PRECIO : EXTRA_TOPPING_PRECIO
   }));
 }
@@ -931,6 +950,10 @@ function allExtras(){ return EXTRAS.concat(extraToppings()); }
 
 function resolveVariante(v){
   if(v.source==='cremas') return CREMAS.map(c=>({id:c.id,label:c.label,extra:c.extra}));
+  if(v.source==='syrupCanasta'){
+    const ids = ['dulce_leche','leche_cond','syrup_caramelo','nutella','pistacho'];
+    return ids.map(id=>BASES.find(b=>b.id===id)).filter(Boolean).map(b=>({id:b.id, label:b.label, extra:b.extra}));
+  }
   if(v.source==='basePistacho'){
     const o = [{id:'dulce_leche', label:'Dulce de leche (incluida)', extra:0}];
     const pb = BASES.find(b=>b.id==='pistacho');
@@ -956,7 +979,6 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
     const sizeObj = p.sizes.find(s=>s.id===selSize);
     const allowTopping = !!toppingState && (requireOptIn ? !!p.toppingSelect : true);
     const selTopping = allowTopping ? toppingState[p.id] : null;
-    const toppingExtra = allowTopping ? (p.toppingIncluido ? 0 : toppingExtraFor(selTopping, p.cortesia)) : 0;
 
     const vOpts = {};
     (p.variantes||[]).forEach(v=>{ vOpts[v.key] = resolveVariante(v); });
@@ -969,6 +991,8 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
     }
     const premiumSel = (p.variantes||[]).some(v=> CORTESIA_BASE_IDS.includes(itemVariantes[p.id][v.key]));
     const varExtraOf = (v,o)=> ((premiumSel || v.gratis) && v.source==='cremas') ? 0 : (o ? o.extra : 0);
+    const cz = p.cortesia || premiumSel;   // regalo: cortesía fija o syrup/base de pistacho elegido
+    const toppingExtra = allowTopping ? (p.toppingIncluido ? 0 : toppingExtraFor(selTopping, cz)) : 0;
     const varianteExtra = (p.variantes||[]).reduce((sum,v)=>{
       const opt = vOpts[v.key].find(o=>o.id===itemVariantes[p.id][v.key]);
       return sum + varExtraOf(v,opt);
@@ -979,13 +1003,13 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
 
     let toppingHTML = '';
     if(allowTopping){
-      const cortesiaActiva = p.cortesia;
+      const cortesiaActiva = cz;
       toppingHTML = `
         <div class="topping-select-wrap">
           <label class="topping-label">Topping</label>
           <select class="topping-select">
             ${TOPPINGS.map(t=>{
-              const extra = p.toppingIncluido ? 0 : toppingExtraFor(t.id, p.cortesia);
+              const extra = p.toppingIncluido ? 0 : toppingExtraFor(t.id, cz);
               const priceTag = extra>0 ? ` (+${extra})` : (!p.toppingIncluido && t.extra>0 && cortesiaActiva && cortesiaCubre(t) ? ' (gratis)' : '');
               return `<option value="${t.id}" ${t.id===selTopping?'selected':''}>${t.label}${priceTag}</option>`;
             }).join('')}
@@ -996,7 +1020,13 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
 
     let variantesHTML = '';
     if(p.variantes){
-      variantesHTML = p.variantes.map(v=>`
+      variantesHTML = p.variantes.map(v=> v.type==='select' ? `
+        <div class="variante-wrap">
+          <label class="topping-label">${v.label}</label>
+          <select class="topping-select variante-select" data-key="${v.key}">
+            ${vOpts[v.key].map(o=>{ const ex = varExtraOf(v,o); return `<option value="${o.id}" ${itemVariantes[p.id][v.key]===o.id?'selected':''}>${o.label}${ex?' (+'+ex+')':''}</option>`; }).join('')}
+          </select>
+        </div>` : `
         <div class="variante-wrap">
           <label class="topping-label">${v.label}</label>
           <div class="variante-row">
@@ -1024,6 +1054,12 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
         renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
       });
     });
+    wrap.querySelectorAll('.variante-select').forEach(sel=>{
+      sel.addEventListener('change', ()=>{
+        itemVariantes[p.id][sel.dataset.key] = sel.value;
+        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
+      });
+    });
     wrap.querySelectorAll('.variante-chip').forEach(chip=>{
       chip.addEventListener('click', ()=>{
         itemVariantes[p.id][chip.dataset.key] = chip.dataset.opt;
@@ -1042,7 +1078,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
       let precioUnit = s.price;
       if(allowTopping){
         const tp = TOPPINGS.find(t=>t.id===toppingState[p.id]);
-        const extra = p.toppingIncluido ? 0 : toppingExtraFor(toppingState[p.id], p.cortesia);
+        const extra = p.toppingIncluido ? 0 : toppingExtraFor(toppingState[p.id], cz);
         detalles.push(`Topping: ${tp.label}${extra>0?' (+'+extra+')':''}`);
         precioUnit += extra;
       }
@@ -1090,23 +1126,9 @@ function renderExtrasStandalone(containerId){
   const cont = document.getElementById(containerId);
   if(!cont) return;
   cont.innerHTML = '';
-  const tops = extraToppings();
-  if(tops.length){
-    const w = document.createElement('div');
-    w.className = 'extra-mini-card';
-    w.innerHTML = `<select class="topping-select" style="flex:1; margin:0;">${tops.map(t=>`<option value="${t.id}">Topping extra: ${t.nombre} 2oz</option>`).join('')}</select>
-      <span class="extra-mini-price"></span><button class="extra-mini-btn">+</button>`;
-    const sel = w.querySelector('select'), pr = w.querySelector('.extra-mini-price');
-    const upd = ()=>{ const t = tops.find(x=>x.id===sel.value); pr.textContent = money(t.extra); };
-    sel.addEventListener('change', upd); upd();
-    w.querySelector('.extra-mini-btn').addEventListener('click', ()=>{
-      const t = tops.find(x=>x.id===sel.value);
-      addToCart({uid:uid(), nombre:'Topping extra: '+t.nombre+' 2oz', detalles:[], cantidad:1, precioUnit:t.extra});
-      renderCart(); showToast('Agregado al carrito');
-    });
-    cont.appendChild(w);
-  }
-  EXTRAS.forEach(ex=>{
+  const head = t=>{ const h=document.createElement('div'); h.className='topping-label'; h.style.margin='4px 0 8px'; h.textContent=t; cont.appendChild(h); };
+  head('Salsas (2 oz)');
+  salsasOrdenadas().forEach(ex=>{
     const wrap = document.createElement('div');
     wrap.className = 'extra-mini-card';
     wrap.innerHTML = `
@@ -1119,6 +1141,23 @@ function renderExtrasStandalone(containerId){
     });
     cont.appendChild(wrap);
   });
+  const tops = extraToppings();
+  if(tops.length){
+    head('Toppings (2 oz)');
+    const w = document.createElement('div');
+    w.className = 'extra-mini-card';
+    w.innerHTML = `<select class="topping-select" style="flex:1; margin:0;">${tops.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('')}</select>
+      <span class="extra-mini-price"></span><button class="extra-mini-btn">+</button>`;
+    const sel = w.querySelector('select'), pr = w.querySelector('.extra-mini-price');
+    const upd = ()=>{ const t = tops.find(x=>x.id===sel.value); pr.textContent = money(t.extra); };
+    sel.addEventListener('change', upd); upd();
+    w.querySelector('.extra-mini-btn').addEventListener('click', ()=>{
+      const t = tops.find(x=>x.id===sel.value);
+      addToCart({uid:uid(), nombre:'Topping extra: '+t.nombre+' 2oz', detalles:[], cantidad:1, precioUnit:t.extra});
+      renderCart(); showToast('Agregado al carrito');
+    });
+    cont.appendChild(w);
+  }
 }
 
 /* =========================================================
@@ -1150,6 +1189,7 @@ const FIXED_TABS = [
   {key:'personalizada', defaultLabel:'Personalizada', defaultDesc:'Crea tu antojo'},
   {key:'premium', defaultLabel:'Premium', defaultDesc:'Dubái, chocolosas y más'},
   {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
+  {key:'extras', defaultLabel:'Extras', defaultDesc:'Salsas y toppings 2 oz'},
 ];
 
 function aplicarOrdenYEtiquetas(){
@@ -1529,6 +1569,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
       : `💵 Pagará con ${money(billeteNum())}, su cambio será ${money(billeteNum()-total)}.\n`;
   }
 
+  msg = limpiarEmoji(msg);
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 
@@ -1536,6 +1577,13 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   try{ localStorage.setItem('fp_cliente', JSON.stringify({nombre, telefono:tel})); }catch(e){}
   guardarPedidoCliente(tel, nombre, total);
 });
+
+// Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
+function limpiarEmoji(texto){
+  return texto
+    .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]+/gu, '\u0001')
+    .split('\n').map(l=> l.replace(/^\u0001\s*/, '').replace(/\s*\u0001\s*/g, ' ').replace(/\u0001/g,'').replace(/\s+$/,'')).join('\n');
+}
 
 async function guardarPedidoCliente(tel, nombre, total){
   try{
@@ -1581,16 +1629,20 @@ async function cargarTarjeta(){
     const snap = await ref.get();
     if(!snap.exists){ out.innerHTML = '<div class="step-note">Aún no tienes pedidos con este número. ¡Haz el primero! 🍓</div>'; return; }
     const c = snap.data();
-    const p = c.puntos||0, ciclo = p>0 && p%10===0 ? 10 : p%10;
+    const p = c.puntos||0, n = c.pendientes||0;
+    const ini = (p>0 && p%10===0 && n===0) ? p-10 : Math.floor(p/10)*10;
     let stamps = '';
-    for(let i=1;i<=10;i++) stamps += `<div class="stamp${i<=ciclo?' on':''}">${i===5?'🎡':(i===10?'🎁':i)}</div>`;
+    for(let i=ini+1;i<=ini+10;i++){
+      const st = i<=p ? 'on' : (i<=p+n ? 'pend' : '');
+      stamps += `<div class="stamp ${st}">${i%10===5?'🎡':(i%10===0?'🎁':(i-ini))}</div>`;
+    }
     const ped = await ref.collection('pedidos').orderBy('fecha','desc').limit(15).get();
     let hist = '';
     ped.forEach(d=>{ const o=d.data(); const f=o.fecha&&o.fecha.toDate? o.fecha.toDate().toLocaleDateString('es-DO',{day:'numeric',month:'short'}):'';
       hist += `<div class="acct-order"><span>${f} · ${(o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ')}</span><span style="text-align:right;"><b>${money(o.total||0)}</b><br><span class="badge ${o.estado==='confirmado'?'ok':''}">${o.estado==='confirmado'?'Confirmado':(o.estado==='cancelado'?'Cancelado':'Pendiente')}</span></span></div>`; });
     out.innerHTML = `<div style="font-weight:700;">Hola, ${c.nombre||'Pop'} 💕</div>
       <div class="stamps">${stamps}</div>
-      <div class="step-note" style="margin:0;">Compras confirmadas: <b>${p}</b>${c.pendientes?` · Por confirmar: <b>${c.pendientes}</b>`:''}</div>
+      <div class="step-note" style="margin:0;">Compras confirmadas: <b>${p}</b>${n?` · Por confirmar (marrón): <b>${n}</b>`:''}</div>
       <div class="step-note" style="margin:4px 0 0;">🎡 En tu compra 5 giras la ruleta · 🎁 en la 10 ganas una Canasta Pop gratis.</div>
       <div style="margin-top:14px; font-weight:700;">Mis pedidos</div>${hist || '<div class="step-note">Sin pedidos todavía.</div>'}`;
   }catch(e){ out.innerHTML = '<div class="step-note">No se pudo consultar ahora. Intenta de nuevo en un momento.</div>'; }
@@ -1696,6 +1748,7 @@ async function cargarDatosRemotos(){
       if(d.premium) PREMIUM = fusionarConImagenLocal(d.premium, DEFAULT_PREMIUM);
       if(d.otros) OTROS = fusionarConImagenLocal(d.otros, DEFAULT_OTROS);
       if(d.faq && d.faq.length) CONFIG.faq = d.faq;
+      if(d.ordenExtrasInicial) EXTRAS_ORDEN_MANUAL = true;
       if(d.categoriasExtra) CATEGORIAS_EXTRA = d.categoriasExtra;
       if(d.categoriasOrden) CATEGORIAS_ORDEN = d.categoriasOrden;
       if(d.categoriasOcultas) CATEGORIAS_OCULTAS = d.categoriasOcultas;
@@ -1720,7 +1773,9 @@ async function cargarDatosRemotos(){
   renderPersonalizador();
   renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
   renderCardList('premiumList', PREMIUM, premSize, 'Agregar', premTopping, true);
+  renderExtrasStandalone('extrasList');
   renderExtrasStandalone('favoritasExtrasList');
+  renderExtrasStandalone('premiumExtrasList');
   renderOtros();
   renderCart();
   renderInfo();

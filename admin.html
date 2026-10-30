@@ -80,6 +80,13 @@ input:checked + .slider:before{transform:translateX(20px);}
 .btn-cancel{background:#f0e2e4; color:var(--vino);}
 .btn-save{background:var(--principal); color:#fff;}
 
+.sort-item{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+.sort-item.dragging{opacity:.9; box-shadow:0 8px 22px rgba(86,9,31,.25); transform:scale(1.02); background:#fff7f8;}
+.stamp-row{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;}
+.stp{width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; border:1.5px dashed #eed3d8; color:var(--gris);}
+.stp.on{background:var(--principal); border:1.5px solid var(--principal); color:#fff;}
+.stp.pend{background:#8b5e3c; border:1.5px solid #8b5e3c; color:#fff; cursor:pointer; box-shadow:0 0 0 3px rgba(139,94,60,.18);}
+.pend-card{border-left:5px solid #8b5e3c; background:#fbf4ee;}
 .toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--vino); color:#fff; padding:10px 18px; border-radius:30px; font-size:13px; opacity:0; transition:.25s; pointer-events:none; z-index:100;}
 .toast.show{opacity:1;}
 .oferta-card{border-left:4px solid var(--principal);}
@@ -108,8 +115,7 @@ input:checked + .slider:before{transform:translateX(20px);}
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="disponibilidad">Disponibilidad</button>
-    <button class="tab-btn" data-tab="productos">Productos</button>
+    <button class="tab-btn active" data-tab="productos">Productos</button>
     <button class="tab-btn" data-tab="ingredientes">Ingredientes</button>
     <button class="tab-btn" data-tab="ofertas">Ofertas</button>
     <button class="tab-btn" data-tab="faq">Preguntas frecuentes</button>
@@ -119,14 +125,8 @@ input:checked + .slider:before{transform:translateX(20px);}
 
   <div class="wrap">
 
-    <!-- DISPONIBILIDAD -->
-    <div class="tab-panel active" id="panel-disponibilidad">
-      <p class="empty-note" style="padding:6px 0 14px;">Activa o desactiva lo que esté agotado. Los cambios se ven al instante en el sitio.</p>
-      <div id="dispContainer"></div>
-    </div>
-
     <!-- PRODUCTOS -->
-    <div class="tab-panel" id="panel-productos">
+    <div class="tab-panel active" id="panel-productos">
       <div id="prodContainer"></div>
     </div>
 
@@ -162,7 +162,7 @@ input:checked + .slider:before{transform:translateX(20px);}
     <!-- CATEGORIAS -->
     <div class="tab-panel" id="panel-categorias">
       <div class="section-title">Orden y visibilidad</div>
-      <p class="empty-note" style="padding:0 0 10px;">Usa las flechas para reordenar cómo se ven en el sitio. Renombra o muestra/oculta cualquier categoría.</p>
+      <p class="empty-note" style="padding:0 0 10px;">Mantén presionada una categoría y arrástrala para cambiar el orden en el sitio. Renombra o muestra/oculta cualquiera.</p>
       <div id="ordenCategoriasContainer"></div>
 
       <div class="section-title" style="margin-top:8px;">Categorías nuevas</div>
@@ -293,10 +293,11 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 /* ---------- CARGA / GUARDADO ---------- */
 const FIXED_TABS = [
-  {key:'favoritas', defaultLabel:'Las favoritas'},
-  {key:'personalizada', defaultLabel:'Personalizada'},
-  {key:'premium', defaultLabel:'Premium'},
-  {key:'otros', defaultLabel:'Otros postres'},
+  {key:'favoritas', defaultLabel:'Las favoritas', defaultDesc:'Combinaciones ya creadas'},
+  {key:'personalizada', defaultLabel:'Personalizada', defaultDesc:'Crea tu antojo'},
+  {key:'premium', defaultLabel:'Premium', defaultDesc:'Dubái, chocolosas y más'},
+  {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
+  {key:'extras', defaultLabel:'Extras', defaultDesc:'Salsas y toppings 2 oz'},
 ];
 
 async function cargarMenu(){
@@ -309,6 +310,13 @@ async function cargarMenu(){
   // agrega al orden cualquier categoría nueva que aún no esté registrada
   const todasLasClaves = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id));
   todasLasClaves.forEach(k=>{ if(!menu.categoriasOrden.includes(k)) menu.categoriasOrden.push(k); });
+  if(!menu.ordenExtrasInicial){
+    const orden = ['ex_pistacho','ex_nutella','ex_leche_cond','ex_dulce_leche'];
+    const pos = id=>{ const i = orden.indexOf(id); return i<0 ? 99 : i; };
+    menu.extras.sort((x,y)=> pos(x.id) - pos(y.id));
+    menu.ordenExtrasInicial = true;
+    guardarMenu();
+  }
   renderTodo();
   cargarOfertas();
   cargarPendientes();
@@ -332,7 +340,7 @@ const PROD_CATS = [
 ];
 
 function renderTodo(){
-  renderDisponibilidad();
+  
   renderProductos();
   renderIngredientes();
   renderFaq();
@@ -340,106 +348,101 @@ function renderTodo(){
 }
 
 /* ---------- DISPONIBILIDAD (todo en una vista) ---------- */
-function renderDisponibilidad(){
-  const cont = document.getElementById('dispContainer');
-  cont.innerHTML = '';
-  const grupos = [...PROD_CATS, ...CATS];
-  grupos.forEach(g=>{
-    const items = menu[g.key] || [];
-    if(!items.length) return;
-    const title = document.createElement('div');
-    title.className = 'section-title';
-    title.textContent = g.label;
-    cont.appendChild(title);
-    items.forEach(item=>{
-      const card = document.createElement('div');
-      card.className = 'card card-row';
-      const nombre = item.nombre || item.label;
-      card.innerHTML = `
-        <div>
-          <div class="item-name">${nombre}</div>
-          <div class="item-sub">${g.label}</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" ${item.disponible!==false?'checked':''}>
-          <span class="slider"></span>
-        </label>`;
-      card.querySelector('input').addEventListener('change', async (e)=>{
-        item.disponible = e.target.checked;
-        await guardarMenu();
-        showToast(e.target.checked ? `${nombre} disponible` : `${nombre} marcado agotado`);
-      });
-      cont.appendChild(card);
-    });
-  });
+/* ---------- PRODUCTOS (favoritas / premium / otros) ---------- */
 
-  (menu.categoriasExtra||[]).forEach(cat=>{
-    const items = cat.items || [];
-    if(!items.length) return;
-    const title = document.createElement('div');
-    title.className = 'section-title';
-    title.textContent = cat.nombre;
-    cont.appendChild(title);
-    items.forEach(item=>{
-      const card = document.createElement('div');
-      card.className = 'card card-row';
-      card.innerHTML = `
-        <div>
-          <div class="item-name">${item.nombre}</div>
-          <div class="item-sub">${cat.nombre}</div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" ${item.disponible!==false?'checked':''}>
-          <span class="slider"></span>
-        </label>`;
-      card.querySelector('input').addEventListener('change', async (e)=>{
-        item.disponible = e.target.checked;
-        await guardarMenu();
-        showToast(e.target.checked ? `${item.nombre} disponible` : `${item.nombre} marcado agotado`);
-      });
-      cont.appendChild(card);
-    });
+/* ---------- ARRASTRAR PARA ORDENAR (mantener presionado) + INTERRUPTOR DE DISPONIBILIDAD ---------- */
+function sortable(container, itemSel, onDone){
+  let drag = null, timer = null, sx = 0, sy = 0;
+  const items = ()=> [...container.querySelectorAll(itemSel)];
+  const begin = el=>{ drag = el; el.classList.add('dragging'); if(navigator.vibrate) navigator.vibrate(25); };
+  const move = y=>{
+    const over = items().find(o=>{ if(o===drag) return false; const r=o.getBoundingClientRect(); return y>r.top && y<r.bottom; });
+    if(!over) return;
+    const r = over.getBoundingClientRect();
+    container.insertBefore(drag, y < r.top + r.height/2 ? over : over.nextSibling);
+  };
+  const end = ()=>{ clearTimeout(timer); if(!drag) return; const el = drag; drag = null; el.classList.remove('dragging'); onDone(items()); };
+  const pick = e=>{
+    const el = e.target.closest(itemSel);
+    if(!el || !container.contains(el)) return null;
+    if(e.target.closest('button,input,select,textarea,label,a,.stp')) return null;
+    return el;
+  };
+  container.addEventListener('contextmenu', e=>{ if(e.target.closest(itemSel)) e.preventDefault(); });
+  container.addEventListener('touchstart', e=>{
+    const el = pick(e); if(!el) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    timer = setTimeout(()=> begin(el), 380);
+  }, {passive:true});
+  container.addEventListener('touchmove', e=>{
+    if(!drag){
+      if(Math.abs(e.touches[0].clientX-sx) > 8 || Math.abs(e.touches[0].clientY-sy) > 8) clearTimeout(timer);
+      return;
+    }
+    e.preventDefault(); move(e.touches[0].clientY);
+  }, {passive:false});
+  container.addEventListener('touchend', end);
+  container.addEventListener('touchcancel', end);
+  container.addEventListener('mousedown', e=>{
+    const el = pick(e); if(!el) return;
+    timer = setTimeout(()=> begin(el), 380);
+    const mm = ev=>{ if(drag) move(ev.clientY); };
+    const mu = ()=>{ document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); end(); };
+    document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
   });
 }
+function ordenarLista(wrapper, arr, after){
+  sortable(wrapper, '.sort-item', async els=>{
+    const ids = els.map(e=>e.dataset.id);
+    arr.sort((x,y)=> ids.indexOf(x.id) - ids.indexOf(y.id));
+    await guardarMenu(); showToast('Orden guardado');
+    (after || renderTodo)();
+  });
+}
+function crearSwitch(item){
+  const l = document.createElement('label'); l.className = 'switch';
+  l.innerHTML = '<input type="checkbox"><span class="slider"></span>';
+  const i = l.querySelector('input'); i.checked = item.disponible !== false;
+  i.addEventListener('change', async ()=>{
+    item.disponible = i.checked; await guardarMenu();
+    showToast(i.checked ? 'Disponible' : 'Marcado como agotado');
+  });
+  return l;
+}
+function filaItem(item, titulo, sub, onEdit, onDel){
+  const card = document.createElement('div');
+  card.className = 'card sort-item'; card.dataset.id = item.id;
+  card.innerHTML = `<div class="card-row"><div><div class="item-name">${titulo}</div><div class="item-sub">${sub}</div></div>
+    <div class="acts" style="display:flex; gap:6px; align-items:center;"><button class="small-btn btn-edit">Editar</button><button class="small-btn btn-del">Eliminar</button></div></div>`;
+  card.querySelector('.acts').insertBefore(crearSwitch(item), card.querySelector('.btn-edit'));
+  card.querySelector('.btn-edit').addEventListener('click', onEdit);
+  card.querySelector('.btn-del').addEventListener('click', onDel);
+  return card;
+}
+function hintOrden(cont){
+  const h = document.createElement('p'); h.className = 'empty-note'; h.style.padding = '0 0 6px';
+  h.textContent = 'Mantén presionado y arrastra para cambiar el orden. El interruptor marca disponible / agotado.';
+  cont.appendChild(h);
+}
 
-/* ---------- PRODUCTOS (favoritas / premium / otros) ---------- */
 function renderProductos(){
   const cont = document.getElementById('prodContainer');
   cont.innerHTML = '';
+  hintOrden(cont);
   PROD_CATS.forEach(cat=>{
     const title = document.createElement('div');
-    title.className = 'section-title';
-    title.textContent = cat.label;
+    title.className = 'section-title'; title.textContent = cat.label;
     cont.appendChild(title);
+    const list = document.createElement('div'); cont.appendChild(list);
     (menu[cat.key]||[]).forEach((item, idx)=>{
       const precio = item.price!=null ? `RD$${item.price}` : (item.sizes||[]).map(s=>`${s.label}: RD$${s.price}`).join(' · ');
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-row">
-          <div>
-            <div class="item-name">${item.nombre}</div>
-            <div class="item-sub">${precio}</div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="small-btn btn-edit">Editar</button>
-            <button class="small-btn btn-del">Eliminar</button>
-          </div>
-        </div>`;
-      card.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalProducto(cat.key, idx));
-      card.querySelector('.btn-del').addEventListener('click', async ()=>{
-        if(confirm(`¿Eliminar "${item.nombre}"?`)){
-          menu[cat.key].splice(idx,1);
-          await guardarMenu();
-          renderTodo();
-          showToast('Producto eliminado');
-        }
-      });
-      cont.appendChild(card);
+      list.appendChild(filaItem(item, item.nombre, precio,
+        ()=> abrirModalProducto(cat.key, idx),
+        async ()=>{ if(confirm(`¿Eliminar "${item.nombre}"?`)){ menu[cat.key].splice(idx,1); await guardarMenu(); renderTodo(); showToast('Producto eliminado'); } }));
     });
+    ordenarLista(list, menu[cat.key]);
     const addBtn = document.createElement('button');
-    addBtn.className = 'btn-add';
-    addBtn.textContent = `+ Agregar a ${cat.label}`;
+    addBtn.className = 'btn-add'; addBtn.textContent = `+ Agregar a ${cat.label}`;
     addBtn.addEventListener('click', ()=> abrirModalProducto(cat.key, null));
     cont.appendChild(addBtn);
   });
@@ -545,77 +548,36 @@ async function guardarProducto(catKey, idx){
 function renderIngredientes(){
   const cont = document.getElementById('ingContainer');
   cont.innerHTML = '';
+  hintOrden(cont);
 
-  // Sección especial: Tamaños de Personalizada (tienen precio y foto propia, no "costo extra")
   const titleTam = document.createElement('div');
-  titleTam.className = 'section-title';
-  titleTam.textContent = 'Tamaños (paso "Personalizada")';
+  titleTam.className = 'section-title'; titleTam.textContent = 'Tamaños (paso "Personalizada")';
   cont.appendChild(titleTam);
+  const listTam = document.createElement('div'); cont.appendChild(listTam);
   (menu.tamanos||[]).forEach((item, idx)=>{
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="card-row">
-        <div>
-          <div class="item-name">${item.label}</div>
-          <div class="item-sub">RD$${item.price}</div>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="small-btn btn-edit">Editar</button>
-          <button class="small-btn btn-del">Eliminar</button>
-        </div>
-      </div>`;
-    card.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalTamano(idx));
-    card.querySelector('.btn-del').addEventListener('click', async ()=>{
-      if(confirm(`¿Eliminar el tamaño "${item.label}"?`)){
-        menu.tamanos.splice(idx,1);
-        await guardarMenu();
-        renderTodo();
-        showToast('Eliminado');
-      }
-    });
-    cont.appendChild(card);
+    listTam.appendChild(filaItem(item, item.label, 'RD$'+item.price,
+      ()=> abrirModalTamano(idx),
+      async ()=>{ if(confirm(`¿Eliminar el tamaño "${item.label}"?`)){ menu.tamanos.splice(idx,1); await guardarMenu(); renderTodo(); showToast('Eliminado'); } }));
   });
+  ordenarLista(listTam, menu.tamanos);
   const addTamBtn = document.createElement('button');
-  addTamBtn.className = 'btn-add';
-  addTamBtn.textContent = '+ Agregar tamaño (ej. 16 oz, Plato Dubái, Paquete)';
+  addTamBtn.className = 'btn-add'; addTamBtn.textContent = '+ Agregar tamaño (ej. 16 oz, Plato Dubái, Paquete)';
   addTamBtn.addEventListener('click', ()=> abrirModalTamano(null));
   cont.appendChild(addTamBtn);
 
   CATS.filter(c=>c.key!=='tamanos').forEach(cat=>{
     const title = document.createElement('div');
-    title.className = 'section-title';
-    title.style.marginTop = '22px';
-    title.textContent = cat.label;
+    title.className = 'section-title'; title.style.marginTop = '22px'; title.textContent = cat.label;
     cont.appendChild(title);
+    const list = document.createElement('div'); cont.appendChild(list);
     (menu[cat.key]||[]).forEach((item, idx)=>{
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-row">
-          <div>
-            <div class="item-name">${item.label}</div>
-            <div class="item-sub">${item.extra ? 'Costo extra: RD$'+item.extra : 'Sin costo extra'}</div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="small-btn btn-edit">Editar</button>
-            <button class="small-btn btn-del">Eliminar</button>
-          </div>
-        </div>`;
-      card.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalIngrediente(cat.key, idx));
-      card.querySelector('.btn-del').addEventListener('click', async ()=>{
-        if(confirm(`¿Eliminar "${item.label}"?`)){
-          menu[cat.key].splice(idx,1);
-          await guardarMenu();
-          renderTodo();
-          showToast('Eliminado');
-        }
-      });
-      cont.appendChild(card);
+      list.appendChild(filaItem(item, item.label, item.extra ? 'Costo extra: RD$'+item.extra : 'Sin costo extra',
+        ()=> abrirModalIngrediente(cat.key, idx),
+        async ()=>{ if(confirm(`¿Eliminar "${item.label}"?`)){ menu[cat.key].splice(idx,1); await guardarMenu(); renderTodo(); showToast('Eliminado'); } }));
     });
+    ordenarLista(list, menu[cat.key]);
     const addBtn = document.createElement('button');
-    addBtn.className = 'btn-add';
-    addBtn.textContent = `+ Agregar ${cat.label.slice(0,-1)}`;
+    addBtn.className = 'btn-add'; addBtn.textContent = `+ Agregar ${cat.label.slice(0,-1)}`;
     addBtn.addEventListener('click', ()=> abrirModalIngrediente(cat.key, null));
     cont.appendChild(addBtn);
   });
@@ -845,53 +807,26 @@ function renderOrdenCategorias(){
   const cont = document.getElementById('ordenCategoriasContainer');
   if(!cont) return;
   cont.innerHTML = '';
-  const orden = menu.categoriasOrden;
-  orden.forEach((key, idx)=>{
+  menu.categoriasOrden.forEach(key=>{
     const esFija = FIXED_TABS.some(f=>f.key===key);
     const oculta = menu.categoriasOcultas.includes(key);
     const row = document.createElement('div');
-    row.className = 'card card-row';
-    row.innerHTML = `
-      <div style="display:flex; align-items:center; gap:10px; flex:1;">
-        <div style="display:flex; flex-direction:column;">
-          <button class="small-btn btn-edit" style="padding:2px 8px;" ${idx===0?'disabled':''}>▲</button>
-          <button class="small-btn btn-edit" style="padding:2px 8px; margin-top:4px;" ${idx===orden.length-1?'disabled':''}>▼</button>
-        </div>
-        <div class="item-name">${catKeyLabel(key)}${esFija?'':' <span class="item-sub">(personalizada)</span>'}</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <button class="small-btn btn-edit" id="renombrar_${idx}">Renombrar</button>
-        <label class="switch"><input type="checkbox" id="ocultar_${idx}" ${oculta?'':'checked'}><span class="slider"></span></label>
-      </div>`;
-    const [upBtn, downBtn] = row.querySelectorAll('.btn-edit[style*="padding:2px"]');
-    upBtn.addEventListener('click', async ()=>{
-      if(idx===0) return;
-      [orden[idx-1], orden[idx]] = [orden[idx], orden[idx-1]];
+    row.className = 'card card-row sort-item'; row.dataset.key = key; row.dataset.id = key;
+    row.innerHTML = `<div class="item-name">${catKeyLabel(key)}${esFija?'':' <span class="item-sub">(nueva)</span>'}</div>
+      <div style="display:flex; align-items:center; gap:8px;"><button class="small-btn btn-edit">Renombrar</button>
+      <label class="switch"><input type="checkbox" ${oculta?'':'checked'}><span class="slider"></span></label></div>`;
+    row.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalRenombrar(key));
+    row.querySelector('input').addEventListener('change', async e=>{
+      if(e.target.checked) menu.categoriasOcultas = menu.categoriasOcultas.filter(k=>k!==key);
+      else menu.categoriasOcultas.push(key);
       await guardarMenu();
-      renderOrdenCategorias();
-      showToast('Orden actualizado');
+      showToast(e.target.checked ? 'Categoría visible' : 'Categoría oculta para los clientes');
     });
-    downBtn.addEventListener('click', async ()=>{
-      if(idx===orden.length-1) return;
-      [orden[idx+1], orden[idx]] = [orden[idx], orden[idx+1]];
-      await guardarMenu();
-      renderOrdenCategorias();
-      showToast('Orden actualizado');
-    });
-    row.querySelector(`#renombrar_${idx}`).addEventListener('click', ()=> abrirModalRenombrar(key));
-    const chk = row.querySelector(`#ocultar_${idx}`);
-    if(chk){
-      chk.addEventListener('change', async (e)=>{
-        if(e.target.checked){
-          menu.categoriasOcultas = menu.categoriasOcultas.filter(k=>k!==key);
-        } else {
-          menu.categoriasOcultas.push(key);
-        }
-        await guardarMenu();
-        showToast(e.target.checked ? 'Categoría visible' : 'Categoría oculta para los clientes');
-      });
-    }
     cont.appendChild(row);
+  });
+  sortable(cont, '.sort-item', async els=>{
+    menu.categoriasOrden = els.map(e=>e.dataset.key);
+    await guardarMenu(); showToast('Orden guardado'); renderOrdenCategorias();
   });
 }
 
@@ -969,7 +904,7 @@ function renderCategorias(){
     (cat.items||[]).forEach((item, prodIdx)=>{
       const precio = item.price!=null ? `RD$${item.price}` : (item.sizes||[]).map(s=>`${s.label}: RD$${s.price}`).join(' · ');
       const prodCard = document.createElement('div');
-      prodCard.className = 'card';
+      prodCard.className = 'card sort-item'; prodCard.dataset.id = item.id;
       prodCard.style.marginBottom = '8px';
       prodCard.innerHTML = `
         <div class="card-row">
@@ -982,6 +917,7 @@ function renderCategorias(){
             <button class="small-btn btn-del">Eliminar</button>
           </div>
         </div>`;
+      { const be = prodCard.querySelector('.btn-edit'); be.parentNode.insertBefore(crearSwitch(item), be); be.parentNode.style.alignItems = 'center'; }
       prodCard.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalProductoCategoria(catIdx, prodIdx));
       prodCard.querySelector('.btn-del').addEventListener('click', async ()=>{
         if(confirm(`¿Eliminar "${item.nombre}"?`)){
@@ -994,6 +930,7 @@ function renderCategorias(){
       listEl.appendChild(prodCard);
     });
 
+    ordenarLista(listEl, cat.items, renderCategorias);
     card.querySelector(`#catAddBtn_${catIdx}`).addEventListener('click', ()=> abrirModalProductoCategoria(catIdx, null));
   });
 }
@@ -1028,7 +965,7 @@ async function guardarCategoria(idx){
   await guardarMenu();
   cerrarModal();
   renderCategorias();
-  renderDisponibilidad();
+  
   showToast('Guardado');
 }
 
@@ -1069,7 +1006,7 @@ async function guardarProductoCategoria(catIdx, prodIdx){
   await guardarMenu();
   cerrarModal();
   renderCategorias();
-  renderDisponibilidad();
+  
   showToast('Guardado');
 }
 
@@ -1081,36 +1018,45 @@ function hito(p){
   if(p%10===5) return '🎡 ¡Le toca girar la ruleta!';
   return '';
 }
+function slotsAdmin(tel, p, pend){
+  const n = pend.length;
+  let s = (p>0 && p%10===0 && n===0) ? p-10 : Math.floor(p/10)*10;
+  let html = '';
+  do{
+    html += '<div class="stamp-row">';
+    for(let i=s+1;i<=s+10;i++){
+      const lab = i%10===5 ? '🎡' : (i%10===0 ? '🎁' : (i-s));
+      if(i<=p) html += `<span class="stp on">${lab}</span>`;
+      else if(i<=p+n) html += `<span class="stp pend" title="Toca para confirmar" onclick="confirmarPedido('${tel}','${pend[i-p-1].id}')">${lab}</span>`;
+      else html += `<span class="stp">${lab}</span>`;
+    }
+    html += '</div>'; s += 10;
+  }while(s < p+n);
+  return html;
+}
 async function cargarPendientes(){
   const cont = document.getElementById('cliPendientes');
   if(!cont) return;
   try{
     const snap = await CLIENTES.where('pendientes','>',0).get();
     if(snap.empty){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>'; return; }
-    const filas = [];
-    for(const d of snap.docs){
-      const c = d.data();
-      const ps = await CLIENTES.doc(d.id).collection('pedidos').where('estado','==','pendiente').get();
-      ps.forEach(pd=> filas.push({tel:d.id, c, id:pd.id, o:pd.data()}));
-    }
-    filas.sort((x,y)=> ((y.o.fecha&&y.o.fecha.seconds)||0) - ((x.o.fecha&&x.o.fecha.seconds)||0));
-    if(!filas.length){ cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>'; return; }
     cont.innerHTML = '';
-    filas.forEach(f=>{
-      const fecha = f.o.fecha&&f.o.fecha.toDate ? f.o.fecha.toDate().toLocaleString('es-DO',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}) : '';
-      const items = (f.o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ');
+    for(const d of snap.docs){
+      const c = d.data(), tel = d.id, p = c.puntos||0;
+      const ps = await CLIENTES.doc(tel).collection('pedidos').where('estado','==','pendiente').get();
+      const pend = [];
+      ps.forEach(pd=>{ const o = pd.data(); pend.push({id:pd.id, o, f:(o.fecha&&o.fecha.seconds)||0}); });
+      pend.sort((x,y)=> x.f - y.f);
+      if(!pend.length) continue;
       const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `<div class="item-name">${f.c.nombre||'Cliente'} · ${f.tel}</div>
-        <div class="item-sub">${fecha} · RD$${f.o.total}</div><div class="item-sub">${items}</div>
-        <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
-          <button class="small-btn btn-edit" data-act="ok">✅ Confirmar</button>
-          <button class="small-btn btn-del" data-act="no">Cancelar</button>
-        </div>`;
-      card.querySelector('[data-act="ok"]').addEventListener('click', ()=> confirmarPedido(f.tel, f.id));
-      card.querySelector('[data-act="no"]').addEventListener('click', ()=> cancelarPedido(f.tel, f.id));
+      card.className = 'card pend-card';
+      card.innerHTML = `<div class="item-name">${c.nombre||'Cliente'}</div><div class="item-sub">${c.telefono||tel}</div>
+        ${slotsAdmin(tel, p, pend)}
+        <div class="item-sub">Toca un círculo marrón para confirmar esa compra.</div>
+        ${pend.map((x,k)=>`<div class="item-sub" style="margin-top:4px;">Compra ${p+k+1}: ${(x.o.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(', ')} · RD$${x.o.total} <a href="#" onclick="cancelarPedido('${tel}','${x.id}'); return false;" style="color:var(--rojo);">cancelar</a></div>`).join('')}`;
       cont.appendChild(card);
-    });
+    }
+    if(!cont.children.length) cont.innerHTML = '<p class="empty-note">No hay pedidos por confirmar. 🎉</p>';
   }catch(e){ cont.innerHTML = '<p class="empty-note">No se pudo cargar (revisa las reglas de Firestore).</p>'; }
 }
 function buscarCliente(){
@@ -1126,9 +1072,10 @@ async function abrirCliente(tel){
   const snap = await ref.get();
   if(!snap.exists){ out.innerHTML = '<p class="empty-note">Ese número aún no tiene pedidos ni tarjeta.</p>'; return; }
   const c = snap.data(), p = c.puntos||0, ciclo = (p>0 && p%10===0) ? 10 : p%10;
-  let stamps = '';
-  for(let i=1;i<=10;i++) stamps += `<span style="display:inline-flex;width:28px;height:28px;margin:2px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;${i<=ciclo?'background:var(--principal);color:#fff;':'border:2px dashed #eed3d8;color:var(--gris);'}">${i===5?'🎡':(i===10?'🎁':i)}</span>`;
   const ped = await ref.collection('pedidos').orderBy('fecha','desc').limit(20).get();
+  const pendD = []; ped.forEach(d=>{ const o = d.data(); if(o.estado==='pendiente') pendD.push({id:d.id, f:(o.fecha&&o.fecha.seconds)||0}); });
+  pendD.sort((x,y)=> x.f - y.f);
+  const stamps = slotsAdmin(tel, p, pendD);
   let lista = '';
   ped.forEach(d=>{
     const o = d.data(); const f = o.fecha&&o.fecha.toDate ? o.fecha.toDate().toLocaleString('es-DO',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}) : '';
