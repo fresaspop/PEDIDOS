@@ -1,0 +1,12 @@
+{
+  "name": "Finanzas Fresas Pop",
+  "short_name": "Finanzas Pop",
+  "start_url": "./finanzas.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff3f4",
+  "theme_color": "#56091f",
+  "icons": [
+    {"src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23db5275'/%3E%3Ctext x='256' y='330' font-size='260' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3E%F0%9F%8D%93%3C/text%3E%3C/svg%3E", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}
