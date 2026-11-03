@@ -47,6 +47,8 @@ img{max-width:100%; display:block;}
 }
 .oferta-banner strong{font-weight:700;}
 .oferta-benef{font-weight:500; font-size:12px; opacity:.95; margin-top:2px;}
+.acct-wrap{display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+.acct-label{font-size:10px; font-weight:700; color:var(--vino); letter-spacing:.2px; line-height:1; white-space:nowrap;}
 .acct-btn{background:#fff; color:var(--principal); border:2px solid var(--principal); box-shadow:none;}
 .acct-overlay{position:fixed; inset:0; background:rgba(58,20,32,.5); display:none; align-items:flex-end; justify-content:center; z-index:60;}
 .acct-overlay.open{display:flex;}
@@ -426,7 +428,10 @@ img{max-width:100%; display:block;}
 <!-- ================= HEADER ================= -->
 <header class="header">
   <div class="header-row">
-    <button class="cart-btn acct-btn" id="acctBtn" aria-label="Mi tarjeta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></button>
+    <div class="acct-wrap" id="acctWrap">
+      <button class="cart-btn acct-btn" id="acctBtn" aria-label="Mi tarjeta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></button>
+      <span class="acct-label" data-t="vip_label">Tarjeta VIP</span>
+    </div>
     <div class="logo-wrap">
       <img class="logo-img" src="" id="headerLogoImg" alt="Fresas Pop">
       <div class="logo-slogan" id="sloganText">Aquí se viene a ser feliz</div>
@@ -445,7 +450,6 @@ img{max-width:100%; display:block;}
   <button class="tab-btn" data-tab="personalizada"><span class="tab-name">Personalizada</span><span class="tab-desc">Crea tu antojo</span></button>
   <button class="tab-btn" data-tab="premium"><span class="tab-name">Premium</span><span class="tab-desc">Dubái, chocolosas y más</span></button>
   <button class="tab-btn" data-tab="otros"><span class="tab-name">Otros postres</span><span class="tab-desc">Brownies y más</span></button>
-  <button class="tab-btn" data-tab="extras"><span class="tab-name">Extras</span><span class="tab-desc">Salsas y toppings 2 oz</span></button>
 </nav>
 <div class="tabs-arrow"><span class="tabs-arrow-text">más</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
 </div>
@@ -528,11 +532,6 @@ img{max-width:100%; display:block;}
 </section>
 
 <!-- ================= TAB: OTROS POSTRES ================= -->
-<section class="tab-panel" id="panel-extras">
-  <div class="section-title"><h2 data-t="extras_titulo">Extras</h2><p data-t="extras_sub">Agrega un poco más a tu pedido</p></div>
-  <div id="extrasList" style="display:flex; flex-direction:column;"></div>
-</section>
-
 <section class="tab-panel" id="panel-otros">
   <div class="section-title"><h2 data-t="otros_titulo">Otros postres</h2><p>&nbsp;</p></div>
   <div class="card-list" id="otrosList"></div>
@@ -1208,7 +1207,6 @@ const FIXED_TABS = [
   {key:'personalizada', defaultLabel:'Personalizada', defaultDesc:'Crea tu antojo'},
   {key:'premium', defaultLabel:'Premium', defaultDesc:'Dubái, chocolosas y más'},
   {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
-  {key:'extras', defaultLabel:'Extras', defaultDesc:'Salsas y toppings 2 oz'},
 ];
 
 function aplicarOrdenYEtiquetas(){
@@ -1481,7 +1479,7 @@ function renderCart(){
   <div class="form-group">
     <label class="form-label">${T('tel_label','Tu número de WhatsApp')}</label>
     <input type="tel" inputmode="tel" class="form-input" id="telefonoInput" placeholder="Ej. 829-555-1234">
-    <div class="step-note" style="margin:6px 0 0;">${T('tel_ayuda','Lo usamos para tu tarjeta de fidelidad y tu historial de pedidos.')}</div>
+    <div class="step-note" style="margin:6px 0 0;">${T('tel_ayuda','Con tu número acumulas sellos en tu Tarjeta VIP: en tu 5.ª compra giras la ruleta y en la 10.ª te regalamos una mini clásica 🎁.')}</div>
   </div>
   <div class="form-group">
     <label class="form-label">${T('notas_label','Notas / aclaraciones (opcional)')}</label>
@@ -1651,6 +1649,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
       : `💵 Pagará con ${money(billeteNum())}, su cambio será ${money(billeteNum()-total)}.\n`;
   }
 
+  msg += `\n` + T('msg_vip','Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.') + `\n`;
   msg = limpiarEmoji(msg);
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
@@ -1694,7 +1693,8 @@ async function guardarPedidoCliente(tel, nombre, total, regalos, descuento, prem
    ========================================================= */
 document.body.insertAdjacentHTML('beforeend', `
 <div class="acct-overlay" id="acctOverlay"><div class="acct-sheet">
-  <h3>🍓 Mi tarjeta Pop</h3>
+  <h3>👑 Tarjeta VIP</h3>
+  <details id="acctDet" open style="margin-bottom:10px;"><summary style="font-weight:700; color:var(--vino); cursor:pointer; font-size:13.5px;">✨ ¿Cómo funciona? Beneficios</summary><div id="acctBenef"></div></details>
   <div class="step-note" style="margin:0 0 10px;">Escribe tu número para ver tus compras y tu historial.</div>
   <input type="tel" inputmode="tel" class="form-input" id="acctTel" placeholder="Ej. 829-555-1234">
   <button class="btn-add" id="acctGo" style="margin-top:10px; width:100%;">Ver mi tarjeta</button>
@@ -1729,12 +1729,12 @@ async function cargarTarjeta(){
     out.innerHTML = `<div style="font-weight:700;">Hola, ${c.nombre||'Pop'} 💕</div>
       <div class="stamps">${stamps}</div>
       <div class="step-note" style="margin:0;">Compras confirmadas: <b>${p}</b>${n?` · Por confirmar (rosado): <b>${n}</b>`:''}${p>=10?` · Tarjetas completadas: <b>${Math.floor(p/10)}</b>`:''}</div>
-      <div class="step-note" style="margin:4px 0 0;">🎡 Con 5 compras confirmadas giras la ruleta · 🎁 en tu compra 10 te regalamos una mini clásica.</div>
       ${tieneRegaloFidelidad() ? `<div class="gift-box">🎁 ${T('regalo10','¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.')}<br><b>Tu próximo pedido incluye una mini clásica de regalo.</b></div>` : ''}
       ${pr ? `<div class="gift-box">🎡 <b>Tienes un premio:</b> ${pr.nombre}<br>Se aplica en tu próximo pedido.</div>` : ''}
       ${puedeGirar() ? `<button class="btn-add" id="acctSpin" style="width:100%; margin-top:6px;">🎡 Girar ruleta</button>` : ''}
       <div style="margin-top:14px; font-weight:700;">Mis pedidos</div>${hist || '<div class="step-note">Sin pedidos todavía.</div>'}`;
     const sp = document.getElementById('acctSpin'); if(sp) sp.addEventListener('click', abrirRuleta);
+    document.getElementById('acctDet').open = false;
     if(window.__ruletaAuto && puedeGirar()){ window.__ruletaAuto = false; abrirRuleta(); }
     renderCart();
   }catch(e){ out.innerHTML = '<div class="step-note">No se pudo consultar ahora. Intenta de nuevo en un momento.</div>'; }
@@ -1824,13 +1824,62 @@ async function girarRuleta(){
 document.getElementById('wheelBtn').addEventListener('click', ()=>{ const b = document.getElementById('wheelBtn'); if(!b.onclick) girarRuleta(); });
 document.getElementById('wheelClose').addEventListener('click', ()=>{ ruletaOv.classList.remove('open'); cargarTarjeta(); });
 
+function beneficiosHTML(){
+  return `<div class="gift-box" style="background:#fff;">
+    <div style="margin-bottom:5px;">1️⃣ ${T('vip_b1','Cada compra te suma un sello; lo confirmamos al finalizar tu pedido.')}</div>
+    <div style="margin-bottom:5px;">2️⃣ ${T('vip_b2','Con 5 sellos giras la ruleta y ganas premios 🎡.')}</div>
+    <div>3️⃣ ${T('vip_b3','Con 10 sellos te regalamos una mini clásica 🎁 y tu tarjeta vuelve a empezar.')}</div></div>`;
+}
+/* ---------- SELLO POR QR (cliente en el local) ---------- */
+document.body.insertAdjacentHTML('beforeend', `
+<div class="acct-overlay" id="qrOverlay"><div class="acct-sheet">
+  <h3>⭐ Suma tu sello VIP</h3>
+  <div id="qrBody">
+    <div class="step-note" style="margin:0 0 10px;">Escribe tu nombre y tu WhatsApp. Te confirmamos el sello en el momento.</div>
+    <input type="text" class="form-input" id="qrNombre" placeholder="Tu nombre">
+    <input type="tel" inputmode="tel" class="form-input" id="qrTel" placeholder="Tu WhatsApp, ej. 829-555-1234" style="margin-top:8px;">
+    <button class="btn-add" id="qrGo" style="margin-top:10px; width:100%;">Sumar mi sello</button>
+    <div id="qrMsg" class="step-note" style="margin-top:8px;"></div>
+  </div>
+  <button class="choice-btn" id="qrClose" style="margin-top:12px; width:100%;">Cerrar</button>
+</div></div>`);
+const qrOv = document.getElementById('qrOverlay');
+function abrirQR(){
+  document.getElementById('qrNombre').value = orderState.nombre || '';
+  document.getElementById('qrTel').value = orderState.telefono ? fmtTel(normTel(orderState.telefono)) : '';
+  document.getElementById('qrMsg').textContent = '';
+  qrOv.classList.add('open');
+}
+async function sumarSelloQR(){
+  const nombre = document.getElementById('qrNombre').value.trim(), tel = normTel(document.getElementById('qrTel').value), msg = document.getElementById('qrMsg');
+  if(!nombre){ msg.textContent = 'Escribe tu nombre.'; return; }
+  if(tel.length !== 10){ msg.textContent = 'Escribe tu WhatsApp de 10 dígitos.'; return; }
+  const hoy = new Date().toISOString().slice(0,10);
+  try{ if(localStorage.getItem('fp_qr_dia') === hoy + '|' + tel){ msg.textContent = 'Ya enviaste tu sello hoy. ¡Gracias! Lo estamos confirmando.'; return; } }catch(e){}
+  const btn = document.getElementById('qrGo'); btn.disabled = true; msg.textContent = 'Enviando…';
+  try{
+    const FV = firebase.firestore.FieldValue, ref = db.collection('clientes').doc(tel), snap = await ref.get();
+    if(snap.exists) await ref.update({pendientes: FV.increment(1), ultimoPedido: FV.serverTimestamp()});   // la tarjeta existente conserva su nombre
+    else await ref.set({nombre, telefono:tel, puntos:0, pendientes:1, creado: FV.serverTimestamp(), ultimoPedido: FV.serverTimestamp()});
+    await ref.collection('pedidos').add({fecha: FV.serverTimestamp(), nombre, total:0, descuento:0, regalos:[], items:[{nombre:'Compra en el local (QR)', cantidad:1, detalles:[], precioUnit:0}], delivery:false, pago:'local', estado:'pendiente', notas:'', origen:'qr-local'});
+    try{ localStorage.setItem('fp_cliente', JSON.stringify({nombre, telefono:tel})); localStorage.setItem('fp_qr_dia', hoy + '|' + tel); }catch(e){}
+    orderState.nombre = nombre; orderState.telefono = tel;
+    document.getElementById('qrBody').innerHTML = `<div class="gift-box" style="text-align:center;">✅ <b>¡Listo, ${nombre}!</b><br>Tu sello quedó en rosado pastel. Lo confirmamos en un momento.</div>
+      <button class="btn-add" id="qrVer" style="width:100%;">Ver mi Tarjeta VIP</button>`;
+    document.getElementById('qrVer').addEventListener('click', ()=>{ qrOv.classList.remove('open'); abrirTarjeta(false); });
+  }catch(e){ msg.textContent = 'No se pudo enviar. Intenta de nuevo en un momento.'; btn.disabled = false; }
+}
+document.getElementById('qrGo').addEventListener('click', sumarSelloQR);
+document.getElementById('qrClose').addEventListener('click', ()=> qrOv.classList.remove('open'));
 function abrirTarjeta(auto){
+  document.getElementById('acctBenef').innerHTML = beneficiosHTML();
+  document.getElementById('acctDet').open = true;
   window.__ruletaAuto = !!auto;
   acctOv.classList.add('open');
   document.getElementById('acctTel').value = orderState.telefono ? fmtTel(normTel(orderState.telefono)) : '';
   if(normTel(orderState.telefono).length===10) cargarTarjeta();
 }
-document.getElementById('acctBtn').addEventListener('click', ()=> abrirTarjeta(false));
+document.getElementById('acctWrap').addEventListener('click', ()=> abrirTarjeta(false));
 document.getElementById('acctGo').addEventListener('click', cargarTarjeta);
 document.getElementById('acctClose').addEventListener('click', ()=> acctOv.classList.remove('open'));
 acctOv.addEventListener('click', e=>{ if(e.target===acctOv) acctOv.classList.remove('open'); });
@@ -1955,7 +2004,6 @@ async function cargarDatosRemotos(){
   renderPersonalizador();
   renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
   renderCardList('premiumList', PREMIUM, premSize, 'Agregar', premTopping, true);
-  renderExtrasStandalone('extrasList');
   renderExtrasStandalone('favoritasExtrasList');
   renderExtrasStandalone('premiumExtrasList');
   renderOtros();
@@ -1966,6 +2014,7 @@ async function cargarDatosRemotos(){
   aplicarTextos();
   cargarClienteActual();
   if(new URLSearchParams(location.search).has('ruleta')) abrirTarjeta(true);
+  if(new URLSearchParams(location.search).has('qr')) abrirQR();
 }
 
 document.body.insertAdjacentHTML('afterbegin', '<div id="ofertaBanner" class="oferta-banner" style="display:none;"></div>');

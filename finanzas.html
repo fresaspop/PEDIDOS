@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es-DO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#56091f">
+<title>Finanzas | Fresas Pop</title>
+<link rel="manifest" href="finanzas.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<style>
+:root{ --principal:#db5275; --vino:#56091f; --rojo:#b62d11; --crema:#fff3f4; --texto:#3a1420; --gris:#8a7378; --verde:#2e9e5b; --amar:#d98a00; --sombra:0 6px 18px rgba(86,9,31,.10); }
+*{box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif; background:var(--crema); color:var(--texto); margin:0; padding:0 0 70px;}
+h1,h2,h3,.brand{font-family:'Baloo 2',sans-serif;}
+header{background:var(--vino); color:#fff; padding:14px 16px; text-align:center; position:sticky; top:0; z-index:20;}
+header h1{margin:0; font-size:18px;} header p{margin:0; font-size:11.5px; opacity:.85;}
+.logout{position:absolute; right:12px; top:16px; background:none; border:1.5px solid rgba(255,255,255,.6); color:#fff; font-size:12px; padding:4px 11px; border-radius:20px;}
+.tabs{display:flex; gap:8px; overflow-x:auto; padding:12px 14px 0; scrollbar-width:none;} .tabs::-webkit-scrollbar{display:none;}
+.tab{flex:none; padding:8px 14px; border-radius:20px; border:1.5px solid var(--principal); background:#fff; color:var(--principal); font-weight:600; font-size:13px; white-space:nowrap;}
+.tab.active{background:var(--principal); color:#fff;}
+.wrap{max-width:640px; margin:0 auto; padding:14px;}
+.card{background:#fff; border-radius:16px; box-shadow:var(--sombra); padding:13px 15px; margin-bottom:11px;}
+.row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.name{font-weight:600; font-size:14.5px;} .sub{font-size:12px; color:var(--gris); margin-top:2px;}
+.title{font-size:15px; font-weight:700; color:var(--vino); margin:18px 0 8px;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.stat{background:#fff; border-radius:14px; box-shadow:var(--sombra); padding:11px 13px;}
+.stat .k{font-size:11.5px; color:var(--gris);} .stat .v{font-family:'Baloo 2',sans-serif; font-size:21px; font-weight:800; color:var(--vino);}
+.stat.big{grid-column:1/-1; background:linear-gradient(135deg,#fff,#fff0f4);} .pos{color:var(--verde)!important;} .neg{color:var(--rojo)!important;}
+.field{margin-bottom:10px;} .field label{display:block; font-size:12.5px; font-weight:600; margin-bottom:4px; color:var(--vino);}
+input,select,textarea{width:100%; padding:10px; border-radius:10px; border:1.5px solid #eed3d8; font-size:14px; font-family:inherit; background:#fff;}
+.btn{border:none; border-radius:12px; padding:11px 14px; font-weight:700; font-size:14px; background:var(--principal); color:#fff; width:100%;}
+.btn.sec{background:#f0e2e4; color:var(--vino);} .btn.red{background:#fbdede; color:var(--rojo);}
+.mini{border:none; border-radius:10px; padding:6px 11px; font-size:12px; font-weight:600; background:#f0e2e4; color:var(--vino);} .mini.red{background:#fbdede; color:var(--rojo);}
+.chips{display:flex; gap:6px; margin:4px 0 10px;} .chip{flex:1; padding:7px; border-radius:20px; border:1.5px solid #eed3d8; background:#fff; font-size:12.5px; font-weight:600; text-align:center;}
+.chip.on{background:var(--vino); border-color:var(--vino); color:#fff;}
+.fecha{display:flex; gap:6px; align-items:center; margin-bottom:10px;} .fecha input{flex:1;}
+.badge{font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:12px; background:#f0e2e4; color:var(--vino); white-space:nowrap;}
+.badge.ok{background:#dff3e6; color:#1d7a43;} .badge.low{background:#fff0cc; color:#9a6200;} .badge.out{background:#fbdede; color:var(--rojo);} .badge.web{background:#e3ecff; color:#2c4fa8;}
+.alerta{background:#fff0cc; border:1.5px solid #f0c24f; color:#7a4e00; border-radius:14px; padding:10px 13px; font-size:13px; margin:12px 14px 0; max-width:612px;}
+@media(min-width:660px){.alerta{margin-left:auto; margin-right:auto;}}
+.cal{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:10px;} .cal .h{font-size:11px; text-align:center; color:var(--gris); font-weight:600;}
+.cal .d{aspect-ratio:1; background:#fff; border-radius:10px; font-size:12.5px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(86,9,31,.06); position:relative;}
+.cal .d.hoy{border:2px solid var(--principal);} .cal .d.sel{background:var(--vino); color:#fff;} .cal .d.vacio{background:transparent; box-shadow:none;}
+.cal .pt{display:flex; gap:2px; margin-top:2px;} .cal .pt i{width:6px; height:6px; border-radius:50%; background:var(--principal); display:block;} .cal .pt i.v{background:var(--rojo);}
+.empty{text-align:center; color:var(--gris); font-size:13px; padding:18px 0;}
+.overlay{position:fixed; inset:0; background:rgba(58,20,32,.5); display:none; align-items:flex-end; justify-content:center; z-index:60;} .overlay.on{display:flex;}
+.modal{background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:18px; max-height:90vh; overflow-y:auto;}
+.modal h3{margin:0 0 10px;} .acts{display:flex; gap:10px; margin-top:12px;} .acts .btn{flex:1;}
+.toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--vino); color:#fff; padding:10px 18px; border-radius:30px; font-size:13px; opacity:0; transition:.25s; pointer-events:none; z-index:100; max-width:90%; text-align:center;}
+.toast.show{opacity:1;}
+#login{max-width:340px; margin:70px auto; padding:24px; background:#fff; border-radius:16px; box-shadow:var(--sombra); text-align:center;}
+#login input{margin:6px 0;} #login .btn{margin-top:8px;} #loginError{color:var(--rojo); font-size:13px; min-height:18px; margin-top:6px;}
+.linea{display:grid; grid-template-columns:1fr 62px 62px auto; gap:6px; align-items:center; margin-bottom:6px; font-size:12.5px;}
+.linea input,.linea select{padding:7px; font-size:12.5px;} .tot{font-weight:700;}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2 class="brand">🍓 Finanzas Fresas Pop</h2>
+  <p style="color:var(--gris); font-size:13px;">Solo para la administradora</p>
+  <input type="email" id="loginEmail" placeholder="Correo" autocomplete="username">
+  <input type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
+  <button class="btn" onclick="entrar()">Entrar</button>
+  <div id="loginError"></div>
+</div>
+
+<div id="app" style="display:none;">
+  <header><button class="logout" onclick="salir()">Salir</button><h1 class="brand">Finanzas Fresas Pop</h1><p>Inventario, ventas y gastos</p></header>
+  <div id="alertas"></div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-v="resumen">Resumen</button>
+    <button class="tab" data-v="ventas">Ventas</button>
+    <button class="tab" data-v="gastos">Gastos</button>
+    <button class="tab" data-v="inventario">Inventario</button>
+    <button class="tab" data-v="calendario">Calendario</button>
+    <button class="tab" data-v="costos">Costos</button>
+    <button class="tab" data-v="calculadora">Calculadora</button>
+    <button class="tab" data-v="ajustes">Ajustes</button>
+  </div>
+  <div class="wrap" id="vista"></div>
+</div>
+
+<div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDr190z0obWeyDmm2UY6_5rZ_PqXUr883E", authDomain: "adminfresaspop.firebaseapp.com", projectId: "adminfresaspop",
+  storageBucket: "adminfresaspop.firebasestorage.app", messagingSenderId: "840834985196", appId: "1:840834985196:web:28f8fa890ace7ac3dc89c9"
+});
+const db = firebase.firestore(), auth = firebase.auth(), FV = firebase.firestore.FieldValue;
+const CFG_REF = db.collection('finanzas_config').doc('main');
+
+/* ================= datos iniciales (tus costos) ================= */
+// [id, nombre, categoría, unidad de compra, precio por compra, rinde (porciones por compra), mínimo, nota]
+const SEED_INSUMOS = [
+ ['crema_leche','Crema de leche','Crema y lácteos','litro',290,30,2,'Rinde 30 bolas'],
+ ['leche_condensada','Leche condensada','Crema y lácteos','envase',110,2,1,'Rinde 2 litros'],
+ ['leche_evaporada','Leche evaporada','Crema y lácteos','envase',70,2,1,'Rinde 2 litros'],
+ ['leche_coco','Leche de coco','Crema y lácteos','envase',65,2,1,'Rinde 2 litros'],
+ ['azucar_glass','Azúcar glass','Crema y lácteos','bolsa',350,30,1,'Rinde 30 litros'],
+ ['vainilla','Vainilla','Crema y lácteos','frasco',35,35,1,'Rinde 35 litros'],
+ ['sal','Sal','Crema y lácteos','bolsa',15,30,1,'Rinde 30 litros'],
+ ['coco_rallado','Coco rallado (2.5 lb)','Crema y lácteos','bolsa',750,1,1,'Ajusta cuánto rinde'],
+ ['crema_lista','Crema preparada (bola)','Crema y lácteos','bola',15,1,null,'Costo por bola ya preparada'],
+ ['fresas','Fresas (paquete)','Fruta','paquete',120,3,2,'1 porción = 1 canasta (3 canastas, 2 vasos pequeños, o 1 grande + 1 canasta)'],
+ ['dulce_leche','Dulce de leche (11 lb)','Toppings y coberturas','envase',1750,250,1,'Estimado ~250 cucharadas: ajústalo'],
+ ['caramelo','Caramelo','Toppings y coberturas','envase',450,20,1,'Rinde 20 preparaciones'],
+ ['galleta_choco','Galleta de chocolate (paq. de 10)','Toppings y coberturas','paquete',110,30,1,'1 unidad = 3 porciones'],
+ ['malvavisco','Malvavisco','Toppings y coberturas','paquete',60,20,1,'Rinde 20 porciones'],
+ ['granola','Granola','Toppings y coberturas','paquete',110,35,1,'Rinde 35 porciones'],
+ ['hielo','Hielo','Toppings y coberturas','funda',70,1,null,''],
+ ['vaso9','Vaso 9 oz (50 u.)','Empaque','paquete',200,50,1,''],
+ ['vaso12','Vaso 12 oz (50 u.)','Empaque','paquete',210,50,1,''],
+ ['tapa','Tapa para vasos (100 u.)','Empaque','paquete',250,100,1,''],
+ ['cuchara','Cucharas (25 u.)','Empaque','paquete',25,25,1,''],
+ ['servilleta','Servilletas (500 u.)','Empaque','paquete',160,500,1,''],
+ ['cantina','Cantina plástica (canasta)','Empaque','unidad',8,1,10,''],
+ ['canastas','Canastas (caja de 50)','Empaque','caja',600,40,1,'Se rompen 5 a 8 por caja: rinde ~40'],
+ ['guantes','Guantes (100 u.)','Empaque','caja',60,100,1,''],
+ ['stickers','Stickers (700 u.)','Empaque','paquete',1500,700,1,''],
+ ['cloro','Cloro (galón)','Limpieza','galón',150,30,1,'Rinde 30 días de venta'],
+];
+const I = (id, cantidad, costoManual)=> ({tipo:'insumo', insumoId:id, cantidad, ...(costoManual!==undefined ? {costoManual} : {})});
+const F = (nombre, monto)=> ({tipo:'fijo', nombre, monto});
+const CFG_DEFAULT = {
+  indirectos: {manoObra:30, marketing:5, merma:5, packaging:3},          // % del precio de venta
+  fijos: [
+    {nombre:'Alquiler', monto:5000, per:'mes'}, {nombre:'Luz', monto:2500, per:'mes'}, {nombre:'Limpieza', monto:1500, per:'mes'},
+    {nombre:'Capcut', monto:3500, per:'anio'}, {nombre:'Canva', monto:3000, per:'anio'},
+    {nombre:'Ahorro', monto:2500, per:'semana', ahorro:true},
+  ],
+  recetas: {
+    canasta: {nombre:'Canasta', precio:200, lineas:[ I('crema_lista',1), I('fresas',1), I('canastas',1), F('Syrup',10), I('servilleta',1,1), I('cantina',1), F('Topping',5) ]},
+    pequeno: {nombre:'Vaso pequeño (9 oz)', precio:250, lineas:[ I('vaso9',1,4), I('tapa',1,2), I('stickers',1,5), I('servilleta',1,1), I('crema_lista',1), I('fresas',1.5), I('cuchara',1,1), F('Cobertura',10), F('Topping',5) ]},
+    grande: {nombre:'Vaso grande (12 oz)', precio:350, lineas:[ I('vaso12',1,4), I('tapa',1,2), I('servilleta',1,1), I('crema_lista',3,14), I('fresas',2.25), F('Vaso y tapa (segunda línea de tu lista)',6), I('cuchara',1,1), I('stickers',1,5), F('Cobertura',15) ]},
+  },
+};
+// ---- Lista actualizada de compras (precios de tu libreta) ----
+// [id, nombre, categoría, se compra por, precio, rinde (porciones), porción, mínimo, nota]
+const LISTA_V2 = [
+ ['dulce_leche','Dulce de leche (cubo 11 lb)','Toppings y rellenos','cubo',1750,250,'cucharada',null,'Estimado: ~250 cucharadas por cubo; ajústalo'],
+ ['pistacho_crunch','Pistacho Caravella Crunch (cubo 11 lb)','Toppings y rellenos','cubo',6910,1,'cubo',null,''],
+ ['pistacho_gran','Gran Pistacho (cubo 11 lb)','Toppings y rellenos','cubo',4870,1,'cubo',null,''],
+ ['nutella','Nutella (cubo 11 lb)','Toppings y rellenos','cubo',2760,1,'cubo',null,''],
+ ['crema_leche','Crema para batir (litro)','Crema y lácteos','litro',280,1,'litro',2,'Caja de 12 a RD$3,360'],
+ ['leche_condensada','Leche condensada (lata)','Crema y lácteos','lata',96,1.3,'taza',2,'Caja de 48 a RD$4,600. Estimado: 1 lata ≈ 1.3 tazas'],
+ ['leche_evaporada','Leche evaporada (lata 410 g)','Crema y lácteos','lata',70,1,'lata',2,''],
+ ['mantequilla','Mantequilla (barra)','Crema y lácteos','barra',100,1,'barra',null,''],
+ ['fresas','Fresas (paquete)','Fruta','paquete',120,3,'canasta',2,'Compras a RD$100–120. 1 porción = 1 canasta (3 canastas, 2 vasos pequeños, o 1 grande + 1 canasta). ~400 por mes'],
+ ['vainilla','Vainilla (galón)','Crema y lácteos','galón',150,256,'cucharada',null,'Estimado: 1 galón ≈ 256 cucharadas'],
+ ['esencia_coco','Esencia de coco','Crema y lácteos','frasco',180,24,'cucharadita',null,'Estimado: frasco de 4 oz ≈ 24 cucharaditas'],
+ ['azucar_glass','Azúcar glass (funda 5 lb)','Panadería y base','funda',310,19,'taza',1,'Estimado: 5 lb ≈ 19 tazas'],
+ ['coco_rallado','Coco rallado (funda 2.5 lb)','Panadería y base','funda',700,14,'taza',null,'Estimado: 2.5 lb ≈ 14 tazas'],
+ ['sal','Sal (funda 1 lb)','Panadería y base','funda',35,75,'cucharadita',null,'Estimado: 1 lb ≈ 75 cucharaditas'],
+ ['cocoa','Cocoa amarga (bolsa 450 g)','Panadería y base','bolsa',510,5,'taza',null,'Estimado: 450 g ≈ 5 tazas'],
+ ['azucar_blanca','Azúcar blanca (5 lb)','Panadería y base','funda',260,11,'taza',null,'Estimado: 5 lb ≈ 11 tazas'],
+ ['azucar_morena','Azúcar morena (2 lb)','Panadería y base','funda',75,1,'funda',null,''],
+ ['maizena','Maizena (425 g)','Panadería y base','caja',132,140,'cucharadita',null,'Estimado: 425 g ≈ 140 cucharaditas'],
+ ['huevos','Huevos (cartón de 30)','Panadería y base','cartón',180,30,'unidad',1,''],
+ ['cafe','Café (1 lb)','Panadería y base','libra',450,1,'libra',null,''],
+ ['agua','Agua (botellón)','Panadería y base','botellón',35,1,'botellón',null,''],
+ ['kataifi','Kataifi (1 lb)','Toppings y rellenos','libra',885,1,'libra',null,''],
+ ['granola','Granola (1 lb)','Toppings y rellenos','libra',95,35,'porción',null,'Rinde ~35 porciones'],
+ ['galleta_choco','Galletas de chocolate (paq. de 10 sobres)','Toppings y rellenos','paquete',120,30,'porción',null,'1 sobre = 3 porciones'],
+ ['chispas_color','Chispas de colores (caja 22 lb)','Toppings y rellenos','caja',3286,1,'caja',null,''],
+ ['chispas_choco','Chispas de chocolate (caja 22 lb)','Toppings y rellenos','caja',4130,1,'caja',null,''],
+ ['choco_blanco','Chocolate blanco en discos (caja 22 lb)','Toppings y rellenos','caja',3840,1,'caja',null,''],
+ ['choco_negro','Chocolate negro en discos (22 lb)','Toppings y rellenos','caja',4250,1,'caja',null,''],
+ ['caramelo','Syrup de caramelo','Toppings y rellenos','envase',405,20,'preparación',null,'Rinde ~20 preparaciones'],
+ ['canastas','Canastas (caja de 50)','Empaque','caja',600,40,'canasta',1,'Se rompen 5 a 8 por caja: rinde ~40 (RD$15 c/u)'],
+ ['guantes','Guantes (paq. de 100)','Empaque','paquete',50,100,'unidad',1,''],
+ ['bolsas_craft','Bolsas craft 7K','Empaque','unidad',8,1,'unidad',null,''],
+ ['vaso9','Vasos 9 oz (paq. de 50)','Empaque','paquete',190,50,'vaso',1,'Caja de 20 paq. a RD$3,800'],
+ ['vaso12','Vasos 12 oz (paq. de 50)','Empaque','paquete',200,50,'vaso',1,'Caja de 20 paq. a RD$4,000'],
+ ['vaso6','Vasos 6 oz (paq. de 50)','Empaque','paquete',45,50,'vaso',null,''],
+ ['vaso2','Vasos 2 oz (paq. de 100)','Empaque','paquete',190,100,'vaso',null,''],
+ ['tapa','Tapas domo sin hoyo (paq. de 100)','Empaque','paquete',181,100,'tapa',1,'Caja de 12 paq. a RD$2,175'],
+ ['tapa2','Tapas 2 oz (paq. de 100)','Empaque','paquete',210,100,'tapa',null,''],
+ ['cuchara','Cucharas (paq. de 25)','Empaque','paquete',19,25,'cuchara',1,'Caja de 40 paq. a RD$750'],
+ ['servilleta','Servilletas (paq. de 500)','Empaque','paquete',165,500,'servilleta',1,''],
+ ['gorros','Gorros (250 u.)','Empaque','paquete',250,250,'gorro',null,''],
+ ['mascarillas','Mascarillas','Empaque','paquete',300,10,'mascarilla',null,'Revisa cuántas trae el paquete'],
+ ['potes12','Potes 12 oz','Empaque','unidad',15,1,'pote',null,''],
+ ['stickers','Stickers','Empaque','unidad',2,1,'sticker',null,''],
+ ['bandeja_transp','Bandejas transparentes','Empaque','unidad',7,1,'bandeja',null,''],
+ ['bandeja_triang','Bandejas transparentes triangulares','Empaque','unidad',10,1,'bandeja',null,''],
+ ['papel_toalla','Papel toalla','Limpieza e higiene','unidad',70,1,'rollo',null,''],
+ ['toallas_humedas','Toallas húmedas','Limpieza e higiene','unidad',115,1,'paquete',null,''],
+ ['cloro','Cloro (medio galón)','Limpieza e higiene','medio galón',700,30,'día',null,'Estimado: dura ~30 días; ajústalo'],
+ ['mistolin','Mistolín (medio galón)','Limpieza e higiene','medio galón',150,1,'medio galón',null,''],
+ ['jabon','Jabón (medio galón)','Limpieza e higiene','medio galón',150,1,'medio galón',null,''],
+ ['limpia_cristales','Limpia cristales','Limpieza e higiene','unidad',250,1,'unidad',null,''],
+];
+const P2 = (id, cantidad)=> ({tipo:'insumo', insumoId:id, cantidad});
+// Preparaciones: el costo sale de los insumos; "rinde" = cuántas unidades salen de una tanda
+const PREPARADOS_V2 = [
+ ['crema_lista','Crema tradicional (bola)','Preparaciones','bola',{rinde:30, lineas:[P2('crema_leche',1), P2('leche_condensada',0.333), P2('azucar_glass',0.25), P2('vainilla',1), P2('sal',1)]},'Una tanda = 1 litro de crema para batir. Rinde ~30 bolas'],
+ ['crema_choco','Crema de chocolate (bola)','Preparaciones','bola',{rinde:30, lineas:[P2('crema_leche',1), P2('leche_condensada',0.333), P2('azucar_glass',0.25), P2('sal',1), P2('cocoa',0.125)]},'Una tanda = 1 litro. Rinde ~30 bolas'],
+ ['crema_coco','Crema de coco (bola)','Preparaciones','bola',{rinde:30, lineas:[P2('crema_leche',1), P2('leche_condensada',0.333), P2('azucar_glass',0.25), P2('sal',1), P2('coco_rallado',0.25), P2('esencia_coco',0.125)]},'Una tanda = 1 litro. Rinde ~30 bolas'],
+ ['flan_tanda','Flan (tanda)','Preparaciones','flan',{rinde:1, lineas:[P2('huevos',10), P2('leche_evaporada',2), P2('leche_condensada',3), P2('sal',0.5), P2('maizena',1), P2('azucar_blanca',2)]},'¿Cuántos flanes salen de una tanda? Cámbialo en Costos → Preparaciones'],
+];
+const OBSOLETOS_V2 = ['leche_coco','malvavisco','hielo'];
+const FIJOS_V2 = [
+  {nombre:'Local (alquiler)', monto:5000, per:'mes'}, {nombre:'Luz (estimado)', monto:2500, per:'mes'},
+  {nombre:'Capcut', monto:3160, per:'anio'}, {nombre:'Claude (3 meses)', monto:1200, per:'mes'},
+  {nombre:'Empleada 1', monto:12000, per:'mes'}, {nombre:'Empleada 2 (cuando la contrates)', monto:35000, per:'mes', activo:false},
+  {nombre:'Ahorro', monto:2500, per:'semana', ahorro:true},
+];
+async function migrarListaV2(){
+  for(const r of LISTA_V2){
+    const [id,nombre,categoria,unidad,precio,rinde,porcion,minimo,nota] = r, d = {nombre,categoria,unidad,precio,rinde,porcion,nota};
+    const ex = insumos.find(i=>i.id===id);
+    if(ex){ Object.assign(ex, d); await db.collection('insumos').doc(id).update(d); }
+    else { const n = {...d, stock:null, minimo:minimo===undefined?null:minimo}; insumos.push({id, ...n}); await db.collection('insumos').doc(id).set(n); }
+  }
+  for(const [id,nombre,categoria,unidad,prep,nota] of PREPARADOS_V2){
+    const d = {nombre, categoria, unidad, rinde:1, porcion:unidad, nota, preparacion:prep};
+    const ex = insumos.find(i=>i.id===id);
+    if(ex){ Object.assign(ex, d); } else { insumos.push({id, ...d, precio:0, stock:null, minimo:null}); }
+  }
+  for(const [id] of PREPARADOS_V2){
+    const i = insumos.find(x=>x.id===id); i.precio = Math.round(costoUnit(i)*100)/100;
+    const {id:_x, ...datos} = i; await db.collection('insumos').doc(id).set(datos, {merge:true});
+  }
+  for(const id of OBSOLETOS_V2){
+    const ex = insumos.find(i=>i.id===id);
+    if(ex && (ex.stock===null || ex.stock===undefined)){ await db.collection('insumos').doc(id).delete(); insumos = insumos.filter(x=>x.id!==id); }
+  }
+  const LIMPIAR = ['vaso9','vaso12','tapa','stickers','servilleta','cuchara','crema_lista'];
+  Object.values(cfg.recetas).forEach(r=> r.lineas.forEach(l=>{ if(l.tipo==='insumo' && LIMPIAR.includes(l.insumoId)) delete l.costoManual; }));
+  if(!cfg.recetas.flan) cfg.recetas.flan = {nombre:'Flan', precio:0, match:'flan', lineas:[{tipo:'insumo', insumoId:'flan_tanda', cantidad:1}]};
+  cfg.fijos = JSON.parse(JSON.stringify(FIJOS_V2));
+  cfg.listaV2 = true;
+  await CFG_REF.set(cfg);
+}
+async function migrarV3(){
+  const fl = insumos.find(i=>i.id==='flan_tanda');
+  if(fl && fl.preparacion){
+    fl.preparacion.rinde = 8; fl.unidad = 'porción'; fl.porcion = 'porción'; fl.nota = 'Una tanda = 1 molde #22 = 8 porciones';
+    fl.precio = Math.round(costoUnit(fl)*100)/100;
+    await db.collection('insumos').doc('flan_tanda').update({preparacion:fl.preparacion, unidad:fl.unidad, porcion:fl.porcion, nota:fl.nota, precio:fl.precio});
+  }
+  cfg.fijos.forEach(x=>{ if(/empleada 2/i.test(x.nombre)){ x.nombre = 'Mi sueldo (Empleada 2)'; x.activo = true; } });
+  cfg.listaV3 = true; await CFG_REF.set(cfg);
+}
+const CATEGORIAS_GASTO = ['Insumos','Empaque y desechables','Local (alquiler y luz)','Mano de obra','Marketing y suscripciones','Operación y limpieza','Transporte','Equipos y utensilios','Inversión del local','Ahorro','Otros'];
+const CATS_INVERSION = ['Equipos y utensilios','Inversión del local'];   // no cuentan como gasto operativo
+
+/* ================= utilidades ================= */
+const $ = s=> document.querySelector(s);
+const esc = t=> String(t==null?'':t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = v=> Number(String(v).replace(/[^\d.\-]/g,''))||0;
+const money = n=> 'RD$' + (Math.round((Number(n)||0)*100)/100).toLocaleString('es-DO',{minimumFractionDigits:0, maximumFractionDigits:2});
+const z2 = n=> String(n).padStart(2,'0');
+const iso = d=> d.getFullYear()+'-'+z2(d.getMonth()+1)+'-'+z2(d.getDate());
+const sum = (a,f)=> a.reduce((s,x)=> s + (Number(f(x))||0), 0);
+let toastT;
+function toast(m, ms){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'), ms||2000); }
+function abrir(html){ $('#modal').innerHTML = html; $('#ov').classList.add('on'); }
+function cerrar(){ $('#ov').classList.remove('on'); }
+$('#ov').addEventListener('click', e=>{ if(e.target.id==='ov') cerrar(); });
+
+let menuData = {}, ventaLineas = [];
+let insumos = [], cfg = null, diaSel = iso(new Date()), periodo = 'dia', vistaActual = 'resumen';
+
+/* ================= sesión ================= */
+$('#loginEmail').value = localStorage.getItem('fp_admin_email') || 'admin@fresaspop.com';
+function entrar(){
+  const e = $('#loginEmail').value.trim(), p = $('#loginPass').value;
+  $('#loginError').textContent = '';
+  auth.signInWithEmailAndPassword(e,p).then(()=>localStorage.setItem('fp_admin_email', e)).catch(()=> $('#loginError').textContent = 'Correo o contraseña incorrectos.');
+}
+function salir(){ auth.signOut().then(()=>location.reload()); }
+$('#loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') entrar(); });
+auth.onAuthStateChanged(u=>{ if(u){ $('#login').style.display='none'; $('#app').style.display='block'; iniciar(); } });
+
+/* ================= carga ================= */
+async function iniciar(){
+  try{
+    const s = await CFG_REF.get();
+    cfg = s.exists ? s.data() : null;
+    if(!cfg){ cfg = JSON.parse(JSON.stringify(CFG_DEFAULT)); await CFG_REF.set(cfg); }
+    if(cfg.recetas.canasta && cfg.recetas.canasta.match === undefined){ cfg.recetas.canasta.match = 'canasta'; await CFG_REF.set(cfg); }
+    const qs = await db.collection('insumos').get();
+    if(qs.empty){
+      const b = db.batch();
+      SEED_INSUMOS.forEach(r=> b.set(db.collection('insumos').doc(r[0]), {nombre:r[1], categoria:r[2], unidad:r[3], precio:r[4], rinde:r[5], minimo:r[6], stock:null, nota:r[7]}));
+      await b.commit();
+      insumos = SEED_INSUMOS.map(r=>({id:r[0], nombre:r[1], categoria:r[2], unidad:r[3], precio:r[4], rinde:r[5], minimo:r[6], stock:null, nota:r[7]}));
+    } else insumos = qs.docs.map(d=>({id:d.id, ...d.data()}));
+    try{ const mm = await db.collection('menu_data').doc('main').get(); menuData = mm.exists ? mm.data() : {}; }catch(e){ menuData = {}; }
+    if(!cfg.listaV2) await migrarListaV2();
+    if(!cfg.listaV3) await migrarV3();
+    await procesarVentasWeb();
+    await cargarAgenda();
+  }catch(e){ toast('No se pudo cargar. Revisa las reglas de Firestore.', 4000); }
+  alertas(); ir(vistaActual);
+}
+$('#tabs').addEventListener('click', e=>{ const b=e.target.closest('.tab'); if(b) ir(b.dataset.v); });
+function ir(v){
+  vistaActual = v;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.v===v));
+  ({resumen:vResumen, ventas:vVentas, gastos:vGastos, inventario:vInventario, calendario:vCalendario, costos:vCostos, calculadora:vCalculadora, ajustes:vAjustes})[v]();
+}
+
+/* ================= costos ================= */
+const costoUnit = i=> i.preparacion ? sum(i.preparacion.lineas, costoLinea) / (Number(i.preparacion.rinde)||1) : (Number(i.precio)||0) / (Number(i.rinde)||1);
+function costoLinea(l){
+  if(l.tipo==='fijo') return Number(l.monto)||0;
+  const i = insumos.find(x=>x.id===l.insumoId);
+  const u = (l.costoManual!==undefined && l.costoManual!==null && l.costoManual!=='') ? Number(l.costoManual) : (i ? costoUnit(i) : 0);
+  return (Number(l.cantidad)||0) * u;
+}
+const costoReceta = r=> sum(r.lineas, costoLinea);
+const pctIndirectos = ()=> (sum(Object.values(cfg.indirectos), x=>x))/100;
+function fijosDiarios(){
+  let gasto = 0, ahorro = 0;
+  cfg.fijos.forEach(f=>{
+    if(f.activo === false) return;
+    const d = f.per==='mes' ? f.monto/30 : (f.per==='anio' ? f.monto/365 : f.monto/7);
+    if(f.ahorro) ahorro += d; else gasto += d;
+  });
+  return {gasto, ahorro};
+}
+function consumosDe(items){
+  const cons = {}; let costo = 0, sinReceta = 0;
+  items.forEach(it=>{
+    const r = cfg.recetas[it.producto];
+    if(!r){ sinReceta += it.cantidad; return; }
+    costo += costoReceta(r) * it.cantidad;
+    r.lineas.forEach(l=>{ if(l.tipo==='insumo'){ const i = insumos.find(x=>x.id===l.insumoId); if(i) cons[l.insumoId] = (cons[l.insumoId]||0) + (Number(l.cantidad)||0) * it.cantidad / (Number(i.rinde)||1); } });
+  });
+  return {cons, costo, sinReceta};
+}
+async function aplicarStock(cons, signo){
+  for(const id of Object.keys(cons)){
+    const i = insumos.find(x=>x.id===id);
+    if(!i || i.stock===null || i.stock===undefined) continue;
+    const nuevo = Math.max(0, Math.round((Number(i.stock) - signo*cons[id])*1000)/1000);
+    i.stock = nuevo;
+    await db.collection('insumos').doc(id).update({stock:nuevo});
+  }
+}
+function clasificar(nombre, detalles){
+  const n = (nombre||'').toLowerCase(), d = (detalles||[]).join(' ').toLowerCase();
+  for(const k of Object.keys(cfg.recetas)){            // postres con palabra clave (flan, jugo de fresa, canasta…)
+    const m = (cfg.recetas[k].match||'').toLowerCase().trim();
+    if(m && n.includes(m)) return k;
+  }
+  if((n.includes('canasta') || d.includes('canasta pop')) && cfg.recetas.canasta) return 'canasta';
+  if((d.includes('12 oz') || d.includes('12 onzas')) && cfg.recetas.grande) return 'grande';
+  if((d.includes('9 oz') || d.includes('9 onzas')) && cfg.recetas.pequeno) return 'pequeno';
+  return 'otro';
+}
+// Pedidos de la web que confirmaste en el panel: se convierten en venta con su costo
+async function procesarVentasWeb(){
+  const qs = await db.collection('ventas').where('procesada','==',false).get();
+  for(const d of qs.docs){
+    const v = d.data();
+    const items = (v.items||[]).map(it=>({producto:clasificar(it.nombre, it.detalles), nombre:it.nombre, cantidad:it.cantidad||1, precio:it.precioUnit||0}));
+    const {cons, costo} = consumosDe(items);
+    await d.ref.update({items, costo, consumos:cons, procesada:true});
+    await aplicarStock(cons, 1);
+  }
+}
+
+/* ================= alertas de inventario ================= */
+function estado(i){
+  if(i.stock===null || i.stock===undefined) return 'sin';
+  if(Number(i.stock) <= 0) return 'out';
+  if(i.minimo!==null && i.minimo!==undefined && Number(i.stock) <= Number(i.minimo)) return 'low';
+  return 'ok';
+}
+function alertas(){
+  const bajos = insumos.filter(i=>['low','out'].includes(estado(i)));
+  const ag = alertasAgenda();
+  let html = '';
+  if(ag.length){
+    html += `<div class="alerta" style="background:#ffe9e9; border-color:#f0a0a0; color:#8a1f1f; cursor:pointer;" onclick="ir('calendario')">📅 ${ag.slice(0,4).map(e=>{
+      const d = diasHasta(e.fecha), t = d<0 ? `vencido hace ${-d} día${-d>1?'s':''}` : (d===0 ? 'hoy' : (d===1 ? 'mañana' : `en ${d} días`));
+      return `<b>${esc(e.titulo)}</b>${e.monto?' ('+money(e.monto)+')':''} — ${t}`; }).join('<br>')}${ag.length>4 ? `<br>+${ag.length-4} más` : ''}</div>`;
+  }
+  if(bajos.length) html += `<div class="alerta" style="cursor:pointer;" onclick="ir('inventario')">⚠️ <b>${bajos.length} insumo${bajos.length>1?'s':''} por acabarse:</b> ${bajos.map(i=>esc(i.nombre)+(estado(i)==='out'?' (agotado)':'')).join(', ')}</div>`;
+  $('#alertas').innerHTML = html;
+}
+
+/* ================= CALENDARIO (pagos y compromisos) ================= */
+let agenda = [], calMes = iso(new Date()).slice(0,7), calSel = iso(new Date());
+async function cargarAgenda(){ const s = await db.collection('agenda').get(); agenda = s.docs.map(d=>({id:d.id, ...d.data()})); }
+const hoyIso = ()=> iso(new Date());
+const diasHasta = fe=> Math.round((new Date(fe+'T12:00:00') - new Date(hoyIso()+'T12:00:00'))/864e5);
+const pendientesAgenda = ()=> agenda.filter(e=>!e.hecho).sort((a,b)=> a.fecha < b.fecha ? -1 : 1);
+const alertasAgenda = ()=> pendientesAgenda().filter(e=> diasHasta(e.fecha) <= (e.avisar===undefined ? 1 : Number(e.avisar)));
+const ICONO = {pago:'💸', compra:'🛒', otro:'📌'};
+function sumarPeriodo(fe, rep, n){
+  const d = new Date(fe+'T12:00:00'), dia = d.getDate();
+  if(rep==='semana') d.setDate(d.getDate() + 7*n);
+  else if(rep==='mes'){ d.setDate(1); d.setMonth(d.getMonth()+n); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); }
+  else if(rep==='anio'){ d.setDate(1); d.setFullYear(d.getFullYear()+n); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth()+1, 0).getDate())); }
+  return iso(d);
+}
+function ocurrenciasMes(e, y, m){
+  const ini = y+'-'+z2(m)+'-01', fin = y+'-'+z2(m)+'-'+z2(new Date(y,m,0).getDate()), out = [];
+  if(!e.repite || e.repite==='no'){ if(e.fecha>=ini && e.fecha<=fin) out.push(e.fecha); return out; }
+  let cur = e.fecha, n = 0;
+  while(cur <= fin && n < 400){ if(cur >= ini) out.push(cur); n++; cur = sumarPeriodo(e.fecha, e.repite, n); }
+  return out;
+}
+function vCalendario(){
+  const [y,m] = calMes.split('-').map(Number), dias = new Date(y,m,0).getDate(), off = (new Date(y,m-1,1).getDay()+6)%7;
+  const porDia = {};
+  pendientesAgenda().forEach(e=> ocurrenciasMes(e,y,m).forEach(fe=> (porDia[fe] = porDia[fe] || []).push(e)));
+  const nombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  let celdas = ['L','M','M','J','V','S','D'].map(x=>`<div class="h">${x}</div>`).join('') + '<div class="d vacio"></div>'.repeat(off);
+  for(let d=1; d<=dias; d++){
+    const fe = y+'-'+z2(m)+'-'+z2(d), ev = porDia[fe] || [], venc = ev.some(e=>e.fecha<hoyIso());
+    celdas += `<div class="d ${fe===hoyIso()?'hoy':''} ${fe===calSel?'sel':''}" onclick="calSel='${fe}'; vCalendario()">${d}${ev.length?`<span class="pt">${ev.slice(0,3).map(()=>`<i class="${venc?'v':''}"></i>`).join('')}</span>`:''}</div>`;
+  }
+  const delDia = (porDia[calSel] || []);
+  const prox = pendientesAgenda().filter(e=> diasHasta(e.fecha) <= 60);
+  const card = (e, conFecha)=> `<div class="card"><div class="row"><div><div class="name">${ICONO[e.tipo]||'📌'} ${esc(e.titulo)}</div>
+      <div class="sub">${conFecha ? e.fecha+' · ' : ''}${e.monto?money(e.monto)+' · ':''}${e.repite && e.repite!=='no' ? 'se repite cada '+{semana:'semana',mes:'mes',anio:'año'}[e.repite]+' · ' : ''}avisar ${Number(e.avisar||0)===0?'el mismo día':e.avisar+' día(s) antes'}${e.nota?'<br>'+esc(e.nota):''}</div></div>
+      ${e.fecha<hoyIso()?'<span class="badge out">Vencido</span>':(e.fecha===hoyIso()?'<span class="badge low">Hoy</span>':'')}</div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;"><button class="mini" onclick="eventoHecho('${e.id}')">✅ Hecho</button><button class="mini" onclick="icsEvento('${e.id}')">📅 A mi celular</button><button class="mini" onclick="editarEvento('${e.id}')">Editar</button><button class="mini red" onclick="borrarEvento('${e.id}')">Borrar</button></div></div>`;
+  $('#vista').innerHTML = `<div class="fecha"><button class="mini" onclick="calMes=sumarPeriodo(calMes+'-01','mes',-1).slice(0,7); vCalendario()">◀</button><div class="name" style="flex:1; text-align:center;">${nombres[m-1]} ${y}</div><button class="mini" onclick="calMes=sumarPeriodo(calMes+'-01','mes',1).slice(0,7); vCalendario()">▶</button></div>
+    <div class="cal">${celdas}</div>
+    <button class="btn" onclick="editarEvento(null)">+ Nuevo pago o compromiso</button>
+    <div class="title">${calSel===hoyIso()?'Hoy':calSel}</div>${delDia.length ? delDia.map(e=>card(e,false)).join('') : '<div class="empty">Nada para este día.</div>'}
+    <div class="title">Próximos 60 días</div>${prox.length ? prox.map(e=>card(e,true)).join('') : '<div class="empty">No tienes pagos ni compras pendientes.</div>'}`;
+}
+function editarEvento(id){
+  const e = id ? agenda.find(x=>x.id===id) : {titulo:'', tipo:'pago', fecha:calSel, monto:'', repite:'no', avisar:1, nota:'', categoriaGasto:'Local (alquiler y luz)'};
+  abrir(`<h3>${id?'Editar':'Nuevo'} pago o compromiso</h3>
+    <div class="field"><label>¿Qué es?</label><input id="evT" value="${esc(e.titulo)}" placeholder="Ej. Pagar la luz, Comprar crema"></div>
+    <div class="grid2"><div class="field"><label>Tipo</label><select id="evTipo"><option value="pago" ${e.tipo==='pago'?'selected':''}>💸 Pago</option><option value="compra" ${e.tipo==='compra'?'selected':''}>🛒 Compra de insumos</option><option value="otro" ${e.tipo==='otro'?'selected':''}>📌 Otro</option></select></div>
+    <div class="field"><label>Fecha</label><input id="evF" type="date" value="${e.fecha}"></div></div>
+    <div class="grid2"><div class="field"><label>Monto (opcional)</label><input id="evM" type="number" inputmode="decimal" value="${e.monto||''}"></div>
+    <div class="field"><label>Se repite</label><select id="evR"><option value="no" ${e.repite==='no'?'selected':''}>No</option><option value="semana" ${e.repite==='semana'?'selected':''}>Cada semana</option><option value="mes" ${e.repite==='mes'?'selected':''}>Cada mes</option><option value="anio" ${e.repite==='anio'?'selected':''}>Cada año</option></select></div></div>
+    <div class="grid2"><div class="field"><label>Avisarme</label><select id="evA">${[[0,'El mismo día'],[1,'1 día antes'],[2,'2 días antes'],[3,'3 días antes'],[7,'7 días antes']].map(([v,t])=>`<option value="${v}" ${Number(e.avisar)===v?'selected':''}>${t}</option>`).join('')}</select></div>
+    <div class="field"><label>Categoría del gasto</label><select id="evC">${CATEGORIAS_GASTO.map(c=>`<option ${e.categoriaGasto===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
+    <div class="field"><label>Nota (opcional)</label><input id="evN" value="${esc(e.nota||'')}"></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarEvento(${id?`'${id}'`:'null'})">Guardar</button></div>`);
+}
+async function guardarEvento(id){
+  const d = {titulo:$('#evT').value.trim(), tipo:$('#evTipo').value, fecha:$('#evF').value, monto:num($('#evM').value), repite:$('#evR').value, avisar:Number($('#evA').value), categoriaGasto:$('#evC').value, nota:$('#evN').value.trim(), hecho:false};
+  if(!d.titulo || !d.fecha){ toast('Escribe qué es y la fecha'); return; }
+  if(id){ Object.assign(agenda.find(x=>x.id===id), d); await db.collection('agenda').doc(id).update(d); }
+  else { const ref = await db.collection('agenda').add(d); agenda.push({id:ref.id, ...d}); }
+  calSel = d.fecha; calMes = d.fecha.slice(0,7);
+  cerrar(); alertas(); vCalendario(); toast('Guardado ✅');
+}
+async function eventoHecho(id){
+  const e = agenda.find(x=>x.id===id);
+  if(e.tipo==='pago' && e.monto && confirm('¿Registrar este pago como gasto de hoy (' + money(e.monto) + ')?'))
+    await db.collection('gastos').add({dia:hoyIso(), fecha:FV.serverTimestamp(), categoria:e.categoriaGasto||'Otros', descripcion:e.titulo, monto:e.monto, pago:'efectivo', proveedor:''});
+  if(e.repite && e.repite!=='no'){ e.fecha = sumarPeriodo(e.fecha, e.repite, 1); await db.collection('agenda').doc(id).update({fecha:e.fecha}); toast('Listo ✅ Próxima fecha: ' + e.fecha, 3000); }
+  else { e.hecho = true; await db.collection('agenda').doc(id).update({hecho:true}); toast('Listo ✅'); }
+  alertas(); vCalendario();
+}
+async function borrarEvento(id){ if(!confirm('¿Borrar este recordatorio?')) return; await db.collection('agenda').doc(id).delete(); agenda = agenda.filter(x=>x.id!==id); alertas(); vCalendario(); }
+function icsEvento(id){
+  const e = agenda.find(x=>x.id===id), d = e.fecha.replace(/-/g,''), sig = sumarPeriodo(e.fecha,'semana',0) && iso(new Date(new Date(e.fecha+'T12:00:00').getTime()+864e5)).replace(/-/g,'');
+  const avisar = Number(e.avisar||0), horas = avisar*24 - 9;                      // aviso a las 9:00 a. m.
+  const alarma = avisar===0 ? 'TRIGGER;RELATED=START:PT9H' : 'TRIGGER:-PT' + horas + 'H';
+  const clean = t=> String(t||'').replace(/[\\;,]/g, m=>'\\'+m).replace(/\n/g,' ');
+  const rr = {semana:'FREQ=WEEKLY', mes:'FREQ=MONTHLY', anio:'FREQ=YEARLY'}[e.repite];
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Fresas Pop//Finanzas//ES','BEGIN:VEVENT','UID:'+e.id+'@fresaspop','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART;VALUE=DATE:'+d,'DTEND;VALUE=DATE:'+sig,
+    'SUMMARY:'+clean((ICONO[e.tipo]||'')+' '+e.titulo+(e.monto?' (RD$'+e.monto+')':'')), ...(rr?['RRULE:'+rr]:[]), ...(e.nota?['DESCRIPTION:'+clean(e.nota)]:[]),
+    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+clean(e.titulo),alarma,'END:VALARM','END:VEVENT','END:VCALENDAR'];
+  descargar('recordatorio-'+slug(e.titulo)+'.ics', lines.join('\r\n'), 'text/calendar;charset=utf-8');
+  toast('Ábrelo para agregarlo al calendario de tu celular', 3500);
+}
+
+/* ================= fechas ================= */
+function rango(){
+  const d = new Date(diaSel+'T12:00:00'); let a = new Date(d), b = new Date(d);
+  if(periodo==='semana'){ const w=(d.getDay()+6)%7; a.setDate(d.getDate()-w); b=new Date(a); b.setDate(a.getDate()+6); }
+  else if(periodo==='mes'){ a=new Date(d.getFullYear(), d.getMonth(), 1); b=new Date(d.getFullYear(), d.getMonth()+1, 0); }
+  return {desde:iso(a), hasta:iso(b), dias:Math.round((b-a)/864e5)+1};
+}
+function mover(n){
+  const d = new Date(diaSel+'T12:00:00');
+  if(periodo==='mes' && vistaActual==='resumen') d.setMonth(d.getMonth()+n); else d.setDate(d.getDate() + n*(periodo==='semana' && vistaActual==='resumen' ? 7 : 1));
+  diaSel = iso(d); ir(vistaActual);
+}
+const navFecha = ()=> `<div class="fecha"><button class="mini" onclick="mover(-1)">◀</button><input type="date" value="${diaSel}" onchange="diaSel=this.value||diaSel; ir(vistaActual)"><button class="mini" onclick="mover(1)">▶</button><button class="mini" onclick="diaSel=iso(new Date()); ir(vistaActual)">Hoy</button></div>`;
+const qRango = (col,r)=> db.collection(col).where('dia','>=',r.desde).where('dia','<=',r.hasta).get().then(s=>s.docs.map(d=>({id:d.id, ...d.data()})));
+
+/* ================= RESUMEN ================= */
+async function vResumen(){
+  const r = rango();
+  $('#vista').innerHTML = navFecha() + `<div class="chips">${['dia','semana','mes'].map(p=>`<div class="chip ${periodo===p?'on':''}" onclick="periodo='${p}'; ir('resumen')">${{dia:'Día',semana:'Semana',mes:'Mes'}[p]}</div>`).join('')}</div><div class="empty">Cargando…</div>`;
+  const [vs, gs] = await Promise.all([qRango('ventas',r), qRango('gastos',r)]);
+  const ingresos = sum(vs, v=>v.total), costo = sum(vs, v=>v.costo||0);
+  const indirectos = ingresos * pctIndirectos();
+  const fd = fijosDiarios(), fijos = fd.gasto * r.dias, ahorroPlan = fd.ahorro * r.dias;
+  const estimado = ingresos - costo - indirectos - fijos;
+  const gastosReg = sum(gs.filter(g=>g.categoria!=='Ahorro' && !CATS_INVERSION.includes(g.categoria)), g=>g.monto), ahorroReg = sum(gs.filter(g=>g.categoria==='Ahorro'), g=>g.monto);
+  const inversion = sum(gs.filter(g=>CATS_INVERSION.includes(g.categoria)), g=>g.monto);
+  const flujo = ingresos - gastosReg - inversion;
+  const hayImportadas = vs.some(v=>v.origen==='importado');
+  const porCat = {}; gs.forEach(g=>{ porCat[g.categoria] = (porCat[g.categoria]||0) + (Number(g.monto)||0); });
+  const descuentos = sum(vs, v=>v.descuento||0), propinas = sum(vs, v=>v.propina||0);
+  const porProd = {}; vs.filter(v=>v.origen!=='importado').forEach(v=> (v.items||[]).forEach(it=>{ const k = it.nombre || (cfg.recetas[it.producto]||{}).nombre || 'Otros'; porProd[k] = (porProd[k]||0) + (it.cantidad||0); }));
+  const web = vs.filter(v=>v.origen==='web').length;
+  const etiqueta = periodo==='dia' ? diaSel : (r.desde + ' al ' + r.hasta);
+  let cierreHtml = '';
+  if(periodo==='dia'){
+    const cs = await db.collection('cierres').doc(diaSel).get(); const c = cs.exists ? cs.data() : {};
+    const efV = sum(vs.filter(v=>v.pago==='efectivo'), v=>(v.total||0)+(v.propina||0)), efG = sum(gs.filter(g=>g.pago==='efectivo'), g=>g.monto);
+    const esperado = num(c.inicial) + efV - efG;
+    cierreHtml = `<div class="title">Cierre de caja</div><div class="card">
+      <div class="grid2"><div class="field"><label>Efectivo inicial</label><input id="cInicial" type="number" inputmode="decimal" value="${c.inicial??''}"></div>
+      <div class="field"><label>Efectivo final (contado)</label><input id="cFinal" type="number" inputmode="decimal" value="${c.final??''}"></div></div>
+      <div class="sub">Ventas en efectivo (con propinas): ${money(efV)} · Gastos en efectivo: ${money(efG)}<br>Efectivo esperado: <b>${money(esperado)}</b></div>
+      ${c.final!==undefined && c.final!=='' ? `<div class="name ${num(c.final)-esperado>=0?'pos':'neg'}" style="margin-top:6px;">Diferencia: ${money(num(c.final)-esperado)}</div>` : ''}
+      <button class="btn" style="margin-top:10px;" onclick="guardarCierre()">Guardar cierre</button></div>`;
+  }
+  $('#vista').innerHTML = navFecha() + `<div class="chips">${['dia','semana','mes'].map(p=>`<div class="chip ${periodo===p?'on':''}" onclick="periodo='${p}'; ir('resumen')">${{dia:'Día',semana:'Semana',mes:'Mes'}[p]}</div>`).join('')}</div>
+    <div class="sub" style="margin-bottom:8px;">${etiqueta} · ${vs.length} venta${vs.length===1?'':'s'}${web?` (${web} de la web)`:''}</div>
+    <div class="grid2">
+      <div class="stat big"><div class="k">Resultado estimado</div><div class="v ${estimado>=0?'pos':'neg'}">${money(estimado)}</div><div class="sub">Ingresos − costo de recetas − % indirectos − gastos fijos prorrateados</div></div>
+      <div class="stat"><div class="k">Ingresos</div><div class="v">${money(ingresos)}</div></div>
+      <div class="stat"><div class="k">Costo de recetas</div><div class="v">${money(costo)}</div></div>
+      <div class="stat"><div class="k">Indirectos (${Math.round(pctIndirectos()*100)}%)</div><div class="v">${money(indirectos)}</div></div>
+      <div class="stat"><div class="k">Gastos fijos (prorrata)</div><div class="v">${money(fijos)}</div></div>
+      <div class="stat"><div class="k">Gastos operativos</div><div class="v">${money(gastosReg)}</div></div>
+      <div class="stat"><div class="k">Inversión y equipos</div><div class="v">${money(inversion)}</div><div class="sub">Local, equipos, utensilios</div></div>
+      <div class="stat"><div class="k">Flujo de caja</div><div class="v ${flujo>=0?'pos':'neg'}">${money(flujo)}</div><div class="sub">Ingresos − gastos − inversión</div></div>
+      <div class="stat"><div class="k">Ahorro apartado</div><div class="v">${money(ahorroReg)}</div><div class="sub">Plan: ${money(ahorroPlan)}</div></div>
+      <div class="stat"><div class="k">Descuentos dados</div><div class="v">${money(descuentos)}</div></div>
+      <div class="stat"><div class="k">Propinas</div><div class="v">${money(propinas)}</div><div class="sub">No cuentan como ingreso</div></div>
+    </div>
+    ${hayImportadas ? `<div class="alerta" style="margin:12px 0 0; max-width:none;">ℹ️ Este período incluye ventas importadas de tu registro anterior (sin costo de recetas). Para esos meses fíjate en el <b>flujo de caja</b>: el "resultado estimado" no resta el costo de lo vendido.</div>` : ''}
+    ${Object.keys(porCat).length ? `<div class="title">Gastos por categoría</div><div class="card">${Object.entries(porCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row"><span>${esc(k)}${CATS_INVERSION.includes(k)?' <span class="badge">inversión</span>':''}</span><b>${money(v)}</b></div>`).join('')}</div>` : ''}
+    ${Object.keys(porProd).length ? `<div class="title">Vendido</div><div class="card">${Object.keys(porProd).map(k=>`<div class="row"><span>${esc(k)}</span><b>${porProd[k]}</b></div>`).join('')}</div>` : ''}
+    ${cierreHtml}`;
+}
+async function guardarCierre(){
+  await db.collection('cierres').doc(diaSel).set({inicial:$('#cInicial').value, final:$('#cFinal').value}, {merge:true});
+  toast('Cierre guardado ✅'); ir('resumen');
+}
+
+/* ================= VENTAS ================= */
+async function vVentas(){
+  const r = {desde:diaSel, hasta:diaSel};
+  $('#vista').innerHTML = navFecha() + '<div class="empty">Cargando…</div>';
+  const vs = await qRango('ventas', r);
+  const cat = catalogoVenta(), grupos = [];
+  cat.forEach((c,idx)=>{ let g = grupos.find(x=>x.n===c.grupo); if(!g){ g = {n:c.grupo, o:[]}; grupos.push(g); } g.o.push(`<option value="${idx}">${esc(c.nombre)}</option>`); });
+  const opts = grupos.map(g=>`<optgroup label="${esc(g.n)}">${g.o.join('')}</optgroup>`).join('');
+  const tot = sum(vs, v=>v.total);
+  $('#vista').innerHTML = navFecha() + `<div class="card"><div class="title" style="margin-top:0;">Ventas del local (por producto)</div>
+    <div class="sub" style="margin-bottom:8px;">Arma el cierre del día: agrega cada combinación, tamaño y cantidad. Todo se suma solo.</div>
+    <div class="field"><label>Producto</label><select id="vsProd" onchange="vsProductoCambio()">${opts}</select></div>
+    <div class="field" id="vsNombreW" style="display:none;"><label>Nombre</label><input id="vsNombre" placeholder="Ej. Brownie"></div>
+    <div class="grid2"><div class="field"><label>Tamaño</label><select id="vsTam" onchange="vsPrecio()"></select></div>
+    <div class="field"><label>Cantidad</label><input id="vsCant" type="number" inputmode="numeric" value="1"></div></div>
+    <div class="grid2"><div class="field"><label>Precio c/u</label><input id="vsPrecio" type="number" inputmode="decimal"></div>
+    <div style="display:flex; align-items:flex-end; padding-bottom:10px;"><button class="btn" onclick="vsAgregar()">+ Agregar</button></div></div>
+    <div id="vsLista"></div>
+    <div class="grid2"><div class="field"><label>Descuentos (RD$)</label><input id="vsDesc" type="number" inputmode="decimal" placeholder="0" oninput="vsPintar()"></div>
+    <div class="field"><label>Propinas (RD$)</label><input id="vsProp" type="number" inputmode="decimal" placeholder="0" oninput="vsPintar()"></div></div>
+    <div class="field"><label>Motivo del descuento (opcional)</label><input id="vsDescNota" placeholder="Ej. premio de la ruleta, cortesía"></div>
+    <div class="field"><label>Forma de pago</label><select id="vsPago"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option></select></div>
+    <div id="vsTotales" class="stat" style="margin-bottom:10px;"></div>
+    <button class="btn" onclick="guardarVentaLocal()">Guardar ventas del día</button>
+    <div class="sub" style="margin-top:6px;">Las propinas se anotan aparte y no cuentan como ingreso.</div></div>
+        <div class="title">Ventas del día · ${money(tot)}</div>
+    ${vs.length ? vs.sort((a,b)=>((b.fecha&&b.fecha.seconds)||0)-((a.fecha&&a.fecha.seconds)||0)).map(v=>`<div class="card"><div class="row"><div><div class="name">${(v.items||[]).map(i=>i.cantidad+'x '+esc(i.nombre)).join(', ')}</div>
+      <div class="sub">${v.origen==='web'?'<span class="badge web">Web</span> ':''}${esc(v.pago||'')}${v.nombre?' · '+esc(v.nombre):''}${v.descuento?' · desc. −'+money(v.descuento):''}${v.propina?' · propina '+money(v.propina):''}${v.costo!=null?' · costo '+money(v.costo):''}</div></div>
+      <div style="text-align:right;"><b>${money(v.total)}</b><br><button class="mini red" onclick="borrarVenta('${v.id}')">Borrar</button></div></div></div>`).join('') : '<div class="empty">Sin ventas este día.</div>'}`;
+  vsProductoCambio(); vsPintar();
+}
+function catalogoVenta(){
+  const out = [];
+  const add = (grupo, arr)=> (arr||[]).forEach(p=>{
+    const sizes = (p.sizes && p.sizes.length) ? p.sizes.map(s=>({label:s.label, price:Number(s.price)||0})) : [{label:'Único', price:Number(p.price)||0}];
+    out.push({grupo, nombre:p.nombre||p.label, sizes, tipo:'plato'});
+  });
+  add('Favoritas', menuData.favoritas); add('Premium', menuData.premium); add('Otros postres', menuData.otros);
+  (menuData.categoriasExtra||[]).forEach(c=> add(c.nombre, c.items));
+  if((menuData.tamanos||[]).length) out.push({grupo:'Personalizada', nombre:'Personalizada', sizes:menuData.tamanos.map(t=>({label:t.label, price:Number(t.price)||0})), tipo:'plato'});
+  const EXC = ['sin_topping','chispas_color','cono'], ex = [];
+  (menuData.extras||[]).forEach(e=> ex.push({nombre:e.label, price:Number(e.extra)||0}));
+  (menuData.toppings||[]).filter(t=>!EXC.includes(t.id)).forEach(t=> ex.push({nombre:'Extra '+t.label+' 2oz', price:t.id==='kataifi'?50:25}));
+  ex.forEach(e=> out.push({grupo:'Extras (2 oz)', nombre:e.nombre, sizes:[{label:'Único', price:e.price}], tipo:'extra'}));
+  if(!out.some(o=>o.tipo==='plato')) Object.keys(cfg.recetas).forEach(k=> out.push({grupo:'Productos con receta', nombre:cfg.recetas[k].nombre, sizes:[{label:'Único', price:cfg.recetas[k].precio}], tipo:'plato'}));
+  out.push({grupo:'Otro', nombre:'Otro (escribe el nombre)', sizes:[{label:'Único', price:0}], tipo:'otro'});
+  return out;
+}
+function vsProductoCambio(){
+  const c = catalogoVenta()[+$('#vsProd').value]; if(!c) return;
+  $('#vsTam').innerHTML = c.sizes.map((s,i)=>`<option value="${i}">${esc(s.label)}${s.price?' · '+money(s.price):''}</option>`).join('');
+  $('#vsNombreW').style.display = c.tipo==='otro' ? 'block' : 'none';
+  vsPrecio();
+}
+function vsPrecio(){ const c = catalogoVenta()[+$('#vsProd').value]; if(!c) return; const s = c.sizes[+$('#vsTam').value]; $('#vsPrecio').value = s ? s.price : ''; }
+function vsAgregar(){
+  const c = catalogoVenta()[+$('#vsProd').value], s = c.sizes[+$('#vsTam').value];
+  const cant = Math.max(1, Math.round(num($('#vsCant').value))), precio = num($('#vsPrecio').value);
+  if(!precio){ toast('Escribe el precio'); return; }
+  const base = c.tipo==='otro' ? ($('#vsNombre').value.trim() || 'Otro') : c.nombre;
+  const nombre = (c.tipo==='plato' && s.label!=='Único') ? base + ' ' + s.label : base;
+  const producto = c.tipo==='plato' ? clasificar(c.nombre, ['Tamaño: ' + s.label]) : 'otro';
+  const key = nombre + '|' + precio, ya = ventaLineas.find(l=>l.key===key);
+  if(ya) ya.cantidad += cant; else ventaLineas.push({key, nombre, cantidad:cant, precio, producto});
+  $('#vsCant').value = 1; vsPintar();
+}
+function vsCambiar(key, n){
+  const l = ventaLineas.find(x=>x.key===key); if(!l) return;
+  l.cantidad += n; if(l.cantidad <= 0) ventaLineas = ventaLineas.filter(x=>x.key!==key);
+  vsPintar();
+}
+function vsPintar(){
+  const L = $('#vsLista'); if(!L) return;
+  const sub = sum(ventaLineas, l=>l.cantidad*l.precio), desc = num($('#vsDesc') && $('#vsDesc').value), prop = num($('#vsProp') && $('#vsProp').value);
+  L.innerHTML = ventaLineas.length ? ventaLineas.map(l=>`<div class="row" style="padding:6px 0; border-bottom:1px solid #f6e6e9;"><div><div class="name" style="font-size:13.5px;">${esc(l.nombre)}</div><div class="sub">${money(l.precio)} c/u</div></div>
+    <div style="display:flex; align-items:center; gap:6px;"><button class="mini" onclick="vsCambiar('${esc(l.key).replace(/'/g,"\\'")}',-1)">−</button><b>${l.cantidad}</b><button class="mini" onclick="vsCambiar('${esc(l.key).replace(/'/g,"\\'")}',1)">+</button><span style="width:78px; text-align:right;" class="name">${money(l.cantidad*l.precio)}</span></div></div>`).join('') : '<div class="empty" style="padding:8px 0;">Aún no has agregado nada.</div>';
+  $('#vsTotales').innerHTML = `<div class="row"><span class="sub">Subtotal</span><b>${money(sub)}</b></div><div class="row"><span class="sub">Descuentos</span><b>−${money(desc)}</b></div><div class="row tot"><span>Total de ventas</span><span>${money(Math.max(0, sub-desc))}</span></div><div class="row"><span class="sub">Propinas (aparte)</span><b>${money(prop)}</b></div>`;
+}
+async function guardarVentaLocal(){
+  if(!ventaLineas.length){ toast('Agrega al menos un producto'); return; }
+  const subtotal = sum(ventaLineas, l=>l.cantidad*l.precio), descuento = num($('#vsDesc').value), propina = num($('#vsProp').value);
+  const total = Math.max(0, subtotal - descuento);
+  const items = ventaLineas.map(l=>({producto:l.producto, nombre:l.nombre, cantidad:l.cantidad, precio:l.precio}));
+  const {cons, costo} = consumosDe(items), hayReceta = items.some(i=>cfg.recetas[i.producto]);
+  await db.collection('ventas').add({dia:diaSel, fecha:FV.serverTimestamp(), origen:'mostrador', items, subtotal, descuento, notaDescuento:$('#vsDescNota').value.trim(), propina, total, pago:$('#vsPago').value, costo: hayReceta ? costo : null, consumos:cons, procesada:true});
+  await aplicarStock(cons, 1); ventaLineas = []; alertas(); toast('Ventas guardadas ✅'); vVentas();
+}
+async function borrarVenta(id){
+  if(!confirm('¿Borrar esta venta? Se devuelve lo descontado del inventario.')) return;
+  const ref = db.collection('ventas').doc(id), s = await ref.get();
+  if(s.exists && s.data().consumos) await aplicarStock(s.data().consumos, -1);
+  await ref.delete(); alertas(); toast('Venta borrada'); vVentas();
+}
+
+/* ================= GASTOS ================= */
+async function vGastos(){
+  const chips = `<div class="chips">${['dia','semana','mes'].map(p=>`<div class="chip ${periodo===p?'on':''}" onclick="periodo='${p}'; vGastos()">${{dia:'Día',semana:'Semana',mes:'Mes'}[p]}</div>`).join('')}</div>`;
+  $('#vista').innerHTML = navFecha() + chips + '<div class="empty">Cargando…</div>';
+  const rg = periodo==='dia' ? {desde:diaSel, hasta:diaSel} : rango();
+  const gs = (await qRango('gastos', rg)).sort((a,b)=> a.dia < b.dia ? 1 : -1);
+  const tot = sum(gs.filter(g=>g.categoria!=='Ahorro' && !CATS_INVERSION.includes(g.categoria)), g=>g.monto), inv = sum(gs.filter(g=>CATS_INVERSION.includes(g.categoria)), g=>g.monto);
+  $('#vista').innerHTML = navFecha() + chips + `<div class="card"><div class="title" style="margin-top:0;">Registrar gasto</div>
+    <div class="field"><label>Categoría</label><select id="gCat">${CATEGORIAS_GASTO.map(c=>`<option>${c}</option>`).join('')}</select></div>
+    <div class="field"><label>Descripción</label><input id="gDesc" placeholder="Ej. Gasolina, compra de fresas"></div>
+    <div class="grid2"><div class="field"><label>Monto</label><input id="gMonto" type="number" inputmode="decimal"></div>
+    <div class="field"><label>Pagado con</label><select id="gPago"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option></select></div></div>
+    <div class="field"><label>Proveedor (opcional)</label><input id="gProv"></div>
+    <div class="field"><label>📷 Foto de la factura (opcional)</label><input id="gFoto" type="file" accept="image/*" capture="environment"></div>
+    <button class="btn" onclick="guardarGasto()">Agregar gasto</button>
+    <div class="sub" style="margin-top:6px;">Los gastos fijos (alquiler, luz, suscripciones) no se registran aquí: se reparten solos por día desde Ajustes.</div></div>
+    <div class="title">Gastos ${periodo==='dia'?'del día':(periodo==='semana'?'de la semana':'del mes')} · ${money(tot)}${inv?' <span class="sub">(+ '+money(inv)+' de inversión)</span>':''}</div>
+    ${gs.length ? gs.map(g=>`<div class="card"><div class="row"><div><div class="name">${esc(g.descripcion||g.categoria)}</div><div class="sub">${periodo!=='dia'?g.dia+' · ':''}<span class="badge">${esc(g.categoria)}</span> ${esc(g.pago||'')}${g.proveedor?' · '+esc(g.proveedor):''}</div></div>
+      <div style="text-align:right;"><b>${money(g.monto)}</b><br><button class="mini" onclick="verFactura('${g.id}')">${g.tieneFoto?'📷 Ver':'📷 +'}</button> <button class="mini" onclick="editarGasto('${g.id}')">Editar</button> <button class="mini red" onclick="borrarGasto('${g.id}')">Borrar</button></div></div></div>`).join('') : '<div class="empty">Sin gastos este día.</div>'}`;
+}
+async function guardarGasto(){
+  const monto = num($('#gMonto').value);
+  if(!monto){ toast('Escribe el monto'); return; }
+  const ref = await db.collection('gastos').add({dia:diaSel, fecha:FV.serverTimestamp(), categoria:$('#gCat').value, descripcion:$('#gDesc').value.trim(), monto, pago:$('#gPago').value, proveedor:$('#gProv').value.trim()});
+  await adjuntarFactura(ref.id, 'gFoto', diaSel);
+  toast('Gasto registrado ✅'); vGastos();
+}
+async function editarGasto(id){
+  const s = await db.collection('gastos').doc(id).get(); if(!s.exists) return; const g = s.data();
+  abrir(`<h3>Editar gasto</h3>
+    <div class="field"><label>Categoría</label><select id="egCat">${CATEGORIAS_GASTO.map(c=>`<option ${g.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="field"><label>Descripción</label><input id="egDesc" value="${esc(g.descripcion||'')}"></div>
+    <div class="grid2"><div class="field"><label>Monto</label><input id="egMonto" type="number" inputmode="decimal" value="${g.monto}"></div><div class="field"><label>Fecha</label><input id="egDia" type="date" value="${g.dia}"></div></div>
+    <div class="field"><label>Pagado con</label><select id="egPago"><option value="efectivo" ${g.pago==='efectivo'?'selected':''}>Efectivo</option><option value="transferencia" ${g.pago!=='efectivo'?'selected':''}>Transferencia / tarjeta</option></select></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarEdicionGasto('${id}')">Guardar</button></div>`);
+}
+async function guardarEdicionGasto(id){
+  const monto = num($('#egMonto').value); if(!monto){ toast('Escribe el monto'); return; }
+  await db.collection('gastos').doc(id).update({categoria:$('#egCat').value, descripcion:$('#egDesc').value.trim(), monto, dia:$('#egDia').value, pago:$('#egPago').value});
+  cerrar(); toast('Guardado ✅'); vGastos();
+}
+async function borrarGasto(id){ if(!confirm('¿Borrar este gasto?')) return; await db.collection('gastos').doc(id).delete(); await db.collection('facturas').doc(id).delete(); toast('Gasto borrado'); vGastos(); }
+
+/* ================= INVENTARIO ================= */
+function vInventario(){
+  const grupos = {}; insumos.forEach(i=> (grupos[i.categoria||'Otros'] = grupos[i.categoria||'Otros'] || []).push(i));
+  const rot = {sin:['Sin conteo',''], ok:['OK','ok'], low:['Por acabarse','low'], out:['Agotado','out']};
+  $('#vista').innerHTML = `<p class="sub" style="margin:0 0 8px;">Escribe cuánto tienes de cada insumo (toca "Ajustar") y la app te avisa cuando baje del mínimo. Las ventas descuentan solas lo que usa cada receta.</p>
+    ${Object.keys(grupos).map(g=>`<div class="title">${esc(g)}</div>` + grupos[g].map(i=>{
+      const e = estado(i);
+      return `<div class="card"><div class="row"><div><div class="name">${esc(i.nombre)}</div>
+        <div class="sub">${i.stock===null||i.stock===undefined ? 'Sin conteo' : (Math.round(i.stock*100)/100)+' '+esc(i.unidad)+' (≈ '+Math.round(i.stock*i.rinde*10)/10+' porciones)'} · mínimo ${i.minimo??'—'} · ${money(i.preparacion ? costoUnit(i) : i.precio)} por ${esc(i.unidad)}</div></div>
+        <span class="badge ${rot[e][1]}">${rot[e][0]}</span></div>
+        <div style="display:flex; gap:6px; margin-top:8px;">${i.preparacion ? `<button class="mini" onclick="prepararTanda('${i.id}')">🍳 Preparé tanda</button>` : `<button class="mini" onclick="comprar('${i.id}')">+ Compré</button>`}<button class="mini" onclick="ajustar('${i.id}')">Ajustar</button><button class="mini" onclick="editarInsumo('${i.id}')">Editar</button></div></div>`;
+    }).join('')).join('')}
+    <button class="btn" style="margin-top:12px;" onclick="editarInsumo(null)">+ Agregar insumo</button>`;
+}
+function comprar(id){
+  const i = insumos.find(x=>x.id===id);
+  abrir(`<h3>Compré: ${esc(i.nombre)}</h3><div class="grid2"><div class="field"><label>Cantidad (${esc(i.unidad)})</label><input id="cmCant" type="number" inputmode="decimal" value="1"></div>
+    <div class="field"><label>Total pagado (RD$)</label><input id="cmMonto" type="number" inputmode="decimal" value="${i.precio}"></div></div>
+    <div class="field"><label>📷 Foto de la factura (opcional)</label><input id="cmFoto" type="file" accept="image/*" capture="environment"></div>
+    <div class="sub">Se suma al inventario, se actualiza el precio de compra y se registra como gasto de hoy.</div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarCompra('${id}')">Guardar</button></div>`);
+}
+async function guardarCompra(id){
+  const i = insumos.find(x=>x.id===id), cant = num($('#cmCant').value), monto = num($('#cmMonto').value);
+  if(cant<=0 || monto<=0){ toast('Revisa cantidad y monto'); return; }
+  i.stock = (Number(i.stock)||0) + cant; i.precio = Math.round(monto/cant*100)/100;
+  await db.collection('insumos').doc(id).update({stock:i.stock, precio:i.precio});
+  const gref = await db.collection('gastos').add({dia:iso(new Date()), fecha:FV.serverTimestamp(), categoria:'Insumos', descripcion:'Compra: '+i.nombre+' ×'+cant, monto, pago:'efectivo', proveedor:'', insumoId:id});
+  await adjuntarFactura(gref.id, 'cmFoto', iso(new Date()));
+  cerrar(); alertas(); vInventario(); toast('Compra registrada ✅');
+}
+function ajustar(id){
+  const i = insumos.find(x=>x.id===id);
+  abrir(`<h3>Ajustar: ${esc(i.nombre)}</h3><div class="field"><label>Cuánto tienes ahora (${esc(i.unidad)})</label><input id="ajStock" type="number" inputmode="decimal" value="${i.stock??''}"></div>
+    <div class="field"><label>Avisarme cuando tenga ${esc(i.unidad)} o menos</label><input id="ajMin" type="number" inputmode="decimal" value="${i.minimo??''}"></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarAjuste('${id}')">Guardar</button></div>`);
+}
+async function guardarAjuste(id){
+  const i = insumos.find(x=>x.id===id), s = $('#ajStock').value, m = $('#ajMin').value;
+  i.stock = s==='' ? null : num(s); i.minimo = m==='' ? null : num(m);
+  await db.collection('insumos').doc(id).update({stock:i.stock, minimo:i.minimo});
+  cerrar(); alertas(); vInventario(); toast('Guardado ✅');
+}
+function editarInsumo(id){
+  const i = id ? insumos.find(x=>x.id===id) : {nombre:'', categoria:'Otros', unidad:'unidad', precio:0, rinde:1, minimo:null, nota:''};
+  abrir(`<h3>${id?'Editar':'Nuevo'} insumo</h3>
+    <div class="field"><label>Nombre</label><input id="eiN" value="${esc(i.nombre)}"></div>
+    <div class="grid2"><div class="field"><label>Categoría</label><input id="eiC" value="${esc(i.categoria)}"></div><div class="field"><label>Se compra por</label><input id="eiU" value="${esc(i.unidad)}"></div></div>
+    <div class="grid2"><div class="field"><label>Precio por compra</label><input id="eiP" type="number" inputmode="decimal" value="${i.precio}"></div><div class="field"><label>Cuántas porciones rinde</label><input id="eiR" type="number" inputmode="decimal" value="${i.rinde}"></div></div>
+    <div class="field"><label>Una porción es (ej. taza, cucharada, unidad)</label><input id="eiPorcion" value="${esc(i.porcion||'')}"></div>
+    <div class="field"><label>Nota</label><input id="eiNota" value="${esc(i.nota||'')}"></div>
+    <div class="acts">${id?`<button class="btn red" onclick="borrarInsumo('${id}')">Borrar</button>`:''}<button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarInsumo(${id?`'${id}'`:'null'})">Guardar</button></div>`);
+}
+async function guardarInsumo(id){
+  const d = {nombre:$('#eiN').value.trim(), categoria:$('#eiC').value.trim()||'Otros', unidad:$('#eiU').value.trim()||'unidad', precio:num($('#eiP').value), rinde:num($('#eiR').value)||1, porcion:$('#eiPorcion').value.trim(), nota:$('#eiNota').value.trim()};
+  if(!d.nombre){ toast('Falta el nombre'); return; }
+  if(id){ Object.assign(insumos.find(x=>x.id===id), d); await db.collection('insumos').doc(id).update(d); }
+  else { const ref = await db.collection('insumos').add({...d, stock:null, minimo:null}); insumos.push({id:ref.id, ...d, stock:null, minimo:null}); }
+  cerrar(); vInventario(); toast('Guardado ✅');
+}
+function prepararTanda(id){
+  const i = insumos.find(x=>x.id===id);
+  abrir(`<h3>Preparé: ${esc(i.nombre)}</h3><div class="field"><label>¿Cuántas tandas?</label><input id="ptN" type="number" inputmode="decimal" value="1"></div>
+    <div class="sub">Suma ${i.preparacion.rinde} ${esc(i.unidad)} por tanda al inventario y descuenta de cada insumo lo que lleva la receta (los que tengan conteo).</div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="guardarTanda('${id}')">Guardar</button></div>`);
+}
+async function guardarTanda(id){
+  const i = insumos.find(x=>x.id===id), n = num($('#ptN').value);
+  if(n<=0){ toast('Escribe cuántas tandas'); return; }
+  const cons = {};
+  i.preparacion.lineas.forEach(l=>{ if(l.tipo==='insumo'){ const x = insumos.find(z=>z.id===l.insumoId); if(x) cons[l.insumoId] = (cons[l.insumoId]||0) + (Number(l.cantidad)||0)*n/(Number(x.rinde)||1); } });
+  await aplicarStock(cons, 1);
+  i.stock = (Number(i.stock)||0) + n*(Number(i.preparacion.rinde)||1);
+  await db.collection('insumos').doc(id).update({stock:i.stock});
+  cerrar(); alertas(); vInventario(); toast('Tanda registrada ✅');
+}
+async function borrarInsumo(id){
+  if(!confirm('¿Borrar este insumo? Las recetas que lo usan quedarán en 0.')) return;
+  await db.collection('insumos').doc(id).delete(); insumos = insumos.filter(x=>x.id!==id); cerrar(); alertas(); vInventario();
+}
+
+/* ================= COSTOS / RECETAS ================= */
+function vCostos(){
+  const ind = pctIndirectos();
+  $('#vista').innerHTML = `<p class="sub" style="margin:0 0 8px;">Costo de cada producto con tus recetas. Si dejas vacío el "costo c/u" de una línea, usa el precio real de compra del insumo.</p><button class="btn" style="margin-bottom:12px;" onclick="nuevoProducto()">+ Nuevo producto (flan, jugo…)</button>` +
+    Object.keys(cfg.recetas).map(k=>{
+      const r = cfg.recetas[k], costo = costoReceta(r), margen = r.precio*(1-ind) - costo;
+      return `<div class="card"><div class="row"><div style="flex:1;"><input value="${esc(r.nombre)}" style="font-weight:700;" onchange="cambiarTexto('${k}','nombre',this.value)"></div><div style="width:110px;"><input type="number" inputmode="decimal" value="${r.precio}" onchange="cambiarReceta('${k}','precio',this.value)"></div></div><div class="sub">Nombre · Precio de venta</div>
+      <div class="field" style="margin-top:8px;"><label>Palabra que lo identifica en los pedidos de la web</label><input value="${esc(r.match||'')}" placeholder="Vacío = se reconoce por el tamaño (12 oz / 9 oz)" onchange="cambiarTexto('${k}','match',this.value)"></div>
+      <div style="margin-top:8px;"><div class="linea sub"><span>Insumo</span><span>Cant.</span><span>Costo c/u</span><span></span></div>
+      ${r.lineas.map((l,idx)=> l.tipo==='fijo'
+        ? `<div class="linea"><input value="${esc(l.nombre)}" onchange="cambiarLinea('${k}',${idx},'nombre',this.value)"><span class="sub">fijo</span><input type="number" inputmode="decimal" value="${l.monto}" onchange="cambiarLinea('${k}',${idx},'monto',this.value)"><button class="mini red" onclick="quitarLinea('${k}',${idx})">✕</button></div>`
+        : `<div class="linea"><select onchange="cambiarLinea('${k}',${idx},'insumoId',this.value)">${insumos.map(i=>`<option value="${i.id}" ${i.id===l.insumoId?'selected':''}>${esc(i.nombre)}${i.porcion?' · '+esc(i.porcion):''}</option>`).join('')}</select><input type="number" inputmode="decimal" value="${l.cantidad}" onchange="cambiarLinea('${k}',${idx},'cantidad',this.value)"><input type="number" inputmode="decimal" placeholder="${Math.round(costoUnit(insumos.find(i=>i.id===l.insumoId)||{precio:0,rinde:1})*100)/100}" value="${l.costoManual??''}" onchange="cambiarLinea('${k}',${idx},'costoManual',this.value)"><button class="mini red" onclick="quitarLinea('${k}',${idx})">✕</button></div>`).join('')}
+      </div>
+      <div style="display:flex; gap:6px; margin:8px 0;"><button class="mini" onclick="agregarLinea('${k}','insumo')">+ Insumo</button><button class="mini" onclick="agregarLinea('${k}','fijo')">+ Costo fijo</button></div>
+      <div class="row tot"><span>Costo directo</span><span>${money(costo)}</span></div>
+      <div class="row sub"><span>Indirectos ${Math.round(ind*100)}% del precio</span><span>${money(r.precio*ind)}</span></div>
+      <div class="row tot ${margen>=0?'pos':'neg'}"><span>Ganancia por unidad</span><span>${money(margen)}</span></div>
+      <button class="mini red" style="margin-top:10px;" onclick="borrarReceta('${k}')">Borrar este producto</button></div></div>`;
+    }).join('') + `<div class="title">Preparaciones (cremas y flan)</div><p class="sub" style="margin:0 0 8px;">Lo que lleva cada tanda. El costo por unidad se calcula con tus precios de compra y alimenta a los productos.</p>` +
+    insumos.filter(i=>i.preparacion).map(i=>{
+      const p = i.preparacion, costoTanda = sum(p.lineas, costoLinea);
+      return `<div class="card"><div class="name">${esc(i.nombre)}</div>
+      <div class="grid2" style="margin-top:8px;"><div class="field"><label>Una tanda rinde (${esc(i.unidad)})</label><input type="number" inputmode="decimal" value="${p.rinde}" onchange="cambiarPrep('${i.id}','rinde',this.value)"></div>
+      <div class="stat"><div class="k">Costo por ${esc(i.unidad)}</div><div class="v">${money(costoUnit(i))}</div></div></div>
+      <div class="linea sub"><span>Insumo</span><span>Cant.</span><span>Costo c/u</span><span></span></div>
+      ${p.lineas.map((l,idx)=>`<div class="linea"><select onchange="cambiarPrepLinea('${i.id}',${idx},'insumoId',this.value)">${insumos.filter(x=>x.id!==i.id).map(x=>`<option value="${x.id}" ${x.id===l.insumoId?'selected':''}>${esc(x.nombre)}${x.porcion?' · '+esc(x.porcion):''}</option>`).join('')}</select><input type="number" inputmode="decimal" value="${l.cantidad}" onchange="cambiarPrepLinea('${i.id}',${idx},'cantidad',this.value)"><input type="number" inputmode="decimal" placeholder="${Math.round(costoUnit(insumos.find(x=>x.id===l.insumoId)||{precio:0,rinde:1})*100)/100}" value="${l.costoManual??''}" onchange="cambiarPrepLinea('${i.id}',${idx},'costoManual',this.value)"><button class="mini red" onclick="quitarPrepLinea('${i.id}',${idx})">✕</button></div>`).join('')}
+      <button class="mini" style="margin:6px 0;" onclick="agregarPrepLinea('${i.id}')">+ Insumo</button>
+      <div class="row tot"><span>Costo de la tanda</span><span>${money(costoTanda)}</span></div></div>`;
+    }).join('');
+}
+async function guardarPrep(i){ i.precio = Math.round(costoUnit(i)*100)/100; await db.collection('insumos').doc(i.id).update({preparacion:i.preparacion, precio:i.precio}); }
+async function cambiarPrep(id, campo, v){ const i = insumos.find(x=>x.id===id); i.preparacion[campo] = num(v); await guardarPrep(i); vCostos(); }
+async function cambiarPrepLinea(id, idx, campo, v){
+  const i = insumos.find(x=>x.id===id), l = i.preparacion.lineas[idx];
+  if(campo==='insumoId') l.insumoId = v; else if(campo==='costoManual'){ if(v==='') delete l.costoManual; else l.costoManual = num(v); } else l[campo] = num(v);
+  await guardarPrep(i); vCostos();
+}
+async function quitarPrepLinea(id, idx){ const i = insumos.find(x=>x.id===id); i.preparacion.lineas.splice(idx,1); await guardarPrep(i); vCostos(); }
+async function agregarPrepLinea(id){ const i = insumos.find(x=>x.id===id); i.preparacion.lineas.push({tipo:'insumo', insumoId:insumos.find(x=>x.id!==id).id, cantidad:1}); await guardarPrep(i); vCostos(); }
+async function guardarCfg(){ await CFG_REF.set(cfg); }
+function slug(t){ return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'') || 'producto'; }
+async function cambiarTexto(k, campo, v){ cfg.recetas[k][campo] = v.trim(); await guardarCfg(); toast('Guardado'); }
+function nuevoProducto(){
+  abrir(`<h3>Nuevo producto</h3><div class="field"><label>Nombre (ej. Flan, Jugo de fresa)</label><input id="npN"></div><div class="field"><label>Precio de venta</label><input id="npP" type="number" inputmode="decimal"></div>
+    <div class="sub">Después le agregas los insumos que lleva. También puedes calcularlo primero en la pestaña Calculadora.</div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="crearProducto()">Crear</button></div>`);
+}
+async function crearProducto(){
+  const nombre = $('#npN').value.trim(); if(!nombre){ toast('Escribe el nombre'); return; }
+  let k = slug(nombre); while(cfg.recetas[k]) k += '_2';
+  cfg.recetas[k] = {nombre, precio:num($('#npP').value), match:nombre.toLowerCase(), lineas:[]};
+  await guardarCfg(); cerrar(); toast('Producto creado ✅'); vCostos();
+}
+async function borrarReceta(k){
+  if(!confirm('¿Borrar "' + cfg.recetas[k].nombre + '"? Las ventas ya registradas se conservan.')) return;
+  delete cfg.recetas[k]; await guardarCfg(); vCostos();
+}
+
+/* ================= CALCULADORA DE COSTOS ================= */
+let calc = {nombre:'', lineas:[], margen:30, precio:''};
+function vCalculadora(){
+  const ind = pctIndirectos(), costo = sum(calc.lineas, costoLinea), mg = num(calc.margen)/100;
+  const sug = (1-ind-mg) > 0 ? costo/(1-ind-mg) : 0, sugRed = Math.ceil(sug/5)*5;
+  const precio = num(calc.precio) || sugRed;
+  const ganancia = precio*(1-ind) - costo, margenReal = precio ? ganancia/precio*100 : 0;
+  $('#vista').innerHTML = `<p class="sub" style="margin:0 0 8px;">Calcula cuánto cuesta un postre nuevo y a cómo venderlo para ganar lo que quieres. Los precios de los insumos salen de tu inventario.</p>
+    <div class="card"><div class="field"><label>Nombre del postre</label><input value="${esc(calc.nombre)}" placeholder="Ej. Flan" onchange="calc.nombre=this.value"></div>
+    <div class="sub" style="margin-bottom:6px;">Lo que lleva</div>
+    ${calc.lineas.map((l,idx)=> l.tipo==='fijo'
+      ? `<div class="linea"><input value="${esc(l.nombre)}" onchange="calc.lineas[${idx}].nombre=this.value"><span class="sub">fijo</span><input type="number" inputmode="decimal" value="${l.monto}" onchange="calc.lineas[${idx}].monto=num(this.value); vCalculadora()"><button class="mini red" onclick="calc.lineas.splice(${idx},1); vCalculadora()">✕</button></div>`
+      : `<div class="linea"><select onchange="calc.lineas[${idx}].insumoId=this.value; vCalculadora()">${insumos.map(i=>`<option value="${i.id}" ${i.id===l.insumoId?'selected':''}>${esc(i.nombre)}${i.porcion?' · '+esc(i.porcion):''}</option>`).join('')}</select><input type="number" inputmode="decimal" value="${l.cantidad}" onchange="calc.lineas[${idx}].cantidad=num(this.value); vCalculadora()"><input type="number" inputmode="decimal" placeholder="${Math.round(costoUnit(insumos.find(i=>i.id===l.insumoId)||{precio:0,rinde:1})*100)/100}" value="${l.costoManual??''}" onchange="if(this.value===''){delete calc.lineas[${idx}].costoManual}else{calc.lineas[${idx}].costoManual=num(this.value)}; vCalculadora()"><button class="mini red" onclick="calc.lineas.splice(${idx},1); vCalculadora()">✕</button></div>`).join('') || '<div class="empty">Agrega los insumos que lleva el postre.</div>'}
+    <div style="display:flex; gap:6px; margin:8px 0;"><button class="mini" onclick="calc.lineas.push({tipo:'insumo', insumoId:insumos[0].id, cantidad:1}); vCalculadora()">+ Insumo</button><button class="mini" onclick="calc.lineas.push({tipo:'fijo', nombre:'Otro costo', monto:0}); vCalculadora()">+ Costo fijo</button></div>
+    <div class="grid2"><div class="field"><label>Ganancia que quiero (%)</label><input type="number" inputmode="decimal" value="${calc.margen}" onchange="calc.margen=num(this.value); vCalculadora()"></div>
+    <div class="field"><label>Mi precio (opcional)</label><input type="number" inputmode="decimal" value="${calc.precio}" placeholder="${sugRed||''}" onchange="calc.precio=this.value; vCalculadora()"></div></div></div>
+    <div class="grid2">
+      <div class="stat"><div class="k">Costo directo</div><div class="v">${money(costo)}</div></div>
+      <div class="stat"><div class="k">Indirectos (${Math.round(ind*100)}%)</div><div class="v">${money(precio*ind)}</div></div>
+      <div class="stat"><div class="k">Precio sugerido</div><div class="v">${money(sugRed)}</div><div class="sub">para ganar ${calc.margen}%</div></div>
+      <div class="stat"><div class="k">Con precio ${money(precio)}</div><div class="v ${ganancia>=0?'pos':'neg'}">${money(ganancia)}</div><div class="sub">ganancia · ${Math.round(margenReal*10)/10}% del precio</div></div>
+    </div>
+    <div class="acts"><button class="btn sec" onclick="calc={nombre:'',lineas:[],margen:30,precio:''}; vCalculadora()">Limpiar</button><button class="btn" onclick="guardarCalculo()">Guardar como producto</button></div>`;
+}
+async function guardarCalculo(){
+  const nombre = (calc.nombre||'').trim();
+  if(!nombre){ toast('Ponle nombre al postre'); return; }
+  const ind = pctIndirectos(), costo = sum(calc.lineas, costoLinea), mg = num(calc.margen)/100;
+  const sugRed = (1-ind-mg) > 0 ? Math.ceil(costo/(1-ind-mg)/5)*5 : 0;
+  let k = slug(nombre); while(cfg.recetas[k]) k += '_2';
+  cfg.recetas[k] = {nombre, precio: num(calc.precio) || sugRed, match: nombre.toLowerCase(), lineas: JSON.parse(JSON.stringify(calc.lineas))};
+  await guardarCfg(); calc = {nombre:'', lineas:[], margen:30, precio:''};
+  toast('Producto guardado ✅ Ya puedes venderlo y se descuenta del inventario'); ir('costos');
+}
+
+/* ================= FOTO DE FACTURA ================= */
+function comprimirFoto(file, maxW){
+  return new Promise((res, rej)=>{
+    const fr = new FileReader();
+    fr.onload = ()=>{ const img = new Image(); img.onload = ()=>{
+      const sc = Math.min(1, (maxW||1280)/Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      let q = .7, out = c.toDataURL('image/jpeg', q);
+      while(out.length > 900000 && q > .3){ q -= .1; out = c.toDataURL('image/jpeg', q); }
+      res(out); }; img.onerror = rej; img.src = fr.result; };
+    fr.onerror = rej; fr.readAsDataURL(file);
+  });
+}
+async function adjuntarFactura(gastoId, inputId, dia){
+  const inp = document.getElementById(inputId);
+  if(!inp || !inp.files || !inp.files[0]) return false;
+  try{
+    const img = await comprimirFoto(inp.files[0]);
+    await db.collection('facturas').doc(gastoId).set({img, dia, fecha:FV.serverTimestamp()});
+    await db.collection('gastos').doc(gastoId).update({tieneFoto:true});
+    return true;
+  }catch(e){ toast('No se pudo guardar la foto', 3000); return false; }
+}
+async function verFactura(id){
+  const s = await db.collection('facturas').doc(id).get(), d = s.exists ? s.data() : null;
+  abrir(`<h3>Factura</h3>${d ? `<img src="${d.img}" style="width:100%; border-radius:12px;"><a class="btn sec" style="display:block; text-align:center; text-decoration:none; margin-top:8px;" href="${d.img}" download="factura-${id}.jpg">Descargar foto</a>` : '<div class="empty">Este gasto no tiene foto.</div>'}
+    <div class="field" style="margin-top:10px;"><label>${d?'Reemplazar foto':'Agregar foto'}</label><input id="fvFile" type="file" accept="image/*" capture="environment"></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cerrar</button><button class="btn" onclick="guardarFotoGasto('${id}')">Guardar foto</button></div>`);
+}
+async function guardarFotoGasto(id){
+  const ok = await adjuntarFactura(id, 'fvFile', iso(new Date()));
+  if(ok){ cerrar(); toast('Foto guardada ✅'); ir(vistaActual); } else toast('Elige o toma una foto primero');
+}
+
+/* ================= EXPORTAR / RESPALDO ================= */
+function csv(rows){ return '\ufeff' + rows.map(r=> r.map(c=>{ c = String(c==null?'':c); return /[",\n;]/.test(c) ? '"' + c.replace(/"/g,'""') + '"' : c; }).join(',')).join('\r\n'); }
+function descargar(nombre, texto, tipo){
+  const b = new Blob([texto], {type: tipo || 'text/csv;charset=utf-8'}), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 3000);
+}
+const fechaTs = t=> (t && t.toMillis) ? iso(new Date(t.toMillis())) : '';
+function csvInventario(){
+  return csv([['Categoría','Insumo','Se compra por','Precio por compra','Rinde (porciones)','Costo por porción','Stock','Mínimo','Estado','Nota']].concat(
+    insumos.map(i=>[i.categoria, i.nombre, i.unidad, i.precio, i.rinde, Math.round(costoUnit(i)*100)/100, i.stock??'', i.minimo??'', {sin:'Sin conteo', ok:'OK', low:'Por acabarse', out:'Agotado'}[estado(i)], i.nota||''])));
+}
+function csvRecetas(){
+  const rows = [['Producto','Precio de venta','Línea','Cantidad','Costo c/u','Costo de la línea']];
+  Object.keys(cfg.recetas).forEach(k=>{
+    const r = cfg.recetas[k];
+    r.lineas.forEach(l=>{ const i = insumos.find(x=>x.id===l.insumoId);
+      rows.push([r.nombre, r.precio, l.tipo==='fijo' ? l.nombre : (i ? i.nombre : l.insumoId), l.tipo==='fijo' ? '' : l.cantidad, l.tipo==='fijo' ? l.monto : ((l.costoManual!=null && l.costoManual!=='') ? l.costoManual : (i ? Math.round(costoUnit(i)*100)/100 : 0)), Math.round(costoLinea(l)*100)/100]); });
+    rows.push([r.nombre, r.precio, 'COSTO DIRECTO TOTAL','','', Math.round(costoReceta(r)*100)/100]);
+  });
+  return csv(rows);
+}
+function rangoExport(){ return {desde: $('#exDesde').value || '2000-01-01', hasta: $('#exHasta').value || '2999-12-31'}; }
+async function exportarVentas(){
+  const vs = await qRango('ventas', rangoExport());
+  descargar('ventas.csv', csv([['Fecha','Origen','Cliente','Productos','Unidades','Total','Pago','Costo de recetas']].concat(
+    vs.sort((a,b)=>a.dia<b.dia?-1:1).map(v=>[v.dia, v.origen||'', v.nombre||'', (v.items||[]).map(i=>i.cantidad+'x '+i.nombre).join(' + '), sum(v.items||[], i=>i.cantidad), v.total, v.pago||'', v.costo==null?'':Math.round(v.costo*100)/100]))));
+  toast('Descargando ventas…');
+}
+async function exportarGastos(){
+  const gs = await qRango('gastos', rangoExport());
+  descargar('gastos.csv', csv([['Fecha','Categoría','Descripción','Monto','Pagado con','Proveedor','Tiene foto de factura']].concat(
+    gs.sort((a,b)=>a.dia<b.dia?-1:1).map(g=>[g.dia, g.categoria, g.descripcion||'', g.monto, g.pago||'', g.proveedor||'', g.tieneFoto?'Sí':'No']))));
+  toast('Descargando gastos…');
+}
+async function exportarTarjetas(){
+  const qs = await db.collection('clientes').get();
+  descargar('tarjetas-fidelidad.csv', csv([['Nombre','Teléfono','Compras confirmadas','Por confirmar','Último pedido','Premio','Premio usado']].concat(
+    qs.docs.map(d=>{ const c = d.data(); return [c.nombre||'', c.telefono||d.id, c.puntos||0, c.pendientes||0, fechaTs(c.ultimoPedido), c.premio?c.premio.nombre:'', c.premio?(c.premio.usado?'Sí':'No'):'']; }))));
+  toast('Descargando tarjetas…');
+}
+async function respaldoCompleto(){
+  toast('Preparando respaldo… puede tardar un momento', 4000);
+  const todo = {generado:new Date().toISOString(), config:cfg, insumos};
+  for(const col of ['ventas','gastos','cierres']){ const s = await db.collection(col).get(); todo[col] = s.docs.map(d=>({id:d.id, ...d.data()})); }
+  const cs = await db.collection('clientes').get(); todo.clientes = [];
+  for(const d of cs.docs){ const ps = await db.collection('clientes').doc(d.id).collection('pedidos').get(); todo.clientes.push({id:d.id, ...d.data(), pedidos: ps.docs.map(p=>({id:p.id, ...p.data()}))}); }
+  const m = await db.collection('menu_data').doc('main').get(); todo.menu = m.exists ? m.data() : null;
+  descargar('respaldo-fresaspop-' + iso(new Date()) + '.json', JSON.stringify(todo, (k,v)=> (v && v.toMillis) ? new Date(v.toMillis()).toISOString() : v, 1), 'application/json');
+  toast('Respaldo descargado ✅');
+}
+
+async function cambiarReceta(k, campo, v){ cfg.recetas[k][campo] = num(v); await guardarCfg(); vCostos(); }
+async function cambiarLinea(k, idx, campo, v){
+  const l = cfg.recetas[k].lineas[idx];
+  if(campo==='nombre' || campo==='insumoId') l[campo] = v;
+  else if(campo==='costoManual') { if(v==='') delete l.costoManual; else l.costoManual = num(v); }
+  else l[campo] = num(v);
+  await guardarCfg(); vCostos();
+}
+async function quitarLinea(k, idx){ cfg.recetas[k].lineas.splice(idx,1); await guardarCfg(); vCostos(); }
+async function agregarLinea(k, tipo){
+  cfg.recetas[k].lineas.push(tipo==='fijo' ? {tipo:'fijo', nombre:'Nuevo costo', monto:0} : {tipo:'insumo', insumoId:insumos[0].id, cantidad:1});
+  await guardarCfg(); vCostos();
+}
+
+/* ================= AJUSTES ================= */
+function vAjustes(){
+  const sueldos = cfg.fijos.some(x=>/empleada|sueldo|nómina/i.test(x.nombre) && x.activo!==false);
+  $('#vista').innerHTML = `${sueldos && cfg.indirectos.manoObra>0 ? `<div class="alerta" style="margin:0 0 12px; max-width:none;">⚠️ Ya tienes sueldos como gasto fijo y además "Mano de obra" en ${cfg.indirectos.manoObra}%: se estaría contando dos veces. Si quieres, ponla en 0% aquí abajo y toca Guardar ajustes.</div>` : ''}<div class="title" style="margin-top:0;">Indirectos (% del precio de venta)</div><div class="card"><div class="grid2">
+    ${[['manoObra','Mano de obra'],['marketing','Marketing y publicidad'],['merma','Merma'],['packaging','Packaging']].map(([k,l])=>`<div class="field"><label>${l}</label><input type="number" inputmode="decimal" value="${cfg.indirectos[k]}" onchange="cfg.indirectos['${k}']=num(this.value)"></div>`).join('')}</div></div>
+    <div class="title">Gastos fijos (se reparten por día)</div>
+    ${cfg.fijos.map((f,i)=>`<div class="card"><div class="field"><label>Nombre</label><input value="${esc(f.nombre)}" onchange="cfg.fijos[${i}].nombre=this.value"></div>
+      <div class="grid2"><div class="field"><label>Monto</label><input type="number" inputmode="decimal" value="${f.monto}" onchange="cfg.fijos[${i}].monto=num(this.value)"></div>
+      <div class="field"><label>Cada</label><select onchange="cfg.fijos[${i}].per=this.value"><option value="semana" ${f.per==='semana'?'selected':''}>Semana</option><option value="mes" ${f.per==='mes'?'selected':''}>Mes</option><option value="anio" ${f.per==='anio'?'selected':''}>Año</option></select></div></div>
+      <label style="font-size:12.5px; display:flex; gap:8px; align-items:center;"><input type="checkbox" style="width:auto;" ${f.ahorro?'checked':''} onchange="cfg.fijos[${i}].ahorro=this.checked"> Es ahorro (no cuenta como gasto)</label>
+      <label style="font-size:12.5px; display:flex; gap:8px; align-items:center; margin-top:6px;"><input type="checkbox" style="width:auto;" ${f.activo===false?'':'checked'} onchange="cfg.fijos[${i}].activo=this.checked"> Activo (cuenta en los reportes)</label>
+      <button class="mini red" style="margin-top:8px;" onclick="cfg.fijos.splice(${i},1); vAjustes()">Quitar</button></div>`).join('')}
+    <button class="mini" onclick="cfg.fijos.push({nombre:'Nuevo gasto', monto:0, per:'mes'}); vAjustes()">+ Agregar gasto fijo</button>
+    <button class="btn" style="margin-top:14px;" onclick="guardarAjustes()">Guardar ajustes</button>
+    <div class="title" style="margin-top:26px;">Importar mi registro anterior</div><div class="card">
+      <div class="sub" style="margin-bottom:8px;">Elige el archivo <b>fresaspop-registro-importar.json</b> (el que te preparé con tus movimientos de Fresas Pop). Se puede importar más de una vez sin duplicar.</div>
+      <div class="field"><input type="file" id="impFile" accept=".json,application/json"></div>
+      <button class="btn" onclick="importarRegistro()">Importar</button>
+      <button class="btn red" style="margin-top:8px;" onclick="deshacerImportacion()">Deshacer importación</button>
+      <div id="impOut" class="sub" style="margin-top:8px;"></div>
+    </div>
+    <div class="title" style="margin-top:26px;">Respaldo y exportación</div><div class="card">
+      <div class="sub" style="margin-bottom:8px;">Todo ya vive en la nube y lo ves desde cualquier celular. Estos archivos son tu copia extra: se abren en Excel o Google Sheets. Te recomiendo bajar el respaldo completo una vez al mes.</div>
+      <div class="grid2"><div class="field"><label>Desde</label><input type="date" id="exDesde" value="${iso(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}"></div><div class="field"><label>Hasta</label><input type="date" id="exHasta" value="${iso(new Date())}"></div></div>
+      <div class="grid2"><button class="mini" onclick="exportarVentas()">⬇ Ventas</button><button class="mini" onclick="exportarGastos()">⬇ Gastos</button>
+        <button class="mini" onclick="descargar('inventario.csv', csvInventario())">⬇ Inventario</button><button class="mini" onclick="descargar('recetas-y-costos.csv', csvRecetas())">⬇ Recetas y costos</button>
+        <button class="mini" onclick="exportarTarjetas()">⬇ Tarjetas de fidelidad</button></div>
+      <button class="btn" style="margin-top:10px;" onclick="respaldoCompleto()">⬇ Respaldo completo (todo en un archivo)</button>
+    </div>`;
+}
+async function importarRegistro(){
+  const inp = $('#impFile'), out = $('#impOut');
+  if(!inp.files[0]){ toast('Elige primero el archivo'); return; }
+  let datos; try{ datos = JSON.parse(await inp.files[0].text()); }catch(e){ toast('El archivo no se pudo leer'); return; }
+  if(!Array.isArray(datos.gastos) || !Array.isArray(datos.ventas)){ toast('Ese no es el archivo de importación'); return; }
+  if(!confirm('Se van a importar ' + datos.ventas.length + ' ventas y ' + datos.gastos.length + ' gastos. ¿Continuar?')) return;
+  const ts = d=> firebase.firestore.Timestamp.fromDate(new Date(d + 'T12:00:00'));
+  const ops = [];
+  datos.gastos.forEach(g=> ops.push([db.collection('gastos').doc(g.id), {dia:g.dia, fecha:ts(g.dia), categoria:g.categoria, descripcion:g.descripcion, monto:g.monto, pago:g.pago, proveedor:g.proveedor||'', nota:g.nota||'', cuentaOriginal:g.cuentaOriginal||'', origen:'importado'}]));
+  datos.ventas.forEach(v=> ops.push([db.collection('ventas').doc(v.id), {dia:v.dia, fecha:ts(v.dia), origen:'importado', total:v.total, pago:v.pago, nombre:'', nota:v.nota||'', items:[{producto:'otro', nombre:v.descripcion||'Ventas del día', cantidad:1, precio:v.total}], costo:null, consumos:{}, procesada:true}]));
+  try{
+    for(let i=0; i<ops.length; i+=400){
+      const b = db.batch(); ops.slice(i, i+400).forEach(([ref,d])=> b.set(ref, d)); await b.commit();
+      out.textContent = 'Importando… ' + Math.min(i+400, ops.length) + ' de ' + ops.length;
+    }
+    out.innerHTML = '✅ Listo: ' + datos.ventas.length + ' ventas y ' + datos.gastos.length + ' gastos importados. Míralos en Resumen (mes) y en Gastos.';
+    toast('Importación lista ✅', 3000);
+  }catch(e){ out.textContent = 'No se pudo importar. Revisa que las reglas de Firestore estén publicadas.'; }
+}
+async function deshacerImportacion(){
+  if(!confirm('¿Borrar TODO lo que se importó? (Tus ventas y gastos registrados a mano no se tocan.)')) return;
+  const out = $('#impOut'); let n = 0;
+  for(const col of ['gastos','ventas']){
+    const s = await db.collection(col).where('origen','==','importado').get();
+    for(let i=0; i<s.docs.length; i+=400){ const b = db.batch(); s.docs.slice(i,i+400).forEach(d=> b.delete(d.ref)); await b.commit(); }
+    n += s.docs.length;
+  }
+  out.textContent = 'Se borraron ' + n + ' registros importados.'; toast('Importación deshecha');
+}
+async function guardarAjustes(){ await guardarCfg(); toast('Ajustes guardados ✅'); }
+</script>
+</body>
+</html>
