@@ -307,6 +307,16 @@ async function migrarV3(){
 const Ls = (id, cantidad)=> ({tipo:'insumo', insumoId:id, cantidad});
 const Lv = (variable, cantidad)=> ({tipo:'variable', variable, cantidad});
 const Lf = (nombre, monto)=> ({tipo:'fijo', nombre, monto});
+async function asegurarCombos(){
+  const deseadas = [
+    {nombre:'La Clásica', match:'clasica', crema:'crema_lista', base:'dulce_leche'}, {nombre:'Nutipop', match:'nutipop', crema:'crema_lista', base:'nutella'},
+    {nombre:'Choco Pop', match:'choco ?pop', crema:'crema_choco', base:'nutella'}, {nombre:'Balance', match:'balance', crema:'crema_lista', base:'leche_condensada'},
+    {nombre:'Pistacho Paradise', match:'paradise', crema:'crema_choco', base:'pistacho_mezcla'}, {nombre:'Oasis Exótico', match:'oasis', crema:'crema_coco', base:'pistacho_mezcla'},
+    {nombre:'DuoPop', match:'duopop', crema:'crema_lista', base:'pistacho_mezcla'}, {nombre:'La Fit', match:'la fit', crema:'crema_lista', base:'__ninguna'}];
+  cfg.combos = cfg.combos || []; let cambio = false;
+  deseadas.forEach(d=>{ if(!cfg.combos.some(c=>c.match===d.match)){ cfg.combos.push(d); cambio = true; } });
+  if(cambio) await CFG_REF.set(cfg);
+}
 async function migrarEtapa3(){
   const bk = db.collection('respaldos').doc('antes_etapa3');
   if(!(await bk.get()).exists) await bk.set({fecha: iso(new Date()), datos: JSON.stringify({cfg})});
@@ -457,6 +467,7 @@ async function iniciar(){
     if(!cfg.etapa1) await migrarEtapa1();
     if(!cfg.etapa2) await migrarEtapa2();
     if(!cfg.etapa3) await migrarEtapa3();
+    await asegurarCombos();
     await procesarVentasWeb();
     await reintentarStockPendiente();
     await cargarAgenda();
@@ -1140,6 +1151,7 @@ const sinAcentos = t=> String(t||'').toLowerCase().normalize('NFD').replace(/[\u
 const idLinea = (l, ctx)=> l.tipo==='variable' ? ((ctx && ctx[l.variable]) || DEFAULT_VAR[l.variable]) : l.insumoId;
 function costoLinea(l, ctx){
   if(l.tipo==='fijo') return Number(l.monto)||0;
+  if(l.tipo==='variable' && idLinea(l, ctx)==='__ninguna') return 0;
   const i = insumos.find(x=>x.id===idLinea(l, ctx));
   const u = (l.costoManual!==undefined && l.costoManual!==null && l.costoManual!=='') ? Number(l.costoManual) : (i ? costoUnit(i) : 0);
   return (Number(l.cantidad)||0) * u;
@@ -1149,6 +1161,7 @@ const ing0 = r=> costoReceta(r, DEFAULT_VAR);
 const pctIndirectos = ()=> (sum(Object.values(cfg.indirectos), x=>x))/100;
 const pctMO = ()=> (Number(cfg.indirectos.manoObra)||0)/100;
 function baseDeTexto(m){
+  if(/sin base/.test(m)) return '__ninguna';
   if(/nutella/.test(m)) return 'nutella'; if(/pistacho/.test(m)) return 'pistacho_mezcla'; if(/condensada/.test(m)) return 'leche_condensada';
   if(/caramelo/.test(m)) return 'caramelo'; if(/chocolate/.test(m)) return 'choco_negro'; return 'dulce_leche';
 }
@@ -1195,6 +1208,7 @@ function consumosDe(items){
     r.lineas.forEach(l=>{
       if(l.tipo==='fijo') return;
       const id = idLinea(l, ctx), i = insumos.find(x=>x.id===id);
+      if(id==='__ninguna') return;
       if(i) cons[id] = (cons[id]||0) + (Number(l.cantidad)||0) * it.cantidad / (Number(i.rinde)||1);
     });
   });
@@ -1826,7 +1840,7 @@ async function borrarInsumo(id){
 async function guardarCfg(){ await CFG_REF.set(cfg); }
 async function guardarPrep(i){ i.precio = Math.round(costoPorUnidadStock(i)*100)/100; await db.collection('insumos').doc(i.id).update({preparacion:i.preparacion, precio:i.precio, rinde:i.rinde, unidad:i.unidad, porcion:i.porcion, nombre:i.nombre}); }
 let costoSel = 'r:pequeno', costoCtx = {crema:'crema_lista', base:'dulce_leche', complemento:'choco_negro'}, costoFav = '', costoSucio = false, costoBackup = null, costoBackupKey = '', costoMargen = 40;
-const BASES_COSTO = ['dulce_leche','nutella','leche_condensada','caramelo','pistacho_mezcla','choco_negro'];
+const BASES_COSTO = ['dulce_leche','nutella','leche_condensada','caramelo','pistacho_mezcla','choco_negro','__ninguna'];
 const CREMAS_COSTO = ['crema_lista','crema_choco','crema_coco'];
 function selActual(){
   const [t, id] = costoSel.split(':');
@@ -1872,7 +1886,7 @@ function vCostos(){
       const r = o.r, directo = costoReceta(r, costoCtx), mo = pctMO()*directo, total = directo + mo, gan = r.precio - total, marg = r.precio ? gan/r.precio*100 : 0, pctC = r.precio ? total/r.precio*100 : 0;
       const sugMargen = costoMargen < 100 ? total/(1-costoMargen/100) : 0, sugRecargo = total*(1+costoMargen/100), pm = precioMenuDe(o.id), ctl = (cfg.control||{})[o.id] || 'ingredientes';
       const tieneVar = v=> r.lineas.some(l=>l.tipo==='variable' && l.variable===v);
-      const sel = (id, opts, val, fn)=> `<select id="${id}" onchange="${fn}">${opts.map(x=>{ const i = insumos.find(z=>z.id===x); return i ? `<option value="${x}" ${x===val?'selected':''}>${esc(i.nombre.replace(/ \(.*/,''))}</option>` : ''; }).join('')}</select>`;
+      const sel = (id, opts, val, fn)=> `<select id="${id}" onchange="${fn}">${opts.map(x=>{ const i = insumos.find(z=>z.id===x); return x==='__ninguna' ? `<option value="${x}" ${x===val?'selected':''}>Sin base</option>` : (i ? `<option value="${x}" ${x===val?'selected':''}>${esc(i.nombre.replace(/ \(.*/,''))}</option>` : ''); }).join('')}</select>`;
       const variables = (tieneVar('crema')||tieneVar('base')||tieneVar('complemento')) ? `<div class="sub" style="margin:8px 0 4px;">Para calcular, elige la combinación ("Compra" = precio por unidad que compras):</div><div class="grid2">
         ${(tieneVar('crema')||tieneVar('base')) ? `<div class="field"><label>Favorita</label><select onchange="elegirFavorita(this.value)"><option value="">— libre —</option>${(cfg.combos||[]).map(c=>`<option value="${esc(c.match)}" ${costoFav===c.match?'selected':''}>${esc(c.nombre)}</option>`).join('')}</select></div>` : ''}
         ${tieneVar('crema') ? `<div class="field"><label>Crema</label>${sel('cvCrema', CREMAS_COSTO, costoCtx.crema, "costoCtx.crema=this.value; costoFav=''; vCostos()")}</div>` : ''}

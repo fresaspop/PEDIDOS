@@ -348,6 +348,20 @@ async function cargarMenu(){
     menu.ordenExtrasInicial = true;
     guardarMenu();
   }
+  if(!menu.favoritasV2){                                   // DuoPop y La Fit + "choco" con su nombre completo (una sola vez)
+    const nuevas = [
+      {id:'duopop', nombre:'DuoPop', desc:'Una deliciosa combinación de crema de pistacho y nuestra crema tradicional, creando un contraste de sabores y cremosidad.', img:null, toppingDefault:'galletas', cortesia:true, sizes:[{id:'12oz',label:'12 oz',price:450},{id:'9oz',label:'9 oz',price:350}]},
+      {id:'la_fit', nombre:'La Fit', desc:'Una versión más ligera y fresca, preparada con capas de crema tradicional, fresas frescas y granola crujiente. Sin base.', img:null, toppingDefault:'granola', cortesia:false, sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
+    ];
+    nuevas.forEach(n=>{ if(!menu.favoritas.some(x=>x.id===n.id)){ const k = menu.favoritas.findIndex(x=>x.id==='canasta_pop'); menu.favoritas.splice(k<0?menu.favoritas.length:k, 0, n); } });
+    const choc = t=> String(t||'').replace(/Choco [Cc]rema/g,'Crema de chocolate').replace(/(g)alletas de choco(?!late)/gi,(m,g)=>g+'alletas de chocolate').replace(/(c)rema de choco(?!late)/gi,(m,c)=>c+'rema de chocolate');
+    ['cremas','toppings'].forEach(k=> (menu[k]||[]).forEach(x=>{ x.label = choc(x.label); }));
+    ['favoritas','premium','otros'].forEach(k=> (menu[k]||[]).forEach(p=>{ p.desc = choc(p.desc); }));
+    const cp = menu.favoritas.find(x=>x.id==='choco_pop'); if(cp && /^(Choco|Crema de chocolate|Base de Nutella \+ crema tradicional \+ crema de chocolate)/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado';
+    menu.favoritasV2 = true;
+    guardarMenu();
+  }
+  if(!menu.chocoPopV3){ const cp = (menu.favoritas||[]).find(x=>x.id==='choco_pop'); if(cp && /crema tradicional \+ crema de chocolate/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado'; menu.chocoPopV3 = true; guardarMenu(); }
   if(!menu.textos) menu.textos = {};
   renderTodo();
   renderTextos();

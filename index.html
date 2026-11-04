@@ -223,7 +223,7 @@ img{max-width:100%; display:block;}
 .price-bar{
   position:sticky; bottom:0; background:var(--blanco);
   border-radius:var(--radius); padding:14px 16px;
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   box-shadow:var(--sombra-fuerte); margin-top:6px;
 }
 .price-bar .total{font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:800; color:var(--vino);}
@@ -273,13 +273,19 @@ img{max-width:100%; display:block;}
   background:var(--principal); color:#fff; font-size:16px; font-weight:700;
   display:flex; align-items:center; justify-content:center; flex:none;
 }
-.xwrap{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:10px;}
-.xchip{display:flex; align-items:center; gap:6px; min-height:38px; border:1.5px solid #f0d7dc; background:#fff; border-radius:12px; padding:6px 8px 6px 10px; font-size:11.5px; font-weight:600; color:var(--texto); cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; box-shadow:0 1px 3px rgba(86,9,31,.10); transition:.12s;}
-.xchip .xn{flex:1; min-width:0; line-height:1.15;} .xchip .xp{color:var(--principal); font-size:10.5px; font-weight:800; white-space:nowrap;}
+.xwrap{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:8px;}
+.xchip{display:flex; align-items:center; gap:5px; min-height:34px; border:1.5px solid #f0d7dc; background:#fff; border-radius:12px; padding:4px 6px 4px 9px; font-size:10.5px; font-weight:600; color:var(--texto); cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; box-shadow:0 1px 3px rgba(86,9,31,.10); transition:.12s;}
+.xchip .xn{flex:1; min-width:0; line-height:1.15;} .xchip .xp{color:var(--principal); font-size:10px; font-weight:800; white-space:nowrap;}
 .xchip.sel{background:var(--principal); border-color:var(--principal); color:#fff;} .xchip.sel .xp{color:#ffe1ea;}
-.xchip .xq{display:none; font-size:11px; font-weight:800; white-space:nowrap;} .xchip.sel.multi .xq{display:inline;}
-.xchip .xplus{display:none; border:none; background:#fff; color:var(--principal); width:22px; height:22px; border-radius:50%; font-size:15px; font-weight:800; line-height:1; padding:0; flex:none;} .xchip.sel .xplus{display:inline-flex; align-items:center; justify-content:center;}
+.xchip .xctl{display:none; align-items:center; gap:3px; flex:none;} .xchip.sel .xctl{display:inline-flex;}
+.xchip .xq{font-size:11px; font-weight:800; min-width:12px; text-align:center;}
+.xchip .xm, .xchip .xplus{border:none; background:#fff; color:var(--principal); width:20px; height:20px; border-radius:50%; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center;}
 .xhead{font-size:11px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.4px; margin:6px 0 6px;}
+.fav-hint{flex:1 1 100%; background:#fff0f3; border:1.5px solid var(--principal); color:var(--vino); border-radius:12px; padding:6px 10px; font-size:12px; margin-bottom:8px;}
+#panel-personalizada .opt-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px;}
+#panel-personalizada .opt{padding:6px 10px; font-size:12px; border-radius:18px; border-width:1.5px; justify-content:center; text-align:center; line-height:1.2; min-height:34px; gap:4px;}
+#panel-personalizada .opt .extra{font-size:10.5px;}
+#panel-personalizada .opt-mix{grid-column:1/-1; width:100%; background:#fff0f3; color:var(--principal); border-style:dashed;}
 .topping-select-wrap{margin-bottom:9px;}
 .variante-wrap{margin-bottom:9px;}
 .variante-row{display:flex; flex-wrap:wrap; gap:6px;}
@@ -486,6 +492,7 @@ img{max-width:100%; display:block;}
   <div class="step-card">
     <div class="step-head"><div class="step-num">3</div><h3 data-t="paso_crema">Elige tu crema</h3></div>
     <div class="opt-grid" id="cremaOpts"></div>
+    <div id="crema2Wrap" style="margin-top:8px;"></div>
   </div>
 
   <!-- Paso 4: Fruta -->
@@ -520,6 +527,7 @@ img{max-width:100%; display:block;}
   </div>
 
   <div class="price-bar">
+    <div id="favHint" class="fav-hint" style="display:none;"></div>
     <div class="total"><span>Total</span><span id="customTotal">RD$0</span></div>
     <button class="btn-add" id="addCustomBtn" data-t="btn_agregar_carrito">Agregar al carrito</button>
   </div>
@@ -668,7 +676,7 @@ const DEFAULT_BASES = [
 ];
 const DEFAULT_CREMAS = [
   {id:'tradicional', label:'Crema tradicional', extra:0},
-  {id:'choco', label:'Choco Crema', extra:0},
+  {id:'choco', label:'Crema de chocolate', extra:0},
   {id:'coco', label:'Coco Crema', extra:50},
 ];
 const DEFAULT_FRUTAS = [
@@ -678,7 +686,7 @@ const DEFAULT_FRUTAS = [
 ];
 // toppings gratis + premium combinados en un solo selector de elección única
 const DEFAULT_TOPPINGS = [
-  {id:'galletas', label:'Galletas de choco', extra:0},
+  {id:'galletas', label:'Galletas de chocolate', extra:0},
   {id:'granola', label:'Granola', extra:0},
   {id:'cono', label:'Cono triturado', extra:0},
   {id:'chispas_color', label:'Chispas de colores', extra:0},
@@ -696,16 +704,16 @@ const DEFAULT_EXTRAS = [
 
 // ---- Favoritas (recetas fijas) ----
 const DEFAULT_FAVORITAS = [
-  {id:'la_clasica', nombre:'La Clásica', desc:'Dulce de leche + crema tradicional + galletas de choco', img:IMG.laClasica,
+  {id:'la_clasica', nombre:'La Clásica', desc:'Dulce de leche + crema tradicional + galletas de chocolate', img:IMG.laClasica,
     toppingDefault:'galletas', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
-  {id:'choco_pop', nombre:'Choco Pop', desc:'Choco crema + Nutella + cono triturado', img:IMG.chocoPop,
+  {id:'choco_pop', nombre:'Choco Pop', desc:'Base de Nutella + crema de chocolate + cono triturado', img:IMG.chocoPop,
     toppingDefault:'cono', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
-  {id:'oasis_exotico', nombre:'Oasis Exótico', desc:'Coco crema + base de pistacho + galletas de choco', img:IMG.oasisExotico,
+  {id:'oasis_exotico', nombre:'Oasis Exótico', desc:'Coco crema + base de pistacho + galletas de chocolate', img:IMG.oasisExotico,
     toppingDefault:'galletas', cortesia:true,
     sizes:[{id:'12oz',label:'12 oz',price:450},{id:'9oz',label:'9 oz',price:350}]},
-  {id:'pistacho_paradise', nombre:'Pistacho Paradise', desc:'Choco crema + base de pistacho + galletas de choco', img:IMG.pistachoParadise,
+  {id:'pistacho_paradise', nombre:'Pistacho Paradise', desc:'Crema de chocolate + base de pistacho + galletas de chocolate', img:IMG.pistachoParadise,
     toppingDefault:'galletas', cortesia:true,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
   {id:'balance', nombre:'Balance', desc:'Crema tradicional + leche condensada + cono', img:IMG.balance,
@@ -714,6 +722,12 @@ const DEFAULT_FAVORITAS = [
   {id:'nutipop', nombre:'Nutipop', desc:'Base de Nutella + crema tradicional + galletas de chocolate', img:IMG.nutipop,
     toppingDefault:'galletas', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
+  {id:'duopop', nombre:'DuoPop', desc:'Una deliciosa combinación de crema de pistacho y nuestra crema tradicional, creando un contraste de sabores y cremosidad.', img:null,
+    toppingDefault:'galletas', cortesia:true,
+    sizes:[{id:'12oz',label:'12 oz',price:450},{id:'9oz',label:'9 oz',price:350}]},
+  {id:'la_fit', nombre:'La Fit', desc:'Una versión más ligera y fresca, preparada con capas de crema tradicional, fresas frescas y granola crujiente. Sin base.', img:null,
+    toppingDefault:'granola', cortesia:false,
+    sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
   {id:'canasta_pop', nombre:'Canasta Pop', desc:'Crema tradicional + dulce de leche + granola', img:IMG.canastaPop,
     toppingDefault:'granola', cortesia:false,
     variantes:[
@@ -762,7 +776,7 @@ let OTROS = DEFAULT_OTROS;
    ESTADO
    ========================================================= */
 let cart = []; // {uid, nombre, detalles:[], cantidad, precioUnit}
-let custom = { tamano:'12oz', base:'dulce_leche', crema:'tradicional', fruta:'fresa', topping:'galletas', extras:[], cantidad:1 };
+let custom = { tamano:'12oz', base:'dulce_leche', crema:'tradicional', crema2:null, fruta:'fresa', topping:'galletas', extras:[], cantidad:1 };
 const favSize = {}; FAVORITAS.forEach(f=> favSize[f.id] = f.sizes[0].id);
 const favTopping = {}; FAVORITAS.forEach(f=> favTopping[f.id] = f.toppingDefault);
 const premSize = {}; PREMIUM.forEach(p=> premSize[p.id] = p.sizes[0].id);
@@ -810,10 +824,30 @@ function renderSizeOpts(){
     : productImgHTML(null, 'Vista previa');
 }
 
-function toggleExtra(id){
-  const idx = custom.extras.indexOf(id);
-  if(idx>=0) custom.extras.splice(idx,1); else custom.extras.push(id);
+function toggleExtra(id){                                   // elegir / quitar del todo
+  if(custom.extras.includes(id)) custom.extras = custom.extras.filter(x=>x!==id); else custom.extras.push(id);
   renderPersonalizador();
+}
+function addExtra(id){ custom.extras.push(id); renderPersonalizador(); }
+function removeExtra(id){ const k = custom.extras.indexOf(id); if(k>=0) custom.extras.splice(k,1); renderPersonalizador(); }
+const extraCount = id=> custom.extras.filter(x=>x===id).length;
+/* ----- si la combinación armada es igual a una favorita, el pedido se llama como ella ----- */
+const MEZCLA_CREMAS = false;   // por ahora la mezcla de dos cremas queda apagada (cambiar a true para activarla)
+const COMBOS_FAVORITAS = [
+  {id:'la_clasica', base:'dulce_leche', cremas:['tradicional']},
+  {id:'nutipop', base:'nutella', cremas:['tradicional']},
+  {id:'choco_pop', base:'nutella', cremas:['choco']},
+  {id:'pistacho_paradise', base:'pistacho', cremas:['choco']},
+  {id:'oasis_exotico', base:'pistacho', cremas:['coco']},
+  {id:'duopop', base:'pistacho', cremas:['tradicional']},
+  {id:'balance', base:'leche_cond', cremas:['tradicional']},
+  {id:'la_fit', base:'sin_base', cremas:['tradicional'], topping:'granola'},
+];
+function favoritaDeCombo(){
+  if(!['12oz','9oz'].includes(custom.tamano) || custom.fruta !== 'fresa') return null;
+  const cr = [custom.crema, custom.crema2].filter(Boolean).sort().join('+');
+  const c = COMBOS_FAVORITAS.find(x=> x.base===custom.base && x.cremas.slice().sort().join('+')===cr && (!x.topping || x.topping===custom.topping));
+  return c ? (FAVORITAS.find(f=>f.id===c.id) || null) : null;
 }
 
 function calcCustomPrice(){
@@ -821,11 +855,12 @@ function calcCustomPrice(){
   let total = t.price;
   const b = BASES.find(x=>x.id===custom.base);
   const c = CREMAS.find(x=>x.id===custom.crema);
+  const c2 = custom.crema2 ? CREMAS.find(x=>x.id===custom.crema2) : null;
   const fr = FRUTAS.find(x=>x.id===custom.fruta);
   const tp = TOPPINGS.find(x=>x.id===custom.topping);
   const cortesia = CORTESIA_BASE_IDS.includes(b.id); // base premium (pistacho) = regalo
   const cremaGratis = cortesia || custom.tamano==='canasta'; // en Canasta Pop la crema no se cobra
-  total += b.extra + (cremaGratis ? 0 : c.extra) + fr.extra;
+  total += b.extra + (cremaGratis ? 0 : c.extra + (c2 ? c2.extra : 0)) + fr.extra;
   let toppingExtra = tp.extra;
   if(cortesia && cortesiaCubre(tp)) toppingExtra = 0;
   total += toppingExtra;
@@ -843,7 +878,19 @@ function renderPersonalizador(){
   const cremasView = CREMAS.map(c=> (czNow && c.extra>0) ? {...c, extra:0, label:c.label+' 🎁 Gratis'} : c);
   const disabledBase = [];
   renderOptGroup(document.getElementById('baseOpts'), BASES, custom.base, id=>{custom.base=id; renderPersonalizador();});
-  renderOptGroup(document.getElementById('cremaOpts'), cremasView, custom.crema, id=>{custom.crema=id; renderPersonalizador();});
+  if(custom.tamano==='canasta' || !MEZCLA_CREMAS) custom.crema2 = null;
+  if(custom.crema2 === custom.crema) custom.crema2 = null;
+  renderOptGroup(document.getElementById('cremaOpts'), cremasView, custom.crema, id=>{ custom.crema=id; if(custom.crema2===id) custom.crema2=null; renderPersonalizador(); });
+  const w2 = document.getElementById('crema2Wrap');
+  if(custom.tamano==='canasta' || !MEZCLA_CREMAS){ w2.innerHTML = ''; }
+  else if(!custom.crema2){
+    w2.innerHTML = '<button class="opt opt-mix" id="mixCrema">+ Mezclar con otra crema</button>';
+    document.getElementById('mixCrema').addEventListener('click', ()=>{ const o = CREMAS.find(x=>x.id!==custom.crema); if(o){ custom.crema2 = o.id; renderPersonalizador(); } });
+  } else {
+    w2.innerHTML = '<div class="topping-label" style="margin:2px 0 6px;">Segunda crema</div><div class="opt-grid" id="crema2Opts"></div><button class="opt opt-mix" id="quitaCrema2" style="margin-top:6px;">Quitar la segunda crema</button>';
+    renderOptGroup(document.getElementById('crema2Opts'), cremasView, custom.crema2, id=>{ custom.crema2=id; renderPersonalizador(); }, [custom.crema]);
+    document.getElementById('quitaCrema2').addEventListener('click', ()=>{ custom.crema2 = null; renderPersonalizador(); });
+  }
 
   const frutaDisabled = custom.tamano==='canasta' ? ['mixto'] : [];
   document.getElementById('frutaNote').style.display = custom.tamano==='canasta' ? 'block':'none';
@@ -870,20 +917,25 @@ function renderPersonalizador(){
 
   const extraCont = document.getElementById('extraOpts');
   extraCont.className = 'xwrap'; extraCont.innerHTML = '';
-  const chipSel = (opt, nombre)=>{
-    const ch = document.createElement('div'); ch.className = 'xchip' + (custom.extras.includes(opt.id) ? ' sel' : '');
-    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span>`;
-    ch.addEventListener('click', ()=> toggleExtra(opt.id)); extraCont.appendChild(ch);
+  const chipPers = (opt, nombre, cont)=>{
+    const n = extraCount(opt.id), ch = document.createElement('div');
+    ch.className = 'xchip' + (n>0 ? ' sel' : '') + (n>1 ? ' multi' : '');
+    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
+    ch.addEventListener('click', e=>{
+      if(e.target.closest('.xm')){ removeExtra(opt.id); return; }
+      if(e.target.closest('.xplus')){ addExtra(opt.id); return; }
+      toggleExtra(opt.id);
+    });
+    cont.appendChild(ch);
   };
-  salsasOrdenadas().forEach(opt=> chipSel(opt, opt.label));
+  salsasOrdenadas().forEach(opt=> chipPers(opt, opt.label, extraCont));
   const topWrap = document.getElementById('extraToppingWrap');
   topWrap.innerHTML = `<div class="xhead">${T('toppings_label','Toppings (2 oz)')}</div><div class="xwrap" id="extraTopChips"></div>`;
   const tc = document.getElementById('extraTopChips');
-  extraToppings().forEach(t=>{
-    const ch = document.createElement('div'); ch.className = 'xchip' + (custom.extras.includes(t.id) ? ' sel' : '');
-    ch.innerHTML = `<span class="xn">${t.nombre}</span><span class="xp">+${t.extra}</span>`;
-    ch.addEventListener('click', ()=> toggleExtra(t.id)); tc.appendChild(ch);
-  });
+  extraToppings().forEach(t=> chipPers({id:t.id, extra:t.extra}, t.nombre, tc));
+  const fav = favoritaDeCombo(), hint = document.getElementById('favHint');
+  hint.style.display = fav ? 'block' : 'none';
+  if(fav) hint.innerHTML = `✨ ¡Esta combinación es <b>${fav.nombre}</b>! Así quedará en tu pedido.`;
 
   document.getElementById('customTotal').textContent = money(total * custom.cantidad);
 }
@@ -905,15 +957,17 @@ document.getElementById('addCustomBtn').addEventListener('click', ()=>{
   const detalles = [
     `Tamaño: ${t.label}`,
     `Base: ${b.label}`,
-    `Crema: ${c.label}`,
+    `Crema: ${c.label}${custom.crema2 ? ' + ' + (CREMAS.find(x=>x.id===custom.crema2)||{label:''}).label : ''}`,
     `Fruta: ${fr.label}`,
     `Topping: ${tp.label}`,
   ];
   if(custom.extras.length){
-    const names = custom.extras.map(id=> (allExtras().find(e=>e.id===id)||{label:id}).label);
+    const cuenta = {}; custom.extras.forEach(id=>{ cuenta[id] = (cuenta[id]||0) + 1; });
+    const names = Object.keys(cuenta).map(id=> (allExtras().find(e=>e.id===id)||{label:id}).label + (cuenta[id]>1 ? ' ×' + cuenta[id] : ''));
     detalles.push('Extras: ' + names.join(', '));
   }
-  addToCart({uid:uid(), nombre:'Fresas Pop personalizada', detalles, cantidad:custom.cantidad, precioUnit: total});
+  const fav = favoritaDeCombo();                                   // ¿es igual a una favorita? entonces se llama como ella
+  addToCart({uid:uid(), nombre: fav ? fav.nombre : 'Fresas Pop personalizada', detalles, cantidad:custom.cantidad, precioUnit: total});
   custom.cantidad = 1;
   renderPersonalizador();
   renderCart(); showToast('Agregado al carrito');
@@ -1137,7 +1191,7 @@ function refrescarExtras(){
   document.querySelectorAll('.xchip[data-nm]').forEach(ch=>{
     const q = extraQty(ch.dataset.nm);
     ch.classList.toggle('sel', q>0); ch.classList.toggle('multi', q>1);
-    const b = ch.querySelector('.xq'); if(b) b.textContent = '×' + q;
+    const b = ch.querySelector('.xq'); if(b) b.textContent = q;
   });
 }
 function renderExtrasStandalone(containerId){
@@ -1150,8 +1204,12 @@ function renderExtrasStandalone(containerId){
     const w = document.createElement('div'); w.className = 'xwrap';
     lista.forEach(x=>{
       const ch = document.createElement('div'); ch.className = 'xchip'; ch.dataset.nm = x.nm;
-      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xq">×1</span><button class="xplus" aria-label="Agregar otro">+</button>`;
+      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
       ch.addEventListener('click', e=>{
+        if(e.target.closest('.xm')){                         // − : quitar uno (con 1 se deselecciona)
+          const it = cart.find(i=>i.nombre===x.nm && !(i.detalles||[]).length); if(!it) return;
+          it.cantidad--; if(it.cantidad<=0) cart = cart.filter(i=>i!==it); renderCart(); return;
+        }
         if(e.target.closest('.xplus')){                      // + : pedir uno más
           addToCart({uid:uid(), nombre:x.nm, detalles:[], cantidad:1, precioUnit:x.extra}); renderCart(); return;
         }
@@ -2005,6 +2063,9 @@ async function cargarDatosRemotos(){
       if(d.toppings) TOPPINGS = d.toppings.filter(x=>x.disponible!==false);
       if(d.extras) EXTRAS = d.extras.filter(x=>x.disponible!==false);
       if(d.favoritas) FAVORITAS = fusionarConImagenLocal(d.favoritas, DEFAULT_FAVORITAS);
+      if(!d.favoritasV2){                                   // antes de que el panel las guarde, se muestran igual
+        ['duopop','la_fit'].forEach(id=>{ if(!FAVORITAS.some(x=>x.id===id)){ const f = DEFAULT_FAVORITAS.find(x=>x.id===id); const k = FAVORITAS.findIndex(x=>x.id==='canasta_pop'); if(f) FAVORITAS.splice(k<0?FAVORITAS.length:k, 0, f); } });
+      }
       if(d.premium) PREMIUM = fusionarConImagenLocal(d.premium, DEFAULT_PREMIUM);
       if(d.otros) OTROS = fusionarConImagenLocal(d.otros, DEFAULT_OTROS);
       if(d.faq && d.faq.length) CONFIG.faq = d.faq;
@@ -2022,6 +2083,12 @@ async function cargarDatosRemotos(){
     console.warn('No se pudo conectar con el panel de administrador, usando datos locales', e);
   }
 
+  { // nombre completo en lugar de "choco" (también en lo que ya estaba guardado en el panel)
+    const choc = t=> String(t||'').replace(/Choco [Cc]rema/g,'Crema de chocolate').replace(/(g)alletas de choco(?!late)/gi,(m,g)=>g+'alletas de chocolate').replace(/(c)rema de choco(?!late)/gi,(m,c)=>c+'rema de chocolate');
+    CREMAS.forEach(x=>{ x.label = choc(x.label); }); TOPPINGS.forEach(x=>{ x.label = choc(x.label); });
+    [FAVORITAS, PREMIUM, OTROS].forEach(l=> l.forEach(p=>{ p.desc = choc(p.desc); }));
+    const cp = FAVORITAS.find(x=>x.id==='choco_pop'); if(cp && /^(Choco|Crema de chocolate|Base de Nutella \+ crema tradicional \+ crema de chocolate)/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado';
+  }
   try{                                         // lo que se acabó en el inventario (lo publica Finanzas)
     const au = (await MENU_DOC.parent.doc('auto').get()).data() || {};
     const quita = (arr, m)=>{ if(!m) return arr; const r = arr.filter(x=>!m[x.id]); return r.length ? r : arr; };
@@ -2037,6 +2104,7 @@ async function cargarDatosRemotos(){
   if(TAMANOS.length && !TAMANOS.find(t=>t.id===custom.tamano)) custom.tamano = TAMANOS[0].id;
   if(BASES.length && !BASES.find(b=>b.id===custom.base)) custom.base = BASES[0].id;
   if(CREMAS.length && !CREMAS.find(c=>c.id===custom.crema)) custom.crema = CREMAS[0].id;
+  if(custom.crema2 && !CREMAS.find(c=>c.id===custom.crema2)) custom.crema2 = null;
   if(FRUTAS.length && !FRUTAS.find(f=>f.id===custom.fruta)) custom.fruta = FRUTAS[0].id;
   if(TOPPINGS.length && !TOPPINGS.find(t=>t.id===custom.topping)) custom.topping = TOPPINGS[0].id;
 
