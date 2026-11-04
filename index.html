@@ -190,8 +190,8 @@ img{max-width:100%; display:block;}
 .opt-grid{display:flex; flex-wrap:wrap; gap:8px;}
 .opt{
   border:2px solid #f0d7dc; background:#fff;
-  border-radius:12px; padding:9px 13px;
-  font-size:13.5px; font-weight:600; color:var(--texto);
+  border-radius:20px; padding:8px 14px;
+  font-size:13px; font-weight:600; color:var(--texto);
   display:flex; align-items:center; gap:6px; transition:.15s;
 }
 .opt .extra{color:var(--principal); font-weight:700; font-size:12px;}
@@ -212,7 +212,7 @@ img{max-width:100%; display:block;}
 /* size cards with photo */
 .size-grid{display:flex; gap:10px;}
 .size-card{
-  flex:1; border:2px solid #f0d7dc; border-radius:16px;
+  flex:1; border:1.5px solid #f0d7dc; border-radius:20px;
   padding:10px 6px 12px; text-align:center; background:#fff;
 }
 .size-card img{width:100%; height:80px; object-fit:contain; margin-bottom:6px;}
@@ -233,7 +233,7 @@ img{max-width:100%; display:block;}
 .qty-value{font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:800; color:var(--vino); min-width:24px; text-align:center;}
 .btn-add{
   background:var(--principal); color:#fff; border:none;
-  padding:12px 20px; border-radius:14px; font-weight:700; font-size:14px;
+  padding:11px 22px; border-radius:24px; font-weight:700; font-size:14px;
   box-shadow:var(--sombra);
 }
 .btn-add:active{transform:scale(.97);}
@@ -256,8 +256,8 @@ img{max-width:100%; display:block;}
 .pcard-sizes{display:flex; gap:6px; margin-bottom:9px; flex-wrap:wrap;}
 .size-chip-wrap{display:flex; flex-direction:column; align-items:center; gap:2px;}
 .size-chip{
-  border:2px solid #f0d7dc; background:#fff; border-radius:10px;
-  padding:5px 9px; font-size:11.5px; font-weight:700;
+  border:1.5px solid #f0d7dc; background:#fff; border-radius:20px;
+  padding:5px 11px; font-size:11.5px; font-weight:700;
 }
 .size-chip.selected{background:var(--principal); border-color:var(--principal); color:#fff;}
 .size-chip-price{font-size:9.5px; color:var(--gris); font-weight:600;}
@@ -273,6 +273,12 @@ img{max-width:100%; display:block;}
   background:var(--principal); color:#fff; font-size:16px; font-weight:700;
   display:flex; align-items:center; justify-content:center; flex:none;
 }
+.xwrap{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+.xchip{display:inline-flex; align-items:center; gap:5px; border:1.5px solid #f0d7dc; background:#fff; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:600; color:var(--texto); cursor:pointer; user-select:none;}
+.xchip .xp{color:var(--principal); font-size:10px; font-weight:700;} .xchip.sel{background:var(--principal); border-color:var(--principal); color:#fff;} .xchip.sel .xp{color:#ffe1ea;}
+.xchip .xq{background:var(--principal); color:#fff; border-radius:10px; font-size:10px; min-width:16px; padding:0 4px; text-align:center; display:none;} .xchip.has .xq{display:inline-block;}
+.xchip .xm{display:none; border:none; background:#f0e2e4; color:var(--vino); width:18px; height:18px; border-radius:50%; font-size:12px; line-height:1; padding:0;} .xchip.has .xm{display:inline-block;}
+.xhead{font-size:11px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.4px; margin:6px 0 5px;}
 .topping-select-wrap{margin-bottom:9px;}
 .variante-wrap{margin-bottom:9px;}
 .variante-row{display:flex; flex-wrap:wrap; gap:6px;}
@@ -280,15 +286,15 @@ img{max-width:100%; display:block;}
 .variante-chip.selected{background:var(--principal); border-color:var(--principal); color:#fff;}
 .topping-label{font-size:10.5px; font-weight:700; color:var(--gris); display:block; margin-bottom:3px; text-transform:uppercase; letter-spacing:.3px;}
 .topping-select{
-  width:100%; border:2px solid #f0d7dc; border-radius:10px; padding:7px 9px;
+  width:100%; border:2px solid #f0d7dc; border-radius:18px; padding:7px 9px;
   font-family:inherit; font-size:12.5px; font-weight:600; color:var(--texto); background:#fff;
 }
 .topping-cortesia-note{font-size:10px; color:var(--principal); font-weight:600; margin-top:4px; line-height:1.3;}
 .pcard-footer{display:flex; align-items:center; justify-content:space-between;}
 .pcard-price{font-weight:800; color:var(--principal); font-size:15px;}
 .btn-mini{
-  background:var(--vino); color:#fff; border:none; border-radius:10px;
-  padding:8px 14px; font-weight:700; font-size:12.5px;
+  background:var(--vino); color:#fff; border:none; border-radius:20px;
+  padding:8px 15px; font-weight:700; font-size:12.5px;
 }
 .btn-mini:active{transform:scale(.95);}
 
@@ -318,11 +324,6 @@ img{max-width:100%; display:block;}
 .faq-item:first-child{border-top:none; padding-top:0; margin-top:0;}
 .faq-q{font-weight:700; font-size:13.5px; color:var(--vino); margin-bottom:3px;}
 .faq-a{font-size:13px; color:var(--gris); line-height:1.5;}
-.linktree-btn{
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  background:var(--principal); color:#fff; text-decoration:none;
-  padding:12px; border-radius:14px; font-weight:700; font-size:14px; margin-top:4px;
-}
 
 /* ---------- FOOTER ---------- */
 .footer{
@@ -379,7 +380,7 @@ img{max-width:100%; display:block;}
 .form-textarea{resize:vertical; min-height:60px;}
 .choice-row{display:flex; gap:8px;}
 .choice-btn{
-  flex:1; border:2px solid #f0d7dc; background:#fff; border-radius:12px;
+  flex:1; border:2px solid #f0d7dc; background:#fff; border-radius:20px;
   padding:10px; font-weight:700; font-size:13px; text-align:center;
 }
 .choice-btn.selected{background:var(--principal); border-color:var(--principal); color:#fff;}
@@ -408,7 +409,7 @@ img{max-width:100%; display:block;}
   background:#fff; padding:14px 16px; box-shadow:0 -2px 10px rgba(86,9,31,.06); flex-shrink:0;
 }
 .btn-whatsapp{
-  width:100%; background:#25D366; color:#fff; border:none; border-radius:14px;
+  width:100%; background:#25D366; color:#fff; border:none; border-radius:26px;
   padding:14px; font-weight:700; font-size:15px; display:flex; align-items:center;
   justify-content:center; gap:8px; box-shadow:var(--sombra);
 }
@@ -541,11 +542,6 @@ img{max-width:100%; display:block;}
 <section style="padding:26px 16px 6px; max-width:560px; margin:0 auto;">
   <div class="section-title"><h2 data-t="info_titulo">Más información</h2></div>
 
-  <a class="linktree-btn" id="linktreeLink" href="#" target="_blank" rel="noopener">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 6 8h4v6H6l6 6 6-6h-4V8h4z"/></svg>
-    <span data-t="linktree_texto">Visita nuestro Linktree</span>
-  </a>
-
   <div class="info-block" style="margin-top:14px;">
     <h4 data-t="horario_titulo">🕒 Horario</h4>
     <p id="horarioText"></p>
@@ -608,7 +604,6 @@ const CONFIG = {
   whatsapp: '18297076263', // código de país + número
   slogan: 'Aquí se viene a ser feliz',
   instagram: 'https://www.instagram.com/fresaspop',
-  linktree: 'https://linktr.ee/Fresitaspop',
   horario: 'Miércoles a domingo, de 2:30 PM a 7:30 PM.',
   ubicacion: '"El Local Rosa" — Calle Hostos, Cotuí, entre la GBC y Guadalupe, República Dominicana.',
   deliveryCost: 100,
@@ -634,7 +629,7 @@ function aplicarTextos(){
   document.querySelectorAll('[data-t]').forEach(el=>{ const v = TEXTOS[el.dataset.t]; if(v !== undefined && v !== '') el.textContent = v; });
 }
 function aplicarConfigTextos(){
-  const m = {slogan:'slogan', horario:'horario', ubicacion:'ubicacion', ubicacion_link:'ubicacionLink', linktree:'linktree', instagram:'instagram', titular:'titularCuenta'};
+  const m = {slogan:'slogan', horario:'horario', ubicacion:'ubicacion', ubicacion_link:'ubicacionLink', instagram:'instagram', titular:'titularCuenta'};
   Object.keys(m).forEach(k=>{ if(TEXTOS[k]) CONFIG[m[k]] = TEXTOS[k]; });
   if(TEXTOS.whatsapp) CONFIG.whatsapp = String(TEXTOS.whatsapp).replace(/\D/g,'');
   if(TEXTOS.delivery_costo !== undefined && TEXTOS.delivery_costo !== '' && !isNaN(Number(TEXTOS.delivery_costo))) CONFIG.deliveryCost = Number(TEXTOS.delivery_costo);
@@ -873,24 +868,20 @@ function renderPersonalizador(){
   });
 
   const extraCont = document.getElementById('extraOpts');
-  extraCont.innerHTML = '';
-  salsasOrdenadas().forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.className = 'opt' + (custom.extras.includes(opt.id)?' selected':'');
-    btn.innerHTML = opt.label + ` <span class="extra">+${opt.extra}</span>`;
-    btn.addEventListener('click', ()=> toggleExtra(opt.id));
-    extraCont.appendChild(btn);
-  });
+  extraCont.className = 'xwrap'; extraCont.innerHTML = '';
+  const chipSel = (opt, nombre)=>{
+    const ch = document.createElement('div'); ch.className = 'xchip' + (custom.extras.includes(opt.id) ? ' sel' : '');
+    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span>`;
+    ch.addEventListener('click', ()=> toggleExtra(opt.id)); extraCont.appendChild(ch);
+  };
+  salsasOrdenadas().forEach(opt=> chipSel(opt, opt.label));
   const topWrap = document.getElementById('extraToppingWrap');
-  const tops = extraToppings();
-  const selTop = custom.extras.find(id=>id.startsWith('extop_')) || '';
-  topWrap.innerHTML = `<label class="topping-label">${T('toppings_label','Toppings (2 oz)')}</label>
-    <select class="topping-select"><option value="">Sin topping extra</option>
-    ${tops.map(t=>`<option value="${t.id}" ${t.id===selTop?'selected':''}>${t.nombre} (+${t.extra})</option>`).join('')}</select>`;
-  topWrap.querySelector('select').addEventListener('change', e=>{
-    custom.extras = custom.extras.filter(id=>!id.startsWith('extop_'));
-    if(e.target.value) custom.extras.push(e.target.value);
-    renderPersonalizador();
+  topWrap.innerHTML = `<div class="xhead">${T('toppings_label','Toppings (2 oz)')}</div><div class="xwrap" id="extraTopChips"></div>`;
+  const tc = document.getElementById('extraTopChips');
+  extraToppings().forEach(t=>{
+    const ch = document.createElement('div'); ch.className = 'xchip' + (custom.extras.includes(t.id) ? ' sel' : '');
+    ch.innerHTML = `<span class="xn">${t.nombre}</span><span class="xp">+${t.extra}</span>`;
+    ch.addEventListener('click', ()=> toggleExtra(t.id)); tc.appendChild(ch);
   });
 
   document.getElementById('customTotal').textContent = money(total * custom.cantidad);
@@ -1140,42 +1131,40 @@ function renderOtros(){
   });
 }
 
+function extraQty(nm){ return cart.filter(i=>i.nombre===nm && !(i.detalles||[]).length).reduce((a,i)=>a+i.cantidad, 0); }
+function refrescarExtras(){
+  document.querySelectorAll('.xchip[data-nm]').forEach(ch=>{
+    const q = extraQty(ch.dataset.nm); ch.classList.toggle('has', q>0);
+    const b = ch.querySelector('.xq'); if(b) b.textContent = q;
+  });
+}
 function renderExtrasStandalone(containerId){
   const cont = document.getElementById(containerId);
   if(!cont) return;
   cont.innerHTML = '';
-  const head = t=>{ const h=document.createElement('div'); h.className='topping-label'; h.style.margin='4px 0 8px'; h.textContent=t; cont.appendChild(h); };
-  head(T('salsas_label','Salsas (2 oz)'));
-  salsasOrdenadas().forEach(ex=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'extra-mini-card';
-    wrap.innerHTML = `
-      <span class="extra-mini-name">${ex.label}</span>
-      <span class="extra-mini-price">${money(ex.extra)}</span>
-      <button class="extra-mini-btn">+</button>`;
-    wrap.querySelector('.extra-mini-btn').addEventListener('click', ()=>{
-      addToCart({uid:uid(), nombre:ex.label, detalles:[], cantidad:1, precioUnit:ex.extra});
-      renderCart(); showToast('Agregado al carrito');
-    });
-    cont.appendChild(wrap);
-  });
-  const tops = extraToppings();
-  if(tops.length){
-    head(T('toppings_label','Toppings (2 oz)'));
-    const w = document.createElement('div');
-    w.className = 'extra-mini-card';
-    w.innerHTML = `<select class="topping-select" style="flex:1; margin:0;">${tops.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('')}</select>
-      <span class="extra-mini-price"></span><button class="extra-mini-btn">+</button>`;
-    const sel = w.querySelector('select'), pr = w.querySelector('.extra-mini-price');
-    const upd = ()=>{ const t = tops.find(x=>x.id===sel.value); pr.textContent = money(t.extra); };
-    sel.addEventListener('change', upd); upd();
-    w.querySelector('.extra-mini-btn').addEventListener('click', ()=>{
-      const t = tops.find(x=>x.id===sel.value);
-      addToCart({uid:uid(), nombre:'Topping extra: '+t.nombre+' 2oz', detalles:[], cantidad:1, precioUnit:t.extra});
-      renderCart(); showToast('Agregado al carrito');
+  const grupo = (titulo, lista)=>{
+    if(!lista.length) return;
+    const h = document.createElement('div'); h.className = 'xhead'; h.textContent = titulo; cont.appendChild(h);
+    const w = document.createElement('div'); w.className = 'xwrap';
+    lista.forEach(x=>{
+      const ch = document.createElement('div'); ch.className = 'xchip'; ch.dataset.nm = x.nm;
+      ch.innerHTML = `<button class="xm" aria-label="Quitar">−</button><span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xq">0</span>`;
+      ch.addEventListener('click', e=>{
+        if(e.target.closest('.xm')){
+          const it = cart.find(i=>i.nombre===x.nm && !(i.detalles||[]).length); if(!it) return;
+          it.cantidad--; if(it.cantidad<=0) cart = cart.filter(i=>i!==it);
+          renderCart(); return;
+        }
+        addToCart({uid:uid(), nombre:x.nm, detalles:[], cantidad:1, precioUnit:x.extra});
+        renderCart(); showToast('Agregado al carrito');
+      });
+      w.appendChild(ch);
     });
     cont.appendChild(w);
-  }
+  };
+  grupo(T('salsas_label','Salsas (2 oz)'), salsasOrdenadas().map(ex=>({nm:ex.label, label:ex.label, extra:ex.extra})));
+  grupo(T('toppings_label','Toppings (2 oz)'), extraToppings().map(t=>({nm:'Topping extra: '+t.nombre+' 2oz', label:t.nombre, extra:t.extra})));
+  refrescarExtras();
 }
 
 /* =========================================================
@@ -1303,6 +1292,39 @@ const drawer = document.getElementById('drawer');
 let orderState = { delivery:null, pago:null, billete:'', ubicacion:'', efectivoTipo:null, telefono:'' };
 try{ const _c = JSON.parse(localStorage.getItem('fp_cliente')||'null'); if(_c){ orderState.nombre=_c.nombre||''; orderState.telefono=_c.telefono||''; } }catch(e){}
 let ACTIVE_OFERTAS = [];
+/* ----- el carrito no se pierde al refrescar o cerrar el navegador ----- */
+const CARRITO_KEY = 'fp_carrito', CARRITO_ULT = 'fp_carrito_ultimo';
+let CARRITO_LISTO = false, MENU_FIRMA = '', CARRITO_FIRMA = '', CARRITO_VIEJO = false;
+function firmaMenu(){
+  const p = a=> (a||[]).map(x=> [x.id, x.price, x.extra, (x.sizes||[]).map(z=>z.price).join('/')].join(':')).join(',');
+  const t = [p(TAMANOS), p(BASES), p(CREMAS), p(FRUTAS), p(TOPPINGS), p(EXTRAS), p(FAVORITAS), p(PREMIUM), p(OTROS)].join('|'); let h = 5381;
+  for(let i=0;i<t.length;i++) h = ((h<<5)+h+t.charCodeAt(i))|0; return String(h);
+}
+function estadoGuardable(){ return {delivery:orderState.delivery, pago:orderState.pago, billete:orderState.billete, ubicacion:orderState.ubicacion, efectivoTipo:orderState.efectivoTipo, notas:orderState.notas||''}; }
+function guardarCarrito(){
+  if(!CARRITO_LISTO) return;
+  try{
+    if(!cart.length){ localStorage.removeItem(CARRITO_KEY); return; }
+    localStorage.setItem(CARRITO_KEY, JSON.stringify({v:1, ts:Date.now(), cart, estado:estadoGuardable(), firma: CARRITO_VIEJO ? CARRITO_FIRMA : MENU_FIRMA}));
+  }catch(e){}
+}
+function restaurarCarrito(){
+  try{
+    const g = JSON.parse(localStorage.getItem(CARRITO_KEY) || 'null');
+    if(g && Array.isArray(g.cart) && g.cart.length && Date.now() - g.ts < 7*864e5){
+      const ok = g.cart.filter(i=> i && typeof i.nombre==='string' && Number(i.cantidad)>0 && isFinite(Number(i.precioUnit)));
+      if(ok.length){ cart = ok.map(i=>({...i, uid: i.uid || uid(), detalles: i.detalles || []})); Object.assign(orderState, g.estado || {}); CARRITO_FIRMA = g.firma || ''; }
+    }
+  }catch(e){}
+  CARRITO_LISTO = true;
+}
+function vaciarCarrito(){
+  if(!cart.length || !confirm('¿Vaciar el carrito?')) return;
+  cart = []; CARRITO_VIEJO = false; renderCart();
+}
+function recuperarUltimoPedido(){
+  try{ const g = JSON.parse(localStorage.getItem(CARRITO_ULT)||'null'); if(!g) return; cart = g.cart; Object.assign(orderState, g.estado||{}); localStorage.removeItem(CARRITO_ULT); renderCart(); showToast('Carrito recuperado'); }catch(e){}
+}
 let CLIENTE_ACTUAL = null;     // tarjeta del cliente (puntos, premio, ruleta) según su número
 let RULETA_PREMIOS = [
   {id:'d50',  nombre:'Descuento $50 Dop 🤗',  tipo:'descuento', valor:50,  peso:20},
@@ -1372,6 +1394,8 @@ function renderCart(){
   if(cart.length===0){
     body.innerHTML = '<div class="empty-cart">' + T('carrito_vacio','Tu carrito está vacío 🍓') + '<br>Agrega tus postres favoritos para comenzar.</div>';
     document.getElementById('sendBtn').disabled = true;
+    try{ const g = JSON.parse(localStorage.getItem(CARRITO_ULT)||'null'); if(g && Date.now()-g.ts < 3*3600e3) body.innerHTML += '<div style="text-align:center; margin-top:10px;"><button class="btn-mini" onclick="recuperarUltimoPedido()">Recuperar mi último pedido</button><div class="step-note" style="margin-top:4px;">Por si no se llegó a enviar por WhatsApp.</div></div>'; }catch(e){}
+    guardarCarrito(); refrescarExtras();
     return;
   }
   document.getElementById('sendBtn').disabled = false;
@@ -1497,7 +1521,10 @@ function renderCart(){
   if(descuento) html += `<div class="summary-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>`;
   html += `<div class="summary-row total"><span>Total</span><span>${money(total)}</span></div>`;
 
+  if(CARRITO_VIEJO) html = `<div class="gift-box" style="margin-bottom:10px;">⚠️ El menú cambió desde que armaste este carrito. Revisa los precios antes de enviar.<div style="margin-top:6px; display:flex; gap:8px;"><button class="btn-mini" onclick="CARRITO_VIEJO=false; renderCart()">Está bien</button><button class="btn-mini" onclick="vaciarCarrito()">Vaciar</button></div></div>` + html;
+  html += `<div style="text-align:center; margin-top:10px;"><button style="background:none; border:none; color:var(--gris); font-size:12px; text-decoration:underline;" onclick="vaciarCarrito()">Vaciar carrito</button></div>`;
   body.innerHTML = html;
+  guardarCarrito(); refrescarExtras();
 
   // reattach events
   body.querySelectorAll('.cart-item').forEach(row=>{
@@ -1554,7 +1581,7 @@ function renderCart(){
   if(notasInput) notasInput.value = orderState.notas || '';
   if(billeteInput) billeteInput.value = orderState.billete || '';
   if(nombreInput) nombreInput.addEventListener('input', e=> orderState.nombre = e.target.value);
-  if(notasInput) notasInput.addEventListener('input', e=> orderState.notas = e.target.value);
+  if(notasInput) notasInput.addEventListener('input', e=>{ orderState.notas = e.target.value; guardarCarrito(); });
   const telefonoInput = document.getElementById('telefonoInput');
   if(telefonoInput){
     telefonoInput.value = orderState.telefono || '';
@@ -1657,6 +1684,10 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   // la web recuerda al cliente y registra el pedido (punto "pendiente") en su tarjeta
   try{ localStorage.setItem('fp_cliente', JSON.stringify({nombre, telefono:tel})); }catch(e){}
   guardarPedidoCliente(tel, nombre, total, regalos, descuento, prEnvio);
+  try{ localStorage.setItem(CARRITO_ULT, JSON.stringify({ts:Date.now(), cart, estado:estadoGuardable()})); }catch(e){}
+  cart = []; CARRITO_VIEJO = false;
+  Object.assign(orderState, {delivery:null, pago:null, billete:'', ubicacion:'', efectivoTipo:null, notas:''});
+  renderCart(); showToast('Pedido enviado ✅ ¡Gracias!');
 });
 
 // Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
@@ -1694,7 +1725,7 @@ async function guardarPedidoCliente(tel, nombre, total, regalos, descuento, prem
 document.body.insertAdjacentHTML('beforeend', `
 <div class="acct-overlay" id="acctOverlay"><div class="acct-sheet">
   <h3>👑 Tarjeta VIP</h3>
-  <details id="acctDet" open style="margin-bottom:10px;"><summary style="font-weight:700; color:var(--vino); cursor:pointer; font-size:13.5px;">✨ ¿Cómo funciona? Beneficios</summary><div id="acctBenef"></div></details>
+  <div id="acctBenef" style="margin-bottom:10px;"></div>
   <div class="step-note" style="margin:0 0 10px;">Escribe tu número para ver tus compras y tu historial.</div>
   <input type="tel" inputmode="tel" class="form-input" id="acctTel" placeholder="Ej. 829-555-1234">
   <button class="btn-add" id="acctGo" style="margin-top:10px; width:100%;">Ver mi tarjeta</button>
@@ -1734,7 +1765,6 @@ async function cargarTarjeta(){
       ${puedeGirar() ? `<button class="btn-add" id="acctSpin" style="width:100%; margin-top:6px;">🎡 Girar ruleta</button>` : ''}
       <div style="margin-top:14px; font-weight:700;">Mis pedidos</div>${hist || '<div class="step-note">Sin pedidos todavía.</div>'}`;
     const sp = document.getElementById('acctSpin'); if(sp) sp.addEventListener('click', abrirRuleta);
-    document.getElementById('acctDet').open = false;
     if(window.__ruletaAuto && puedeGirar()){ window.__ruletaAuto = false; abrirRuleta(); }
     renderCart();
   }catch(e){ out.innerHTML = '<div class="step-note">No se pudo consultar ahora. Intenta de nuevo en un momento.</div>'; }
@@ -1825,7 +1855,7 @@ document.getElementById('wheelBtn').addEventListener('click', ()=>{ const b = do
 document.getElementById('wheelClose').addEventListener('click', ()=>{ ruletaOv.classList.remove('open'); cargarTarjeta(); });
 
 function beneficiosHTML(){
-  return `<div class="gift-box" style="background:#fff;">
+  return `<div class="gift-box" style="background:#fff; font-size:12.5px; line-height:1.4;">
     <div style="margin-bottom:5px;">1️⃣ ${T('vip_b1','Cada compra te suma un sello; lo confirmamos al finalizar tu pedido.')}</div>
     <div style="margin-bottom:5px;">2️⃣ ${T('vip_b2','Con 5 sellos giras la ruleta y ganas premios 🎡.')}</div>
     <div>3️⃣ ${T('vip_b3','Con 10 sellos te regalamos una mini clásica 🎁 y tu tarjeta vuelve a empezar.')}</div></div>`;
@@ -1873,7 +1903,6 @@ document.getElementById('qrGo').addEventListener('click', sumarSelloQR);
 document.getElementById('qrClose').addEventListener('click', ()=> qrOv.classList.remove('open'));
 function abrirTarjeta(auto){
   document.getElementById('acctBenef').innerHTML = beneficiosHTML();
-  document.getElementById('acctDet').open = true;
   window.__ruletaAuto = !!auto;
   acctOv.classList.add('open');
   document.getElementById('acctTel').value = orderState.telefono ? fmtTel(normTel(orderState.telefono)) : '';
@@ -1889,7 +1918,6 @@ acctOv.addEventListener('click', e=>{ if(e.target===acctOv) acctOv.classList.rem
    ========================================================= */
 function renderInfo(){
   document.getElementById('sloganText').textContent = CONFIG.slogan;
-  document.getElementById('linktreeLink').href = CONFIG.linktree;
   document.getElementById('horarioText').textContent = CONFIG.horario;
   document.getElementById('ubicacionText').textContent = CONFIG.ubicacion;
   document.getElementById('ubicacionText').href = CONFIG.ubicacionLink;
@@ -1991,6 +2019,14 @@ async function cargarDatosRemotos(){
     console.warn('No se pudo conectar con el panel de administrador, usando datos locales', e);
   }
 
+  try{                                         // lo que se acabó en el inventario (lo publica Finanzas)
+    const au = (await MENU_DOC.parent.doc('auto').get()).data() || {};
+    const quita = (arr, m)=>{ if(!m) return arr; const r = arr.filter(x=>!m[x.id]); return r.length ? r : arr; };
+    BASES = quita(BASES, au.bases); CREMAS = quita(CREMAS, au.cremas); FRUTAS = quita(FRUTAS, au.frutas); TOPPINGS = quita(TOPPINGS, au.toppings);
+    const sinProd = arr=> au.productos ? arr.filter(p=>!au.productos[p.id]) : arr;
+    FAVORITAS = sinProd(FAVORITAS); PREMIUM = sinProd(PREMIUM); OTROS = sinProd(OTROS);
+    CATEGORIAS_EXTRA = CATEGORIAS_EXTRA.map(c=>({...c, items: sinProd(c.items||[])}));
+  }catch(e){}
   // reconstruir estados que dependen de los arreglos ya actualizados
   FAVORITAS.forEach(f=>{ if(!(f.id in favSize)) favSize[f.id]=f.sizes[0].id; if(!(f.id in favTopping)) favTopping[f.id]=f.toppingDefault; });
   PREMIUM.forEach(p=>{ if(!(p.id in premSize)) premSize[p.id]=p.sizes[0].id; if(p.toppingSelect && !(p.id in premTopping)) premTopping[p.id]=p.toppingDefault; });
@@ -2007,6 +2043,7 @@ async function cargarDatosRemotos(){
   renderExtrasStandalone('favoritasExtrasList');
   renderExtrasStandalone('premiumExtrasList');
   renderOtros();
+  MENU_FIRMA = firmaMenu(); if(CARRITO_FIRMA && CARRITO_FIRMA !== MENU_FIRMA && cart.length) CARRITO_VIEJO = true;
   renderCart();
   renderInfo();
   renderOfertas();
@@ -2017,6 +2054,8 @@ async function cargarDatosRemotos(){
   if(new URLSearchParams(location.search).has('qr')) abrirQR();
 }
 
+document.addEventListener('input', e=>{ if(e.target.closest && e.target.closest('#drawerBody')){ clearTimeout(window.__gc); window.__gc = setTimeout(guardarCarrito, 400); } });
+restaurarCarrito();
 document.body.insertAdjacentHTML('afterbegin', '<div id="ofertaBanner" class="oferta-banner" style="display:none;"></div>');
 cargarDatosRemotos();
 </script>
