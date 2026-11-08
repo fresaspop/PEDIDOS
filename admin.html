@@ -784,6 +784,7 @@ async function cargarOfertas(){
         <div style="flex:1;">
           <div class="item-name">${o.texto}</div>
           ${o.beneficio?`<div class="item-sub">${o.beneficio}</div>`:''}
+          ${o.descTipo && o.descValor>0 ? `<div class="item-sub" style="color:var(--principal); font-weight:700;">Descuento automático: ${o.descTipo==='porcentaje' ? o.descValor+'%' : 'RD$'+o.descValor}${o.descMinimo?' · compra mínima RD$'+o.descMinimo:''}</div>` : `<div class="item-sub">Solo aviso (no cambia el precio)</div>`}
         </div>
         <label class="switch">
           <input type="checkbox" ${o.activa?'checked':''}>
@@ -818,7 +819,12 @@ function abrirModalOferta(){
     <div class="field"><label>¿Cuál es el beneficio? (se le explica al cliente)</label>
       <textarea id="f_oferta_beneficio" rows="2" placeholder="Ej: Del 5 al 7 de diciembre, las Fresas Dubái 12oz cuestan RD$600"></textarea>
     </div>
-    <p class="item-sub" style="margin:-4px 0 10px;">Nota: esto muestra un aviso en el sitio. Si el descuento cambia un precio, recuerda también editarlo en la pestaña "Productos" o "Ingredientes".</p>
+    <div class="field"><label>Descuento automático en el pedido</label>
+      <select id="f_oferta_tipo"><option value="">Solo aviso (no cambia el precio)</option><option value="porcentaje">Porcentaje del subtotal (%)</option><option value="monto">Monto fijo (RD$)</option></select>
+    </div>
+    <div class="field"><label>Valor del descuento (% o RD$)</label><input type="number" id="f_oferta_valor" min="0" inputmode="decimal" placeholder="Ej. 10"></div>
+    <div class="field"><label>Compra mínima en RD$ (opcional)</label><input type="number" id="f_oferta_min" min="0" inputmode="numeric" placeholder="Ej. 500"></div>
+    <p class="item-sub" style="margin:-4px 0 10px;">Con descuento automático, la web lo resta del total y lo muestra en el pedido y en el mensaje de WhatsApp (se suma al premio de la ruleta, sin pasar del subtotal). Sin descuento, solo muestra el aviso y los precios los cambias tú en "Productos".</p>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
       <button class="btn-save" onclick="guardarOferta()">Crear y activar</button>
@@ -830,7 +836,10 @@ async function guardarOferta(){
   const texto = document.getElementById('f_oferta_texto').value.trim();
   if(!texto){ showToast('Escribe el texto de la oferta'); return; }
   const beneficio = (document.getElementById('f_oferta_beneficio').value||'').trim();
-  await OFERTAS_COL.add({texto, beneficio, activa:true, creada: firebase.firestore.FieldValue.serverTimestamp()});
+  const descTipo = document.getElementById('f_oferta_tipo').value, descValor = Number(document.getElementById('f_oferta_valor').value) || 0, descMinimo = Number(document.getElementById('f_oferta_min').value) || 0;
+  if(descTipo && !(descValor > 0)){ showToast('Escribe el valor del descuento'); return; }
+  if(descTipo === 'porcentaje' && descValor > 100){ showToast('El porcentaje no puede pasar de 100'); return; }
+  await OFERTAS_COL.add({texto, beneficio, descTipo: descTipo || '', descValor: descTipo ? descValor : 0, descMinimo: descTipo ? descMinimo : 0, activa:true, creada: firebase.firestore.FieldValue.serverTimestamp()});
   cerrarModal();
   cargarOfertas();
   showToast('Oferta creada');

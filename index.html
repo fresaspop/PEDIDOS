@@ -1784,6 +1784,20 @@ async function cargarClienteActual(){
 }
 function tieneRegaloFidelidad(){ const p = (CLIENTE_ACTUAL && CLIENTE_ACTUAL.puntos) || 0; return p>0 && p%10===9; }
 function premioActivo(){ const pr = CLIENTE_ACTUAL && CLIENTE_ACTUAL.premio; return (pr && !pr.usado) ? pr : null; }
+/* descuentos: premio de la ruleta + promociones activas con descuento automático (se suman sin pasar del subtotal) */
+function descuentosDetalle(){
+  const sub = cartSubtotal(), out = []; let resta = sub;
+  const dp = descuentoPremio(); if(dp){ out.push({tipo:'premio', label:'Premio de la ruleta', monto:dp}); resta -= dp; }
+  ACTIVE_OFERTAS.forEach(o=>{
+    if(!o.descTipo || !(o.descValor > 0)) return;
+    if(o.descMinimo && sub < o.descMinimo) return;
+    let m = o.descTipo === 'porcentaje' ? Math.round(sub * Math.min(o.descValor, 100) / 100) : o.descValor;
+    m = Math.min(m, Math.max(0, resta)); if(m <= 0) return;
+    out.push({tipo:'oferta', label:'Promoción: ' + o.texto, monto:m, oferta:o}); resta -= m;
+  });
+  return out;
+}
+const descuentoTotal = ()=> descuentosDetalle().reduce((a,x)=>a + x.monto, 0);
 function descuentoPremio(){ const pr = premioActivo(); return (pr && pr.tipo==='descuento') ? Math.min(Number(pr.valor)||0, cartSubtotal()) : 0; }
 function extrasRegalo(){
   return salsasOrdenadas().map(e=>({id:e.id, label:e.label})).concat(extraToppings().map(t=>({id:t.id, label:'Extra '+t.nombre+' 2oz'})));
@@ -1808,7 +1822,7 @@ function puedeGirar(){
 function normTel(t){ let d=(t||'').replace(/\D/g,''); if(d.length===11 && d[0]==='1') d=d.slice(1); return d; }
 function fmtTel(d){ return d.length===10 ? d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6) : d; }
 function billeteNum(){ return Number(String(orderState.billete||'').replace(/[^\d.]/g,''))||0; }
-function totalPedido(){ return cartSubtotal() + (orderState.delivery==='si' ? CONFIG.deliveryCost : 0) - descuentoPremio(); }
+function totalPedido(){ return cartSubtotal() + (orderState.delivery==='si' ? CONFIG.deliveryCost : 0) - descuentoTotal(); }
 function cambioTexto(){
   const b = billeteNum(); if(!b) return '';
   const t = totalPedido();
@@ -1906,7 +1920,11 @@ function renderCart(){
     html += `</div>`;
   }
   if(ACTIVE_OFERTAS.length){
-    html += `<div class="form-group">` + ACTIVE_OFERTAS.map(o=>`<div class="step-note">🎉 <b>Oferta activa:</b> ${o.texto}${o.beneficio?' — '+o.beneficio:''}</div>`).join('') + `</div>`;
+    html += `<div class="form-group">` + ACTIVE_OFERTAS.map(o=>{
+      const ap = descuentosDetalle().find(d=>d.oferta===o);
+      const estado = o.descTipo && o.descValor>0 ? (ap ? ` <b style="color:var(--principal);">✓ Descuento de ${money(ap.monto)} aplicado</b>` : (o.descMinimo ? ` <i>(válida en compras desde ${money(o.descMinimo)})</i>` : '')) : '';
+      return `<div class="step-note">🎉 <b>Oferta activa:</b> ${o.texto}${o.beneficio?' — '+o.beneficio:''}${estado}</div>`;
+    }).join('') + `</div>`;
   }
 
   // Entrega: retiro o delivery
@@ -1996,13 +2014,13 @@ function renderCart(){
 
   const subtotal = cartSubtotal();
   const deliveryFee = orderState.delivery==='si' ? CONFIG.deliveryCost : 0;
-  const descuento = descuentoPremio();
+  const descuento = descuentoTotal();
   const total = subtotal + deliveryFee - descuento;
 
   html += `<div class="divider"></div>`;
   html += `<div class="summary-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>`;
   if(orderState.delivery==='si') html += `<div class="summary-row"><span>Delivery</span><span>${money(CONFIG.deliveryCost)}</span></div>`;
-  if(descuento) html += `<div class="summary-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>`;
+  descuentosDetalle().forEach(d=>{ html += `<div class="summary-row"><span>${esc(d.label)}</span><span>-${money(d.monto)}</span></div>`; });
   html += `<div class="summary-row total"><span>Total</span><span>${money(total)}</span></div>`;
 
   if(CARRITO_VIEJO) html = `<div class="gift-box" style="margin-bottom:10px;">⚠️ El menú cambió desde que armaste este carrito. Revisa los precios antes de enviar.<div style="margin-top:6px; display:flex; gap:8px;"><button class="btn-mini" onclick="CARRITO_VIEJO=false; renderCart()">Está bien</button><button class="btn-mini" onclick="vaciarCarrito()">Vaciar</button></div></div>` + html;
@@ -2119,7 +2137,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
 
   const subtotal = cartSubtotal();
   const deliveryFee = orderState.delivery==='si' ? CONFIG.deliveryCost : 0;
-  const descuento = descuentoPremio();
+  const descuento = descuentoTotal();
   const total = subtotal + deliveryFee - descuento;
 
   const { msg: msgBase, bloque } = armarMensajes({nombre, tel, subtotal, deliveryFee, descuento, total});
@@ -2159,7 +2177,7 @@ function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, bloque, co
       ${(orderState.nombre||'').trim() ? `<div class="rs-row"><span>A nombre de</span><b>${esc(orderState.nombre.trim())}</b></div>` : ''}
       ${regalosPedido().map(r=>`<div class="rs-row"><span>🎁 ${esc(r)}</span></div>`).join('')}
     </div>
-    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
+    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuentosDetalle().map(d=>`<div class="rs-row"><span>${esc(d.label)}</span><span>-${money(d.monto)}</span></div>`).join('')}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
     ${orderState.delivery==='si' ? `<div class="rs-note"><div>El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia, solo si está muy lejos.</div>${(!u && !(orderState.ubicacion||'').trim()) ? '<div>Recuerda enviar tu ubicación actual por WhatsApp</div>' : ''}</div><button class="rs-copy" id="rsCopiarEntrega">📋 Copiar datos de entrega</button>` : ''}
     <button class="btn-whatsapp" id="rsEnviar">Enviar por WhatsApp</button>
     <button class="rs-edit" id="rsEditar">Editar pedido</button>`;
@@ -2234,11 +2252,11 @@ function armarMensajes(c){
   if(deliveryFee > 0 || descuento > 0){
     msg += '\nSubtotal: ' + money(subtotal) + '\n';
     if(deliveryFee > 0) msg += 'Delivery: ' + money(deliveryFee) + '\n';
-    if(descuento > 0) msg += 'Descuento (premio de la ruleta): -' + money(descuento) + '\n';
+    descuentosDetalle().forEach(d=>{ msg += d.label + ': -' + money(d.monto) + '\n'; });
     msg += '*Total: ' + money(total) + '*\n';
   } else msg += '\n*Total: ' + money(total) + '*\n';
   if(orderState.notas && orderState.notas.trim()) msg += '\nNotas: ' + orderState.notas.trim() + '\n';
-  if(ACTIVE_OFERTAS.length) msg += '\n🎉 Oferta activa: ' + ACTIVE_OFERTAS.map(o=>o.texto).join(' / ') + '\n';
+  { const sinDesc = ACTIVE_OFERTAS.filter(o=> !descuentosDetalle().some(d=>d.oferta===o)); if(sinDesc.length) msg += '\n🎉 Oferta activa: ' + sinDesc.map(o=>o.texto).join(' / ') + '\n'; }
   msg += '\n' + T('msg_vip','🎀 ¡Gracias por elegir Fresas Pop! Ya tienes tu tarjeta VIP: consúltala cuando quieras en nuestra página de pedidos. 💗') + '\n';
   let bloque = '';
   if(esDel){
@@ -2634,7 +2652,7 @@ async function renderOfertas(){
     if(!wrap) return;
     if(snap.empty){ ACTIVE_OFERTAS=[]; wrap.innerHTML=''; wrap.style.display='none'; renderCart(); return; }
     ACTIVE_OFERTAS = [];
-    snap.forEach(doc=>{ const d=doc.data(); ACTIVE_OFERTAS.push({texto:d.texto, beneficio:d.beneficio||''}); });
+    snap.forEach(doc=>{ const d=doc.data(); ACTIVE_OFERTAS.push({texto:d.texto, beneficio:d.beneficio||'', descTipo:d.descTipo||'', descValor:Number(d.descValor)||0, descMinimo:Number(d.descMinimo)||0}); });
     wrap.innerHTML = ACTIVE_OFERTAS.map(o=>`<div>🎉 <strong>${o.texto}</strong>${o.beneficio?`<div class="oferta-benef">${o.beneficio}</div>`:''}</div>`).join('');
     wrap.style.display = 'block';
     renderCart();
