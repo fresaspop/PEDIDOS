@@ -34,9 +34,10 @@ body{
   font-family:'Poppins',sans-serif;
   background:var(--crema);
   color:var(--texto);
-  padding-bottom:84px;
+  padding-bottom:90px;
   overflow-x:hidden;
 }
+@supports (overflow:clip){ body{overflow-x:clip;} }
 h1,h2,h3,h4,.brand-font{font-family:'Baloo 2',sans-serif;}
 button{font-family:inherit; cursor:pointer;}
 img{max-width:100%; display:block;}
@@ -77,6 +78,10 @@ img{max-width:100%; display:block;}
   padding:14px 14px 10px 16px;
   box-shadow:0 2px 10px rgba(86,9,31,.06);
 }
+.header.compact{padding:5px 14px 5px 16px;}
+.header.compact .logo-slogan, .header.compact .acct-label{display:none;}
+.header.compact .logo-img{height:24px;}
+.header.compact .cart-btn{width:36px; height:36px;} .header.compact .cart-btn svg{width:18px; height:18px;}
 .header-row{
   display:flex; align-items:center; justify-content:space-between; position:relative;
 }
@@ -117,15 +122,15 @@ img{max-width:100%; display:block;}
 /* ---------- NAV TABS ---------- */
 .explore{max-width:560px; margin:0 auto; padding:16px 16px 6px; text-align:center;}
 .explore-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:800; letter-spacing:1.6px; color:var(--vino); margin:0;}
-.topbar{position:sticky; top:0; z-index:50; display:flex; gap:8px; align-items:center; padding:8px 12px; background:rgba(255,243,244,.96); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
+.topbar{position:sticky; top:0; z-index:50; display:flex; gap:8px; align-items:center; padding:5px 12px; background:rgba(255,243,244,.96); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
 .topbar.stuck{box-shadow:0 3px 12px rgba(86,9,31,.10); background:rgba(255,255,255,.97);}
 .search{position:relative; flex:1; min-width:0; max-width:560px; margin:0 auto;}
 .search svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; stroke:var(--principal);}
-.search input{width:100%; height:42px; border:2px solid #f0d7dc; border-radius:21px; padding:0 40px 0 40px; font-size:14px; font-family:inherit; background:#fff; color:var(--texto); outline:none; -webkit-appearance:none;}
+.search input{width:100%; height:38px; border:2px solid #f0d7dc; border-radius:21px; padding:0 40px 0 40px; font-size:14px; font-family:inherit; background:#fff; color:var(--texto); outline:none; -webkit-appearance:none;}
 .search input:focus{border-color:var(--principal);}
 .search input::-webkit-search-cancel-button{display:none;}
 .search-clear{position:absolute; right:7px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:13px; font-weight:700;}
-.top-cats{flex:none; width:42px; height:42px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
+.top-cats{flex:none; width:38px; height:38px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
 .cats{max-width:560px; margin:0 auto; padding:4px 14px 12px; position:relative;}
 .tabs{display:grid; grid-template-columns:1fr 1fr; gap:6px; max-height:140px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px; scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
@@ -229,7 +234,7 @@ body.searching .tab-panel{display:none !important;}
 .size-card.selected{border-color:var(--principal); background:#fff5f7; box-shadow:var(--sombra);}
 
 .price-bar{
-  position:sticky; bottom:62px; background:var(--blanco);
+  position:sticky; bottom:8px; background:var(--blanco);
   border-radius:var(--radius); padding:14px 16px;
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   box-shadow:var(--sombra-fuerte); margin-top:6px;
@@ -277,6 +282,9 @@ body.searching .tab-panel{display:none !important;}
   border:2px solid #f0d7dc; background:#fff; border-radius:10px;
   padding:5px 9px; font-size:11.5px; font-weight:700;
 }
+.size-chip{display:flex; flex-direction:column; align-items:center; line-height:1.1;}
+.sz-sub{display:block; font-size:7.5px; font-weight:600; opacity:.72; text-transform:uppercase; letter-spacing:.3px; margin-top:1px;}
+.opt.opt-size{flex-direction:column; gap:0; align-items:center; justify-content:center;} .opt-main{display:flex; align-items:center; gap:6px;}
 .size-chip.selected{background:var(--principal); border-color:var(--principal); color:#fff;}
 .size-chip-price{font-size:9.5px; color:var(--gris); font-weight:600;}
 .extra-mini-card{
@@ -301,8 +309,9 @@ body.searching .tab-panel{display:none !important;}
 #ubicOverlay, #resumenOverlay{z-index:75;}
 .entrega-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
 .entrega-opt{display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; padding:6px 8px; border:1.5px solid #f0d7dc; background:#fff; border-radius:14px; color:var(--vino); text-align:left; transition:.15s;}
-.entrega-opt svg{color:var(--principal); flex:none;} .eo-t{display:flex; flex-direction:column; line-height:1.15; min-width:0;} .entrega-opt b{font-size:12px;} .entrega-opt small{font-size:10px; color:var(--gris);}
-.entrega-opt.selected{border-color:var(--principal); background:#fff0f3; box-shadow:0 0 0 3px rgba(219,82,117,.18);}
+.entrega-opt svg{color:var(--principal); flex:none;}
+.entrega-opt.selected{background:var(--principal); border-color:var(--principal); color:#fff; box-shadow:0 3px 10px rgba(219,82,117,.35);}
+.entrega-opt.selected svg, .entrega-opt.selected b, .entrega-opt.selected small{color:#fff;} .eo-t{display:flex; flex-direction:column; line-height:1.15; min-width:0;} .entrega-opt b{font-size:12px;} .entrega-opt small{font-size:10px; color:var(--gris);}
 .ubic-card, .ubic-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:2px solid #f0d7dc; border-radius:14px; background:#fff; margin-bottom:8px; cursor:pointer;}
 .ubic-item{cursor:default;}
 .ubic-card.selected{border-color:var(--principal); background:#fff0f3;}
@@ -333,6 +342,12 @@ body.searching .tab-panel{display:none !important;}
 .sel-grid .topping-label{display:block; font-size:9px; line-height:1.1; margin:0 0 2px 2px; text-transform:uppercase; letter-spacing:.3px;}
 .sel-grid .topping-select{width:100%; padding:5px 24px 5px 10px; font-size:12.5px; border-radius:11px; border-width:1.5px; height:32px;}
 .sel-grid .topping-cortesia-note{display:none;}
+.sheet-x{position:absolute; top:10px; right:12px; width:32px; height:32px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; z-index:2;}
+.guia{display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; color:var(--gris); text-align:center; margin:2px 0 12px;} .guia-flecha{color:var(--principal); font-weight:800; font-size:14px; animation:bobSutil 1.7s ease-in-out infinite; display:inline-block;} .guia.ok{color:var(--principal); font-weight:700;}
+.form-label.siguiente::after{content:' ↓'; color:var(--principal); font-weight:800; display:inline-block; animation:bobSutil 1.7s ease-in-out infinite;}
+@keyframes bobSutil{0%,100%{transform:translateY(-1px); opacity:.55;} 50%{transform:translateY(3px); opacity:1;}}
+.form-group.pulso{animation:pulsoGrupo 1.3s ease;} @keyframes pulsoGrupo{0%,100%{box-shadow:none;} 30%{box-shadow:0 0 0 3px rgba(219,82,117,.35); border-radius:12px;}}
+.ruleta-banner{display:flex; align-items:center; justify-content:space-between; gap:10px; background:linear-gradient(135deg,#fff0f3,#ffe3ea); border:1.5px solid #f6c9d4; border-radius:14px; padding:10px 12px; margin-bottom:10px; font-size:13px; color:var(--vino);} .ruleta-banner small{font-size:11.5px; color:var(--gris);}
 .extras-card{background:#fff; border-radius:var(--radius); padding:14px 14px 12px; box-shadow:var(--sombra);}
 .extras-card h3{margin:0 0 2px; font-family:'Baloo 2',sans-serif; font-size:16.5px; color:var(--vino);}
 .extras-card p{margin:0 0 10px; font-size:12.5px; color:var(--gris);}
@@ -432,7 +447,7 @@ body.searching .tab-panel{display:none !important;}
   background:#fff; padding:16px; display:flex; align-items:center; justify-content:space-between;
   box-shadow:0 2px 10px rgba(86,9,31,.06); flex-shrink:0;
 }
-.drawer-menu{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
+.drawer-menu{width:46px; height:42px; border-radius:12px; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0;} .drawer-menu span{font-size:8.5px; font-weight:700; line-height:1;}
 .drawer-head h3{margin:0; color:var(--vino); font-size:18px;}
 .drawer-close{background:none; border:none; font-size:22px; color:var(--gris); line-height:1; padding:4px;}
 .drawer-body{flex:1; overflow-y:auto; padding:14px 16px 20px;}
@@ -495,14 +510,14 @@ body.searching .tab-panel{display:none !important;}
 .btn-whatsapp:disabled{opacity:.5;}
 .btn-whatsapp svg{width:20px; height:20px;}
 
-.cartbar{position:fixed; left:14px; right:14px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; z-index:45; display:flex; align-items:center; gap:10px; padding:6px 8px 6px 8px; border-radius:18px; background:rgba(255,255,255,.97); color:var(--vino); border:1.5px solid #f3cdd6; box-shadow:0 4px 14px rgba(86,9,31,.12); cursor:pointer; transition:.2s; backdrop-filter:blur(6px);}
-.cartbar.vacio{opacity:.92; color:var(--gris);}
-.cb-ic{position:relative; width:40px; height:36px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
-.cb-n{position:absolute; left:57%; top:43%; transform:translate(-50%,-50%); font-size:11.5px; font-weight:800; color:var(--vino); line-height:1; pointer-events:none;} .cb-n.dos{font-size:9.5px; letter-spacing:-.3px;}
-.cb-txt{flex:1; min-width:0; font-size:14px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;} .cartbar.vacio .cb-txt{font-weight:600; font-size:13px;}
-.cb-go{flex:none; background:#fff0f3; color:var(--principal); padding:6px 12px; border-radius:14px; font-weight:700; font-size:12px;} .cartbar.vacio .cb-go{display:none;}
+.cartfab{position:fixed; left:12px; bottom:calc(14px + env(safe-area-inset-bottom)); width:58px; height:58px; border-radius:50%; background:#fff; border:1.5px solid #f3cdd6; color:var(--principal); box-shadow:0 4px 14px rgba(86,9,31,.16); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; z-index:45; cursor:pointer; transition:transform .15s, bottom .2s;}
+.cartfab:active{transform:scale(.94);}
+.cartfab.vacio{opacity:.9; color:var(--gris);} .cartfab.vacio .cf-n, .cartfab.vacio .cf-amt{display:none;}
+.cf-n{position:absolute; top:-6px; right:-6px; min-width:22px; height:22px; padding:0 5px; border-radius:11px; background:var(--principal); color:#fff; font-size:11.5px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 1px 4px rgba(86,9,31,.25);}
+.cf-amt{font-size:8.5px; font-weight:800; color:var(--vino); line-height:1; white-space:nowrap;}
+body.en-pers .cartfab{bottom:calc(92px + env(safe-area-inset-bottom));}
 .toast{
-  position:fixed; bottom:68px; left:50%; transform:translateX(-50%) translateY(260px);
+  position:fixed; bottom:88px; left:50%; transform:translateX(-50%) translateY(260px);
   background:var(--vino); color:#fff; padding:12px 22px; border-radius:30px;
   font-size:13.5px; font-weight:600; z-index:80; transition:.3s; box-shadow:var(--sombra-fuerte);
 }
@@ -539,7 +554,7 @@ body.searching .tab-panel{display:none !important;}
     <input id="menuSearch" type="search" enterkeyhint="search" autocomplete="off" placeholder="Busca un postre o ingrediente…" aria-label="Buscar en el menú">
     <button class="search-clear" id="searchClear" aria-label="Limpiar búsqueda" style="display:none;">✕</button>
   </div>
-  <button class="top-cats" id="topCats" aria-label="Ver categorías" title="Categorías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></button>
+  <button class="top-cats" id="topCats" aria-label="Ver categorías" title="Categorías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </div>
 <div class="aviso-offline" id="avisoOffline" style="display:none;">No pudimos actualizar el menú. Estás viendo la última versión disponible.</div>
 <div class="cats" id="catsWrap">
@@ -691,15 +706,15 @@ body.searching .tab-panel{display:none !important;}
 
 <!-- ================= CART DRAWER ================= -->
 <div class="overlay" id="overlay"></div>
-<div class="cartbar" id="cartBar" role="button" tabindex="0" aria-label="Ver mi pedido">
-  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="30" height="30"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg><span class="cb-n" id="cbN"></span></span>
-  <span class="cb-txt" id="cbT1">Tu carrito está vacío</span>
-  <span class="cb-go" id="cbGo">Ver pedido ›</span>
+<div class="cartfab vacio" id="cartBar" role="button" tabindex="0" aria-label="Ver mi pedido">
+  <span class="cf-n" id="cbN">0</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="23" height="23"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+  <span class="cf-amt" id="cbT1"></span>
 </div>
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <h3 data-t="carrito_titulo">Tu pedido</h3>
-    <span style="display:flex; align-items:center; gap:6px;"><button class="drawer-menu" id="drawerMenu" aria-label="Ir al menú para agregar más" title="Ir al menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></button>
+    <span style="display:flex; align-items:center; gap:6px;"><button class="drawer-menu" id="drawerMenu" aria-label="Ir al menú para agregar más" title="Ir al menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menú</span></button>
     <button class="drawer-close" id="drawerClose">✕</button></span>
   </div>
   <div class="drawer-body" id="drawerBody">
@@ -960,6 +975,8 @@ function uid(){ return 'i' + Math.random().toString(36).slice(2,9); }
 /* =========================================================
    PERSONALIZADOR
    ========================================================= */
+function sizeTag(label){ const l = String(label||''); if(/\b9\b/.test(l)) return 'Peq'; if(/\b12\b/.test(l)) return 'Grande'; return ''; }
+const sizeSub = l=>{ const t = sizeTag(l); return t ? `<span class="sz-sub">${t}</span>` : ''; };
 function renderOptGroup(container, list, selectedId, onPick, disabledIds=[]){
   container.innerHTML = '';
   list.forEach(opt=>{
@@ -979,7 +996,8 @@ function renderSizeOpts(){
   TAMANOS.forEach(t=>{
     const btn = document.createElement('button');
     btn.className = 'opt' + (t.id===custom.tamano?' selected':'');
-    btn.innerHTML = `${t.label} <span class="extra">${money(t.price)}</span>`;
+    btn.className += ' opt-size';
+    btn.innerHTML = `<span class="opt-main">${t.label} <span class="extra">${money(t.price)}</span></span>${sizeSub(t.label)}`;
     btn.addEventListener('click', ()=>{
       custom.tamano = t.id;
       if(t.id==='canasta' && custom.fruta==='mixto') custom.fruta='fresa';
@@ -1141,7 +1159,13 @@ document.getElementById('addCustomBtn').addEventListener('click', ()=>{
     detalles.push('Extras: ' + names.join(', '));
   }
   const fav = favoritaDeCombo();                                   // ¿es igual a una favorita? entonces se llama como ella
-  addToCart({uid:uid(), nombre: fav ? fav.nombre : 'Fresas Pop personalizada', detalles, cantidad:custom.cantidad, precioUnit: total});
+  let det = detalles;
+  if(fav){                                                         // ya es la favorita: no se repiten sus ingredientes y se agrupa con la que se eligió en Favoritas
+    const dig = (String(t.label).match(/\d+/)||[''])[0], fs = (fav.sizes||[]).find(z=>dig && String(z.label).includes(dig));
+    det = [`Tamaño: ${fs ? fs.label : t.label}`, `Topping: ${tp.label}`];                 // mismo texto que la tarjeta de Favoritas, para que se agrupen
+    if(custom.extras.length) det.push(detalles[detalles.length-1]);
+  }
+  addToCart({uid:uid(), nombre: fav ? fav.nombre : 'Fresas Pop personalizada', detalles:det, cantidad:custom.cantidad, precioUnit: total});
   custom.cantidad = 1;
   renderPersonalizador();
   renderCart(); showToast('Agregado al carrito');
@@ -1336,7 +1360,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
       <div class="pcard-body">
         <h4>${p.nombre}</h4>
         <p class="pcard-desc">${p.desc}</p>
-        ${p.sizes.length > 1 ? `<div class="pcard-sizes">${p.sizes.map(s=>`<div class="size-chip-wrap"><button class="size-chip${s.id===selSize?' selected':''}" data-size="${s.id}">${s.label}</button>${s.id!==selSize?`<span class="size-chip-price">${money(s.price)}</span>`:''}</div>`).join('')}</div>` : ''}
+        ${p.sizes.length > 1 ? `<div class="pcard-sizes">${p.sizes.map(s=>`<div class="size-chip-wrap"><button class="size-chip${s.id===selSize?' selected':''}" data-size="${s.id}">${s.label}${sizeSub(s.label)}</button>${s.id!==selSize?`<span class="size-chip-price">${money(s.price)}</span>`:''}</div>`).join('')}</div>` : ''}
         <div class="sel-grid">${variantesHTML}${toppingHTML}</div>
         <div class="pcard-footer">
           <span class="pcard-price">${money(total)}</span>
@@ -1479,6 +1503,7 @@ function renderExtrasStandalone(containerId){
    TABS
    ========================================================= */
 function activarTab(key, desplazar){
+  document.body.classList.toggle('en-pers', key==='personalizada');
   const btn = document.querySelector(`.tab-btn[data-tab="${key}"]`), panel = document.getElementById('panel-'+key);
   if(!btn || !panel) return;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1487,7 +1512,7 @@ function activarTab(key, desplazar){
   if(desplazar) irAlPanel(panel);
 }
 function irAlPanel(panel){                         // muestra la cuadrícula con la categoría elegida y el inicio de sus productos, justo debajo del buscador fijo
-  const cats = document.getElementById('catsWrap'), top = cats.getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4;
+  const cats = document.getElementById('catsWrap'), top = cats.getBoundingClientRect().top + window.scrollY - alturaFija() - 4;
   window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
 }
 document.getElementById('tabs').addEventListener('click', (e)=>{
@@ -1503,10 +1528,17 @@ function actualizarFlechasTabs(){                 // si hay más categorías de 
 document.getElementById('tabs').addEventListener('scroll', actualizarFlechasTabs);
 window.addEventListener('resize', actualizarFlechasTabs);
 window.addEventListener('load', ()=>{ renderNextCat(); actualizarFlechasTabs(); });
-function irAlMenu(){ limpiarBusqueda(true); const top = document.getElementById('catsWrap').getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4; window.scrollTo({top:Math.max(0, top), behavior:'smooth'}); }
+function irAlMenu(){ limpiarBusqueda(true); const top = document.getElementById('catsWrap').getBoundingClientRect().top + window.scrollY - alturaFija() - 4; window.scrollTo({top:Math.max(0, top), behavior:'smooth'}); }
 document.getElementById('topCats').addEventListener('click', irAlMenu);
 document.getElementById('drawerMenu').addEventListener('click', ()=>{ closeDrawer(); setTimeout(irAlMenu, 120); });
 window.addEventListener('scroll', ()=>{ document.getElementById('topbar').classList.toggle('stuck', window.scrollY > document.getElementById('explora').offsetTop + 30); }, {passive:true});
+const alturaFija = ()=> 46 + document.getElementById('topbar').offsetHeight;     // encabezado compacto + buscador
+function ajustarSticky(){
+  const h = document.querySelector('.header'), t = document.getElementById('topbar'), y = window.scrollY;
+  if(y > 60) h.classList.add('compact'); else if(y < 20) h.classList.remove('compact');
+  t.style.top = h.offsetHeight + 'px';
+}
+window.addEventListener('scroll', ajustarSticky, {passive:true}); window.addEventListener('resize', ajustarSticky); window.addEventListener('load', ajustarSticky); ajustarSticky();
 /* ----- al terminar una sección, se invita a seguir con la siguiente ----- */
 function renderNextCat(){
   const tabs = [...document.querySelectorAll('.tab-btn')].filter(b=>b.style.display!=='none');
@@ -1587,7 +1619,7 @@ function irAProducto(tab, id){
   setTimeout(()=>{
     const panel = document.getElementById('panel-'+tab), card = id==='__pers' ? panel : panel.querySelector(`[data-pid="${id}"]`);
     if(!card) return;
-    const top = card.getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 14;
+    const top = card.getBoundingClientRect().top + window.scrollY - alturaFija() - 14;
     window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
     if(id!=='__pers'){ card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 2000); }
   }, 120);
@@ -1758,12 +1790,12 @@ function extrasRegalo(){
 }
 function regalosPedido(){
   const r = [];
-  if(tieneRegaloFidelidad()) r.push('Mini clásica (regalo por fidelidad)');
+  if(tieneRegaloFidelidad()) r.push('Tarjeta VIP, compra 10: mini clásica de regalo');
   const pr = premioActivo();
   if(pr){
-    if(pr.tipo==='descuento') r.push('Premio ruleta: '+pr.nombre+' — descuento de '+money(descuentoPremio())+' ya aplicado');
-    else if(pr.tipo==='mini') r.push('Premio ruleta: Mini clásica gratis');
-    else if(pr.tipo==='extra'){ const e = extrasRegalo().find(x=>x.id===orderState.extraRegalo); r.push('Premio ruleta: 1 extra gratis — '+(e ? e.label : '(sin elegir)')); }
+    if(pr.tipo==='descuento') r.push('Premio de la ruleta: '+pr.nombre+' (descuento de '+money(descuentoPremio())+' aplicado)');
+    else if(pr.tipo==='mini') r.push('Premio de la ruleta: mini clásica gratis');
+    else if(pr.tipo==='extra'){ const e = extrasRegalo().find(x=>x.id===orderState.extraRegalo); r.push('Premio de la ruleta: 1 extra gratis ('+(e ? e.label : 'sin elegir')+')'); }
   }
   return r;
 }
@@ -1797,11 +1829,27 @@ function cartSubtotal(){
 function actualizarCartBar(){
   const n = cart.reduce((a,i)=>a+i.cantidad, 0), bar = document.getElementById('cartBar'); if(!bar) return;
   bar.classList.toggle('vacio', n === 0);
-  const cn = document.getElementById('cbN'); cn.textContent = n === 0 ? '' : (n > 99 ? '99+' : n); cn.classList.toggle('dos', n > 9);
-  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : money(cartSubtotal());
+  document.getElementById('cbN').textContent = n > 99 ? '99+' : n;
+  document.getElementById('cbT1').textContent = n === 0 ? '' : money(cartSubtotal());
 }
 document.getElementById('cartBar').addEventListener('click', ()=> openDrawer());
 document.getElementById('cartBar').addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDrawer(); } });
+function pasoSiguiente(){
+  if(!orderState.delivery) return 'entrega';
+  if(!orderState.pago) return 'pago';
+  if(orderState.pago === 'efectivo'){
+    if(!orderState.efectivoTipo) return 'cambio';
+    if(orderState.efectivoTipo === 'billete' && billeteNum() < totalPedido()) return 'cambio';
+  }
+  if(!(orderState.nombre||'').trim()) return 'nombre';
+  if(normTel(orderState.telefono).length !== 10) return 'telefono';
+  return null;
+}
+function resaltarPaso(p){
+  const el = document.querySelector('#drawerBody [data-paso="' + p + '"]'); if(!el) return;
+  el.scrollIntoView({block:'center', behavior:'smooth'});
+  const g = el.closest('.form-group') || el; g.classList.add('pulso'); setTimeout(()=> g.classList.remove('pulso'), 1400);
+}
 function renderCart(){
   const count = cart.reduce((s,i)=>s+i.cantidad,0);
   const countEl = document.getElementById('cartCount');
@@ -1819,6 +1867,10 @@ function renderCart(){
   document.getElementById('sendBtn').disabled = cart.some(lineaAgotada);
 
   let html = '';
+  if(puedeGirar()){                                                // con 5 sellos confirmados se puede girar antes de completar los datos
+    const selN = ((CLIENTE_ACTUAL.puntos-1)%10)+1;
+    html += `<div class="ruleta-banner"><div>🎡 <b>¡Tienes ${selN} sellos confirmados!</b><br><small>Gira la ruleta y gana un premio para este pedido.</small></div><button class="btn-mini" id="girarDesdePedido">Girar</button></div>`;
+  }
   cart.forEach(item=>{
     const agItem = lineaAgotada(item);
     html += `
@@ -1841,9 +1893,11 @@ function renderCart(){
   });
 
   html += `<div class="divider"></div>`;
+  const psGuia = pasoSiguiente();
+  html += `<div class="guia${psGuia ? '' : ' ok'}">${psGuia ? 'Completa tus datos para enviar el pedido' : '¡Listo! Ya puedes enviarlo por WhatsApp'}<span class="guia-flecha">↓</span></div>`;
 
   if(tieneRegaloFidelidad()){
-    html += `<div class="form-group"><div class="gift-box">🎁 ${T('regalo10','¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.')}<br><b>Tu mini clásica va incluida en este pedido.</b></div></div>`;
+    html += `<div class="form-group"><div class="gift-box">🎁 ${T('regalo10','¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.')}<br><b>Regalo de tu Tarjeta VIP: tu mini clásica va incluida en este pedido.</b></div></div>`;
   }
   const prCart = premioActivo();
   if(prCart){
@@ -1859,7 +1913,7 @@ function renderCart(){
   if(orderState.delivery==='si' && !ubicSel() && UBIC.items.length) orderState.ubicacionId = (UBIC.items.find(u=>u.id===UBIC.ultimo) || UBIC.items[0]).id;
   html += `
   <div class="form-group">
-    <label class="form-label">¿Cómo quieres recibir tu pedido?</label>
+    <label class="form-label" data-paso="entrega">¿Cómo quieres recibir tu pedido?</label>
     <div class="entrega-row">
       <button class="entrega-opt" id="delivNo">${ic('store',20)}<span class="eo-t"><b>Retirar en el local</b><small>Sin costo</small></span></button>
       <button class="entrega-opt" id="delivSi">${icMoto(18)}<span class="eo-t"><b>Delivery</b><small>Desde ${money(CONFIG.deliveryCost)} · Cotuí</small></span></button>
@@ -1895,7 +1949,7 @@ function renderCart(){
   // Metodo de pago
   html += `
   <div class="form-group">
-    <label class="form-label">${T('pago_titulo','Método de pago')}</label>
+    <label class="form-label" data-paso="pago">${T('pago_titulo','Método de pago')}</label>
     <div class="choice-row">
       <button class="choice-btn" id="pagoTransferencia">Transferencia <span style="font-weight:400;font-size:11px;">(enviar comprobante)</span></button>
       <button class="choice-btn" id="pagoEfectivo">Efectivo</button>
@@ -1911,7 +1965,7 @@ function renderCart(){
       <div class="bank-row"><div class="b-info">Titular: <b>${CONFIG.titularCuenta}</b></div></div>
     </div>
     <div class="cash-note" id="cashNote">
-      <label class="form-label" style="margin-top:10px;">¿Cómo pagarás en efectivo?</label>
+      <label class="form-label" data-paso="cambio" style="margin-top:10px;">¿Cómo pagarás en efectivo?</label>
       <div class="choice-row">
         <button class="choice-btn" id="efBillete">Necesito cambio</button>
         <button class="choice-btn" id="efExacto">Tengo el dinero exacto</button>
@@ -1927,11 +1981,11 @@ function renderCart(){
   // Nombre y notas
   html += `
   <div class="form-group">
-    <label class="form-label">${T('nombre_label','Tu nombre')}</label>
+    <label class="form-label" data-paso="nombre">${T('nombre_label','Tu nombre')}</label>
     <input type="text" class="form-input" id="nombreInput" placeholder="¿Cómo te llamas?">
   </div>
   <div class="form-group">
-    <label class="form-label">${T('tel_label','Tu número de WhatsApp')}</label>
+    <label class="form-label" data-paso="telefono">${T('tel_label','Tu número de WhatsApp')}</label>
     <input type="tel" inputmode="tel" class="form-input" id="telefonoInput" placeholder="Ej. 829-555-1234">
     <div class="step-note" style="margin:6px 0 0;">${T('tel_ayuda','Con tu número acumulas sellos en tu Tarjeta VIP: en tu 5.ª compra giras la ruleta y en la 10.ª te regalamos una mini clásica.')}</div>
   </div>
@@ -1980,6 +2034,8 @@ function renderCart(){
   delivNo.addEventListener('click', ()=>{ orderState.delivery='no'; orderState.ubicacion=''; renderCart(); });
 
   body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a') || e.target.closest('.copy-link')) return; orderState.ubicacionId = c.dataset.id; renderCart(); }));
+  { const ps = pasoSiguiente(), lb = ps ? body.querySelector('[data-paso="' + ps + '"]') : null; if(lb) lb.classList.add('siguiente'); }
+  const gdp = document.getElementById('girarDesdePedido'); if(gdp) gdp.addEventListener('click', ()=> abrirRuleta());
   const ubAdd = document.getElementById('ubicAdd'); if(ubAdd) ubAdd.addEventListener('click', ()=> abrirFormUbic(null, true));
   const ubMan = document.getElementById('ubicManage'); if(ubMan) ubMan.addEventListener('click', abrirUbicaciones);
   const ubicacionInput = document.getElementById('ubicacionInput');
@@ -2052,15 +2108,11 @@ function showToast(msg){
 document.getElementById('sendBtn').addEventListener('click', async ()=>{
   if(cart.length===0) return;
   if(cart.some(lineaAgotada)){ showToast('Quita lo agotado de tu carrito para continuar'); return; }
-  const nombre = (orderState.nombre||'').trim();
-  if(!nombre){ showToast('Por favor escribe tu nombre'); document.getElementById('nombreInput')?.focus(); return; }
-  if(!orderState.delivery){ showToast('Indica si deseas delivery'); return; }
-  if(!orderState.pago){ showToast('Elige un método de pago'); return; }
-  const tel = normTel(orderState.telefono);
-  if(tel.length!==10){ showToast('Escribe tu número de WhatsApp (10 dígitos)'); document.getElementById('telefonoInput')?.focus(); return; }
-  if(orderState.pago==='efectivo'){
-    if(!orderState.efectivoTipo){ showToast('Indica si pagarás con billete o dinero exacto'); return; }
-    if(orderState.efectivoTipo==='billete' && billeteNum() < totalPedido()){ showToast('El billete debe cubrir el total del pedido'); return; }
+  const nombre = (orderState.nombre||'').trim(), tel = normTel(orderState.telefono);
+  const falta = pasoSiguiente();
+  if(falta){
+    const avisos = {entrega:'Elige retiro en el local o delivery', pago:'Elige un método de pago', cambio:(orderState.efectivoTipo==='billete' ? 'El billete debe cubrir el total del pedido' : 'Indica si pagarás con billete o dinero exacto'), nombre:'Por favor escribe tu nombre', telefono:'Escribe tu número de WhatsApp (10 dígitos)'};
+    showToast(avisos[falta]); resaltarPaso(falta); return;
   }
   const prEnvio = premioActivo();
   if(prEnvio && prEnvio.tipo==='extra' && !orderState.extraRegalo){ showToast('Elige tu extra gratis (premio de la ruleta)'); return; }
@@ -2105,6 +2157,7 @@ function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, bloque, co
       ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver ubicación</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>` : ''}
       <div class="rs-row"><span>Pago</span><b>${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}</b></div>
       ${(orderState.nombre||'').trim() ? `<div class="rs-row"><span>A nombre de</span><b>${esc(orderState.nombre.trim())}</b></div>` : ''}
+      ${regalosPedido().map(r=>`<div class="rs-row"><span>🎁 ${esc(r)}</span></div>`).join('')}
     </div>
     <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
     ${orderState.delivery==='si' ? `<div class="rs-note"><div>El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia, solo si está muy lejos.</div>${(!u && !(orderState.ubicacion||'').trim()) ? '<div>Recuerda enviar tu ubicación actual por WhatsApp</div>' : ''}</div><button class="rs-copy" id="rsCopiarEntrega">📋 Copiar datos de entrega</button>` : ''}
@@ -2129,6 +2182,37 @@ async function reservarFlan(n){
 }
 // Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
 const enNavegadorApp = ()=> /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedance|Snapchat/i.test(navigator.userAgent || '');
+const sizeCorto = l=>{ const t = sizeTag(l); return t ? t.toLowerCase() : ''; };
+const parseDet = d=>{ const i = d.indexOf(': '); return i < 0 ? {k:'', v:d.trim()} : {k:d.slice(0,i).trim(), v:d.slice(i+2).trim()}; };
+const sinPrecio = v=> String(v||'').replace(/\s*\(\+\d+\)\s*$/, '');
+function lineasProductos(){
+  const grupos = [], sueltos = {};
+  cart.forEach(it=>{
+    if(OPT_ALL.extras.some(e=>e.label===it.nombre) || /^Topping extra: /.test(it.nombre)){ const n = it.nombre.replace(/^Topping extra: /,''); sueltos[n] = (sueltos[n]||0) + it.cantidad; return; }
+    const det = (it.detalles||[]).filter(Boolean).map(parseDet), get = k=> (det.find(x=>x.k===k)||{}).v || '';
+    const tam = get('Tamaño'), top = sinPrecio(get('Topping')), ext = get('Extras');
+    const fav = FAVORITAS.find(f=>norm(f.nombre)===norm(it.nombre));
+    const otros = det.filter(x=>!['Tamaño','Topping','Extras'].includes(x.k));
+    const ingr = (fav && !(fav.variantes && fav.variantes.length)) ? fav.desc : otros.map(x=>sinPrecio(x.v)).join(' + ');     // favorita: base + crema, sin repetir ingredientes
+    const key = norm(it.nombre) + '|' + ingr + '|' + ext;
+    let g = grupos.find(x=>x.key===key); if(!g){ g = {key, nombre:it.nombre, ingr, ext, tam:[], tops:[]}; grupos.push(g); }
+    const sz = sizeCorto(tam), a = g.tam.find(x=>x.s===sz); if(a) a.n += it.cantidad; else g.tam.push({s:sz, n:it.cantidad});
+    if(top){ const b = g.tops.find(x=>x.s===sz && x.t===top); if(b) b.n += it.cantidad; else g.tops.push({s:sz, t:top, n:it.cantidad}); }
+  });
+  const out = [];
+  grupos.forEach(g=>{
+    out.push('*' + g.nombre + ':* ' + g.tam.map(x=> 'x' + x.n + (x.s ? ' ' + x.s : '')).join(' + '));
+    if(g.ingr) out.push('• ' + g.ingr);
+    if(g.tops.length){
+      if(new Set(g.tops.map(x=>x.t)).size === 1) out.push('• Topping: x' + g.tops.reduce((a,x)=>a+x.n, 0) + ' ' + g.tops[0].t);
+      else { const conTam = new Set(g.tops.map(x=>x.s)).size > 1; out.push('• Topping:'); g.tops.forEach(x=> out.push('- x' + x.n + (conTam && x.s ? ' ' + x.s : '') + ' ' + x.t)); }
+    }
+    if(g.ext) out.push('• Extras: ' + g.ext);
+  });
+  const ks = Object.keys(sueltos);
+  if(ks.length) out.push('*Extras:* ' + ks.map(n=>'x' + sueltos[n] + ' ' + n).join(' + '));
+  return out.join('\n');
+}
 function armarMensajes(c){
   const {nombre, tel, subtotal, deliveryFee, descuento, total} = c;
   const esDel = orderState.delivery === 'si', efectivo = orderState.pago === 'efectivo';
@@ -2136,47 +2220,32 @@ function armarMensajes(c){
   const uSel = esDel ? ubicSel() : null, link = uSel && uSel.link ? uSel.link : '';
   const ubTxt = uSel ? uSel.nombre + (uSel.direccion ? ' — ' + uSel.direccion : '') : ((orderState.ubicacion||'').trim());
   const ubicLineas = (ubTxt || link) ? [ubTxt, link].filter(Boolean).join('\n') : 'pendiente (la enviará por WhatsApp)';
-  // 1) agradecimiento de la tarjeta VIP, arriba
-  let msg = T('msg_vip', `🎀 ¡Gracias por elegir Fresas Pop!
-
-Ya tienes tu tarjeta VIP. Disfruta de beneficios y promociones especiales. 💗
-
-Puedes consultarla cuando quieras desde nuestra página de pedidos.`) + `\n\n`;
-  msg += T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + `\n\n`;
-  msg += `*Cliente:* ${nombre}\n*Teléfono:* ${fmtTel(tel)}\n\n*Productos:*\n`;
-  cart.forEach((item, idx)=>{
-    msg += `${idx+1}. ${item.cantidad}x ${item.nombre} — ${money(item.precioUnit*item.cantidad)}\n`;
-    (item.detalles||[]).filter(Boolean).forEach(d=>{ msg += `   • ${d}\n`; });                 // sin líneas vacías si no hay detalles
-  });
-  const regalos = regalosPedido();
-  if(regalos.length){ msg += `\n*Regalos / premios:*\n`; regalos.forEach(r=>{ msg += `   • ${r}\n`; }); }
-  // 2) solo la opción elegida
-  msg += `\n${esDel ? '🛵 Delivery' : '🏠 Retiro en el local'}\n`;
-  if(esDel) msg += `📍 Ubicación: ${ubicLineas}\n`;
-  // 3) pago
+  let msg = T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + '\n\n';
+  if(!esDel) msg += 'Cliente: ' + nombre + ' · ' + fmtTel(tel) + '\n\n';          // con delivery, nombre y número van en el bloque final
+  msg += lineasProductos() + '\n';
+  const premios = regalosPedido();
+  if(premios.length) msg += '\n' + premios.map(r=>'🎁 ' + r).join('\n') + '\n';      // premios de la ruleta o de la tarjeta VIP, bien aclarados
+  msg += '\n' + (esDel ? '🛵 Delivery' : '🏠 Retiro en el local') + '\n';
   if(efectivo){
-    msg += `💳 Método de pago: Efectivo\n💵 Pagará con: ${money(exacto ? total : paga)}\n`;
-    msg += exacto ? `💸 No necesita cambio\n` : `💸 Su cambio será: ${money(cambio)}\n`;
+    msg += '💳 Método de pago: Efectivo\nPagará con: ' + money(exacto ? total : paga) + '\n' + (exacto ? 'No necesita cambio' : 'Su cambio será: ' + money(cambio)) + '\n';
   } else {
-    msg += `💳 Método de pago: Transferencia\n` + T('msg_comprobante','🧾 Pagos por transferencia: por favor envíe el comprobante.') + `\n`;
+    msg += '💳 Método de pago: Transferencia\n' + T('msg_comprobante','🧾 Pagos por transferencia: por favor envíe el comprobante.') + '\n';
   }
-  // 4) totales: el subtotal solo si hay delivery o descuento
   if(deliveryFee > 0 || descuento > 0){
-    msg += `\n*Subtotal:* ${money(subtotal)}\n`;
-    if(deliveryFee > 0) msg += `*Delivery:* ${money(deliveryFee)}\n`;
-    if(descuento > 0) msg += `*Descuento premio:* -${money(descuento)}\n`;
-    msg += `💵 Total: ${money(total)}\n`;
-  } else msg += `\n💵 Total: ${money(total)}\n`;
-  if(orderState.notas && orderState.notas.trim()) msg += `\n*Notas:* ${orderState.notas.trim()}\n`;
-  if(ACTIVE_OFERTAS.length) msg += `\n🎉 *Oferta activa:* ${ACTIVE_OFERTAS.map(o=>o.texto).join(' / ')}\n`;
-  // 5) bloque para el repartidor (solo delivery)
+    msg += '\nSubtotal: ' + money(subtotal) + '\n';
+    if(deliveryFee > 0) msg += 'Delivery: ' + money(deliveryFee) + '\n';
+    if(descuento > 0) msg += 'Descuento (premio de la ruleta): -' + money(descuento) + '\n';
+    msg += '*Total: ' + money(total) + '*\n';
+  } else msg += '\n*Total: ' + money(total) + '*\n';
+  if(orderState.notas && orderState.notas.trim()) msg += '\nNotas: ' + orderState.notas.trim() + '\n';
+  if(ACTIVE_OFERTAS.length) msg += '\n🎉 Oferta activa: ' + ACTIVE_OFERTAS.map(o=>o.texto).join(' / ') + '\n';
+  msg += '\n' + T('msg_vip','🎀 ¡Gracias por elegir Fresas Pop! Ya tienes tu tarjeta VIP: consúltala cuando quieras en nuestra página de pedidos. 💗') + '\n';
   let bloque = '';
   if(esDel){
-    bloque = `📦 INFORMACIÓN PARA DELIVERY · USO INTERNO\n\n👤 Nombre: ${nombre}\n📞 Número: ${fmtTel(tel)}\n📍 Ubicación: ${ubicLineas}\n`;
-    if(efectivo){
-      bloque += `💵 Total del pedido: ${money(total)}\n💸 Pagará con: ${money(exacto ? total : paga)}\n💸 Su cambio será: ${exacto ? 'No necesita cambio' : money(cambio)}`;
-    } else bloque += `💸 Su cambio será: Pago por transferencia`;
-    msg += `\n` + bloque + `\n`;
+    bloque = '📦 INFORMACIÓN PARA DELIVERY · USO INTERNO\n\n👤 Nombre: ' + nombre + '\n📞 Número: ' + fmtTel(tel) + '\n📍 Ubicación: ' + ubicLineas + '\n';
+    if(efectivo) bloque += 'Total del pedido: ' + money(total) + '\nPagará con: ' + money(exacto ? total : paga) + '\nSu cambio será: ' + (exacto ? 'No necesita cambio' : money(cambio));
+    else bloque += 'Su cambio será: Pago por transferencia';
+    msg += '\n' + bloque + '\n';
   }
   return {msg: msg.replace(/\n{3,}/g, '\n\n').replace(/\s+$/, '') + '\n', bloque};
 }
@@ -2325,6 +2394,7 @@ function abrirFormUbic(id, desdeCheckout){
     if(guardar && !v.link) return err('Para guardar la ubicación pega el enlace de Google Maps o Waze.');
     if(id){ Object.assign(u, {nombre, direccion:dir, link:v.link}); ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación actualizada'); return; }
     if(!guardar){ orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
+    if(UBIC.items.length >= 10) return err('Puedes guardar hasta 10 ubicaciones. Elimina una para agregar otra.');
     const nu = {id:'u' + Date.now().toString(36), nombre, direccion:dir, link:v.link};
     ubicClave(); UBIC.items.push(nu); UBIC.ultimo = nu.id; ubicGuardar();
     if(desdeCheckout || orderState.delivery==='si'){ orderState.ubicacionId = nu.id; orderState.ubicTemp = null; }
@@ -2338,7 +2408,8 @@ function abrirFormUbic(id, desdeCheckout){
    MI TARJETA POP (el cliente consulta con su número)
    ========================================================= */
 document.body.insertAdjacentHTML('beforeend', `
-<div class="acct-overlay" id="acctOverlay"><div class="acct-sheet">
+<div class="acct-overlay" id="acctOverlay"><div class="acct-sheet" style="position:relative;">
+  <button class="sheet-x" id="acctX" aria-label="Cerrar y volver al menú">✕</button>
   <h3>👑 Tarjeta VIP</h3>
   <div id="acctBenef" style="margin-bottom:10px;"></div>
   <div class="step-note" style="margin:0 0 10px;">Escribe tu número para ver tus compras y tu historial.</div>
@@ -2459,7 +2530,7 @@ async function girarRuleta(){
     await db.collection('clientes').doc(tel).update(data);
     CLIENTE_ACTUAL = Object.assign({}, CLIENTE_ACTUAL, data);
     msg.innerHTML = pr.tipo === 'nada' ? pr.nombre : (pr.nombre + '<br><span style="font-weight:500;font-size:12px;">¡Quedó guardado! Se aplica en tu próximo pedido.</span>');
-    b.textContent = 'Listo'; b.disabled = false; b.onclick = ()=>{ ruletaOv.classList.remove('open'); b.onclick = null; cargarTarjeta(); };
+    b.textContent = 'Listo'; b.disabled = false; b.onclick = ()=>{ ruletaOv.classList.remove('open'); b.onclick = null; cargarTarjeta(); cargarClienteActual(); };
   }catch(e){
     msg.textContent = 'No se pudo guardar tu premio. Intenta de nuevo.';
     b.disabled = false; b.textContent = 'Girar de nuevo';
@@ -2526,6 +2597,8 @@ function abrirTarjeta(auto){
 document.getElementById('acctWrap').addEventListener('click', ()=> abrirTarjeta(false));
 document.getElementById('acctGo').addEventListener('click', cargarTarjeta);
 document.getElementById('acctClose').addEventListener('click', ()=> acctOv.classList.remove('open'));
+document.getElementById('acctX').addEventListener('click', ()=> acctOv.classList.remove('open'));
+acctOv.addEventListener('click', e=>{ if(e.target===acctOv) acctOv.classList.remove('open'); });
 acctOv.addEventListener('click', e=>{ if(e.target===acctOv) acctOv.classList.remove('open'); });
 
 /* =========================================================
@@ -2643,6 +2716,7 @@ async function cargarDatosRemotos(){
         if(d.textos) ['fav_titulo','fav_sub','pers_titulo','pers_sub','prem_titulo','prem_sub','otros_titulo','otros_sub'].forEach(k=>{ delete d.textos[k]; });
       }
       if(!d.deliveryV2 && d.textos) delete d.textos.delivery_nota;
+      if(!d.textosV5 && d.textos) delete d.textos.msg_vip;
       if(!d.textosV4 && d.textos) ['delivery_nota','delivery_ubic_aviso','msg_vip','msg_comprobante','msg_ubicacion','msg_saludo'].forEach(k=>{ delete d.textos[k]; });
     } else {
       await MENU_DOC.set(construirSeedInicial());
