@@ -34,7 +34,7 @@ body{
   font-family:'Poppins',sans-serif;
   background:var(--crema);
   color:var(--texto);
-  padding-bottom:90px;
+  padding-bottom:100px;
   overflow-x:hidden;
 }
 h1,h2,h3,h4,.brand-font{font-family:'Baloo 2',sans-serif;}
@@ -115,27 +115,36 @@ img{max-width:100%; display:block;}
 .cart-count.hidden{display:none;}
 
 /* ---------- NAV TABS ---------- */
-.explore{max-width:560px; margin:0 auto; padding:18px 16px 8px; text-align:center;}
-.explore-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:800; letter-spacing:1.6px; color:var(--vino); margin:0 0 10px;}
-.search{position:relative; margin:0 auto;}
-.search svg{position:absolute; left:15px; top:50%; transform:translateY(-50%); width:19px; height:19px; stroke:var(--principal);}
-.search input{width:100%; height:46px; border:2px solid #f0d7dc; border-radius:23px; padding:0 44px 0 42px; font-size:14px; font-family:inherit; background:#fff; color:var(--texto); box-shadow:var(--sombra); outline:none; -webkit-appearance:none;}
+.explore{max-width:560px; margin:0 auto; padding:16px 16px 6px; text-align:center;}
+.explore-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:800; letter-spacing:1.6px; color:var(--vino); margin:0;}
+.topbar{position:sticky; top:0; z-index:50; display:flex; gap:8px; align-items:center; padding:8px 12px; background:rgba(255,243,244,.96); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
+.topbar.stuck{box-shadow:0 3px 12px rgba(86,9,31,.10); background:rgba(255,255,255,.97);}
+.search{position:relative; flex:1; min-width:0; max-width:560px; margin:0 auto;}
+.search svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; stroke:var(--principal);}
+.search input{width:100%; height:42px; border:2px solid #f0d7dc; border-radius:21px; padding:0 40px 0 40px; font-size:14px; font-family:inherit; background:#fff; color:var(--texto); outline:none; -webkit-appearance:none;}
 .search input:focus{border-color:var(--principal);}
 .search input::-webkit-search-cancel-button{display:none;}
-.search-clear{position:absolute; right:8px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:14px; font-weight:700;}
-.tabs-wrap{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.97); backdrop-filter:blur(6px); border-bottom:1px solid #f0d7dc; box-shadow:0 3px 10px rgba(86,9,31,.06);}
-.tabs{display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding:9px 46px 9px 14px; scrollbar-width:none; max-width:620px; margin:0 auto;}
+.search-clear{position:absolute; right:7px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:13px; font-weight:700;}
+.top-cats{flex:none; width:42px; height:42px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
+.cats{max-width:560px; margin:0 auto; padding:4px 14px 12px; position:relative;}
+.tabs{display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px; scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tabs::before,.tabs::after{content:''; margin:auto;}
-.tab-btn{flex:none; scroll-snap-align:center; border:1.5px solid var(--principal); background:var(--blanco); color:var(--principal); border-radius:20px; height:36px; padding:0 16px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; white-space:nowrap; transition:.15s;}
-.tab-btn .tab-desc{display:none;}
-.tab-btn.active{background:var(--principal); color:#fff; box-shadow:var(--sombra);}
-.tabs-fade{position:absolute; top:0; bottom:0; width:44px; pointer-events:none; display:flex; align-items:center; opacity:0; transition:opacity .2s;}
-.tabs-fade.show{opacity:1;}
-.tabs-fade.right{right:0; justify-content:flex-end; gap:1px; padding-right:8px; background:linear-gradient(to right, rgba(255,255,255,0), #fff 55%);}
-.tabs-fade.left{left:0; background:linear-gradient(to left, rgba(255,255,255,0), #fff 55%);}
-.tabs-fade span{font-size:10.5px; font-weight:800; color:var(--principal); text-transform:uppercase; letter-spacing:.3px;}
-.tabs-fade svg{width:15px; height:15px;} .tabs-fade path{stroke:var(--principal); stroke-width:2.6; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+.tab-btn{display:flex; align-items:center; gap:9px; text-align:left; height:56px; padding:0 11px; border-radius:16px; border:1.5px solid #f0d7dc; background:#fff; color:var(--vino); transition:.15s; min-width:0;}
+.tab-ic{width:32px; height:32px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
+.tab-ic svg{width:19px; height:19px;}
+.tab-txt{display:flex; flex-direction:column; min-width:0; line-height:1.15;}
+.tab-name{font-weight:800; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.tab-desc{display:block; font-size:10.5px; font-weight:500; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;}
+.tab-btn.active{background:var(--principal); border-color:var(--principal); color:#fff; box-shadow:var(--sombra);}
+.tab-btn.active .tab-ic{background:rgba(255,255,255,.22); color:#fff;} .tab-btn.active .tab-desc{color:#ffe1ea;}
+.tabs .tab-btn:last-child:nth-child(odd){grid-column:1/-1;}
+.cats-hint{display:none; text-align:center; font-size:11px; font-weight:700; color:var(--principal); padding-top:4px;}
+.cats-hint.show{display:block;}
+.aviso-offline{max-width:560px; margin:6px auto; padding:8px 14px; background:#fff3cd; color:#7a5b00; font-size:12.5px; border-radius:12px;}
+body.searching .cats{display:none;}
+body.cargando .tab-panel.active .card-list, body.cargando #panel-personalizada .step-card{visibility:hidden; position:relative;}
+body.cargando .tab-panel.active .card-list::before{content:''; visibility:visible; position:absolute; left:0; right:0; height:220px; border-radius:16px; background:linear-gradient(90deg,#f6e6e9 25%,#fff3f4 50%,#f6e6e9 75%); background-size:200% 100%; animation:shimmer 1.2s infinite;}
+@keyframes shimmer{to{background-position:-200% 0;}}
 .search-results{max-width:560px; margin:0 auto; padding:14px 16px 10px;}
 .sr-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; font-size:13px; color:var(--gris);}
 .sr-head button{border:1.5px solid var(--principal); background:#fff; color:var(--principal); border-radius:18px; padding:6px 12px; font-weight:700; font-size:12px;}
@@ -220,7 +229,7 @@ body.searching .tab-panel{display:none !important;}
 .size-card.selected{border-color:var(--principal); background:#fff5f7; box-shadow:var(--sombra);}
 
 .price-bar{
-  position:sticky; bottom:0; background:var(--blanco);
+  position:sticky; bottom:76px; background:var(--blanco);
   border-radius:var(--radius); padding:14px 16px;
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   box-shadow:var(--sombra-fuerte); margin-top:6px;
@@ -284,15 +293,37 @@ body.searching .tab-panel{display:none !important;}
 }
 .xwrap{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:8px;}
 .xchip{display:flex; align-items:center; gap:5px; min-height:34px; border:1.5px solid #f0d7dc; background:#fff; border-radius:12px; padding:4px 6px 4px 9px; font-size:10.5px; font-weight:600; color:var(--texto); cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; box-shadow:0 1px 3px rgba(86,9,31,.10); transition:.12s;}
-.xchip .xn{flex:1; min-width:0; line-height:1.15;} .xchip .xp{color:var(--principal); font-size:10px; font-weight:800; white-space:nowrap;}
+.xchip .xn{flex:1; min-width:0; line-height:1.15;} .xchip .xp{color:var(--principal); font-size:10.5px; font-weight:700; white-space:nowrap;}
 .xchip.sel{background:var(--principal); border-color:var(--principal); color:#fff;} .xchip.sel .xp{color:#ffe1ea;}
 .xchip .xctl{display:none; align-items:center; gap:3px; flex:none;} .xchip.sel .xctl{display:inline-flex;}
 .xchip .xq{font-size:11px; font-weight:800; min-width:12px; text-align:center;}
 .xchip .xm, .xchip .xplus{border:none; background:#fff; color:var(--principal); width:20px; height:20px; border-radius:50%; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center;}
+#ubicOverlay, #resumenOverlay{z-index:75;}
+.entrega-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.entrega-opt{display:flex; flex-direction:column; align-items:center; gap:3px; padding:12px 8px; border:2px solid #f0d7dc; background:#fff; border-radius:16px; color:var(--vino); text-align:center; transition:.15s;}
+.entrega-opt svg{color:var(--principal);} .entrega-opt b{font-size:13px;} .entrega-opt small{font-size:11px; color:var(--gris);}
+.entrega-opt.selected{border-color:var(--principal); background:#fff0f3; box-shadow:0 0 0 3px rgba(219,82,117,.18);}
+.ubic-card, .ubic-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:2px solid #f0d7dc; border-radius:14px; background:#fff; margin-bottom:8px; cursor:pointer;}
+.ubic-item{cursor:default;}
+.ubic-card.selected{border-color:var(--principal); background:#fff0f3;}
+.ubic-ic{width:34px; height:34px; border-radius:50%; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;} .ubic-card.selected .ubic-ic{background:var(--principal); color:#fff;}
+.ubic-tx{flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3;} .ubic-tx b{font-size:13.5px; color:var(--vino);} .ubic-tx small{font-size:11.5px; color:var(--gris);}
+.ubic-map{font-size:11.5px; font-weight:700; color:var(--principal); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:2px;}
+.ubic-radio{width:20px; height:20px; border-radius:50%; border:2px solid #e3c9cf; flex:none;} .ubic-card.selected .ubic-radio{border-color:var(--principal); background:radial-gradient(circle, var(--principal) 45%, #fff 50%);}
+.ubic-acts{display:flex; gap:6px; flex:none;} .mini-ic{width:32px; height:32px; border-radius:50%; border:1.5px solid #f0d7dc; background:#fff; color:var(--vino); display:flex; align-items:center; justify-content:center;}
+.ubic-chips{display:flex; gap:6px; margin-bottom:6px;} .ubic-chips .opt{padding:5px 12px; font-size:12px;}
+.uf-err{color:var(--rojo); font-size:12.5px; font-weight:700; min-height:16px; margin-top:6px;} .uf-check{display:flex; gap:8px; align-items:center; font-size:12.5px; margin-top:8px;}
+.ubic-code{margin-top:12px; padding:10px 12px; background:#fff0f3; border-radius:12px; font-size:12px; word-break:break-all;} .ubic-code small{display:block; color:var(--gris); margin-top:4px;}
+.ubic-rest{margin-top:10px; font-size:12.5px;} .ubic-rest summary{cursor:pointer; color:var(--principal); font-weight:700;}
+.rs-box{background:#fffafb; border:1.5px solid #f6dfe4; border-radius:14px; padding:8px 12px; margin-bottom:10px;}
+.rs-item{display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid #f6e6e9; font-size:13.5px;} .rs-item:last-child{border:none;} .rs-item small{display:block; color:var(--gris); font-size:11.5px; font-weight:400;}
+.rs-row{display:flex; justify-content:space-between; gap:10px; padding:5px 0; font-size:13px; align-items:center;} .rs-row span{display:inline-flex; gap:6px; align-items:center;}
+.rs-dir{font-size:12.5px; color:var(--texto); padding:4px 0 6px 24px; line-height:1.4;}
+.rs-tot{padding:4px 2px 10px;} .rs-row.total{font-size:17px; font-weight:800; color:var(--vino); border-top:1px solid #f0d7dc; margin-top:4px; padding-top:8px;}
 .extras-intro{margin:26px 0 12px; padding:16px; border-radius:18px; background:linear-gradient(135deg,#fff0f3,#ffe6ec); text-align:center;}
 .extras-intro h3{margin:0 0 4px; font-family:'Baloo 2',sans-serif; font-size:19px; color:var(--vino);}
 .extras-intro p{margin:0 0 8px; font-size:13px; color:var(--texto); line-height:1.45;}
-.extras-note{font-size:11.5px; color:var(--principal); font-weight:700;}
+.extras-img{display:none; margin:8px auto 0; max-width:340px; border-radius:14px; overflow:hidden;} .extras-img.show{display:block;} .extras-img img{width:100%; display:block;}
 .extras-sum{display:none; margin:2px 0 8px; padding:9px 12px; border-radius:12px; background:#fff; border:1.5px solid var(--principal); font-size:12.5px; color:var(--vino); line-height:1.4;}
 .extras-sum.show{display:block;}
 .xhead{font-size:11px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.4px; margin:6px 0 6px;}
@@ -314,7 +345,10 @@ body.searching .tab-panel{display:none !important;}
 .topping-cortesia-note{font-size:10px; color:var(--principal); font-weight:600; margin-top:4px; line-height:1.3;}
 .pcard-footer{display:flex; align-items:center; justify-content:space-between;}
 .pcard-price{font-weight:800; color:var(--principal); font-size:15px;}
-.btn-mini{
+.btn-mini svg{width:15px; height:15px; flex:none;}
+.btn-add svg{flex:none;}
+.btn-add:has(svg){display:inline-flex; align-items:center; justify-content:center; gap:7px;}
+.btn-mini{display:inline-flex; align-items:center; gap:6px; 
   background:var(--vino); color:#fff; border:none; border-radius:10px;
   padding:8px 14px; font-weight:700; font-size:12.5px;
 }
@@ -341,6 +375,10 @@ body.searching .tab-panel{display:none !important;}
 .info-inner{max-width:560px; margin:0 auto; padding:22px 16px 6px;}
 .info-block{padding:14px 0; margin:0; border-bottom:1px solid rgba(86,9,31,.10);}
 .info-block:last-child{border-bottom:none;}
+.loc-link{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--texto); padding:10px 12px; border-radius:14px; border:1.5px solid #f0d7dc; background:#fffafb;}
+.loc-ic{width:38px; height:38px; border-radius:50%; background:var(--principal); color:#fff; display:flex; align-items:center; justify-content:center; flex:none;}
+.loc-txt{flex:1; min-width:0; display:flex; flex-direction:column; font-weight:600; font-size:13.5px; line-height:1.3;} .loc-txt small{font-size:11px; color:var(--principal); font-weight:700; margin-top:2px;}
+.loc-go{color:var(--principal); flex:none;}
 .info-block h4{margin:0 0 6px; color:var(--gris); font-size:11.5px; text-transform:uppercase; letter-spacing:.7px; display:flex; gap:7px; align-items:center;}
 .info-block p{margin:0; font-size:13.5px; line-height:1.55; color:var(--texto);}
 .faq-item{border-top:1px solid #f4e3e6; padding-top:10px; margin-top:10px;}
@@ -439,8 +477,14 @@ body.searching .tab-panel{display:none !important;}
 .btn-whatsapp:disabled{opacity:.5;}
 .btn-whatsapp svg{width:20px; height:20px;}
 
+.cartbar{position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:536px; margin:0 auto; z-index:45; display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:18px; background:var(--vino); color:#fff; box-shadow:0 8px 24px rgba(86,9,31,.35); cursor:pointer; transition:.2s;}
+.cartbar.vacio{background:#fff; color:var(--gris); box-shadow:0 4px 16px rgba(86,9,31,.14); border:1.5px solid #f0d7dc;}
+.cb-ic{position:relative; width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; flex:none;} .cartbar.vacio .cb-ic{background:#fff0f3; color:var(--principal);}
+.cb-n{position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; border-radius:10px; background:var(--principal); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; padding:0 5px; border:2px solid var(--vino);} .cartbar.vacio .cb-n{display:none;}
+.cb-txt{flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.2;} .cb-txt b{font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;} .cb-txt small{font-size:11.5px; opacity:.85;}
+.cb-go{flex:none; background:var(--principal); color:#fff; padding:9px 14px; border-radius:14px; font-weight:800; font-size:12.5px;} .cartbar.vacio .cb-go{display:none;}
 .toast{
-  position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(100px);
+  position:fixed; bottom:84px; left:50%; transform:translateX(-50%) translateY(260px);
   background:var(--vino); color:#fff; padding:12px 22px; border-radius:30px;
   font-size:13.5px; font-weight:600; z-index:80; transition:.3s; box-shadow:var(--sombra-fuerte);
 }
@@ -470,33 +514,37 @@ body.searching .tab-panel{display:none !important;}
 <!-- ================= TABS ================= -->
 <section class="explore" id="explora">
   <h2 class="explore-title" data-t="explora_titulo">EXPLORA NUESTRO MENÚ</h2>
+</section>
+<div class="topbar" id="topbar">
   <div class="search" id="searchBox">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
     <input id="menuSearch" type="search" enterkeyhint="search" autocomplete="off" placeholder="Busca un postre o ingrediente…" aria-label="Buscar en el menú">
     <button class="search-clear" id="searchClear" aria-label="Limpiar búsqueda" style="display:none;">✕</button>
   </div>
-</section>
-<div class="tabs-wrap" id="tabsWrap">
-  <div class="tabs-fade left" id="fadeL"></div>
+  <button class="top-cats" id="topCats" aria-label="Ver categorías" title="Categorías"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></button>
+</div>
+<div class="aviso-offline" id="avisoOffline" style="display:none;">No pudimos actualizar el menú. Estás viendo la última versión disponible.</div>
+<div class="cats" id="catsWrap">
   <nav class="tabs" id="tabs">
-  <button class="tab-btn active" data-tab="favoritas"><span class="tab-name">Las favoritas</span><span class="tab-desc">Combinaciones ya creadas</span></button>
-  <button class="tab-btn" data-tab="personalizada"><span class="tab-name">Personalizada</span><span class="tab-desc">Crea tu antojo</span></button>
-  <button class="tab-btn" data-tab="premium"><span class="tab-name">Premium</span><span class="tab-desc">Dubái, chocolosas y más</span></button>
-  <button class="tab-btn" data-tab="otros"><span class="tab-name">Otros postres</span><span class="tab-desc">Brownies y más</span></button>
+  <button class="tab-btn active" data-tab="favoritas"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.7-9.5-9.4A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.5 4.7c-2 4.7-9.5 9.4-9.5 9.4z"/></svg></span><span class="tab-txt"><span class="tab-name">Favoritas</span><span class="tab-desc">Fresas con crema</span></span></button>
+  <button class="tab-btn" data-tab="premium"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-1.6 6L12 21M15 3l1.6 6L12 21"/></svg></span><span class="tab-txt"><span class="tab-name">Fresas Dubai</span><span class="tab-desc">Premium</span></span></button>
+  <button class="tab-btn" data-tab="personalizada"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span><span class="tab-txt"><span class="tab-name">Personalizadas</span><span class="tab-desc">Fresas con crema</span></span></button>
+  <button class="tab-btn" data-tab="otros"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20v-5a7 7 0 0 1 14 0v5"/><path d="M8.5 12c1 1.2 2.2 1.2 3.5 0s2.5-1.2 3.5 0"/></svg></span><span class="tab-txt"><span class="tab-name">Más postres</span><span class="tab-desc">Flan y más</span></span></button>
+  <button class="tab-btn" data-tab="bebidas"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10l-1.3 15.2a2 2 0 0 1-2 1.8h-3.4a2 2 0 0 1-2-1.8z"/><path d="M7.4 9h9.2"/><path d="M13 4l1.2-2.4"/></svg></span><span class="tab-txt"><span class="tab-name">Bebidas</span><span class="tab-desc">Frías y calientes</span></span></button>
   </nav>
-  <div class="tabs-fade right" id="fadeR"><span>más</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+  <div class="cats-hint" id="catsHint">Desliza para ver más categorías ↓</div>
 </div>
 <div class="search-results" id="searchResults" style="display:none;"></div>
 
 <!-- ================= TABS ================= -->
 <main>
 <section class="tab-panel active" id="panel-favoritas">
-  <div class="section-title"><h2 data-t="fav_titulo">Favoritas de Fresas Pop</h2><p data-t="fav_sub">Combinaciones ya creadas</p></div>
+  <div class="section-title"><h2 data-t="fav_titulo">Favoritas</h2><p data-t="fav_sub">Combinaciones especiales, probadas y elegidas por nuestros clientes.</p></div>
   <div class="card-list" id="favoritasList"></div>
   <div class="extras-intro">
     <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
-    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos para crear una combinación a tu gusto.</p>
-    <div class="extras-note" data-t="extras_nota">Los extras tienen un costo adicional y se suman al total de tu pedido.</div>
+    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos</p>
+    <div class="extras-img" data-extras-img></div>
   </div>
   <div id="favoritasExtrasList"></div>
   <div class="extras-sum" id="favoritasExtrasSum"></div>
@@ -504,7 +552,7 @@ body.searching .tab-panel{display:none !important;}
 
 <!-- ================= TAB: PERSONALIZADA ================= -->
 <section class="tab-panel" id="panel-personalizada">
-  <div class="section-title"><h2 data-t="pers_titulo">Combina tus Fresas Pop</h2><p data-t="pers_sub">Tú eliges, nosotros las preparamos</p></div>
+  <div class="section-title"><h2 data-t="pers_titulo">Personalizadas</h2><p data-t="pers_sub">Crea tu propia combinación y elige tus ingredientes favoritos.</p></div>
 
   <!-- Paso 1: Tamaño -->
   <div class="step-card">
@@ -560,18 +608,18 @@ body.searching .tab-panel{display:none !important;}
   <div class="price-bar">
     <div id="favHint" class="fav-hint" style="display:none;"></div>
     <div class="total"><span>Total</span><span id="customTotal">RD$0</span></div>
-    <button class="btn-add" id="addCustomBtn" data-t="btn_agregar_carrito">Agregar al carrito</button>
+    <button class="btn-add" id="addCustomBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg><span data-t="btn_agregar_carrito">Agregar al carrito</span></button>
   </div>
 </section>
 
 <!-- ================= TAB: PREMIUM ================= -->
 <section class="tab-panel" id="panel-premium">
-  <div class="section-title"><h2 data-t="prem_titulo">Línea Premium</h2><p data-t="prem_sub">Dubái, chocolosas y más</p></div>
+  <div class="section-title"><h2 data-t="prem_titulo">Fresas Dubai</h2><p data-t="prem_sub">Una experiencia especial con pistacho, chocolate y nuestro toque Fresas Pop.</p></div>
   <div class="card-list" id="premiumList"></div>
   <div class="extras-intro">
     <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
-    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos para crear una combinación a tu gusto.</p>
-    <div class="extras-note" data-t="extras_nota">Los extras tienen un costo adicional y se suman al total de tu pedido.</div>
+    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos</p>
+    <div class="extras-img" data-extras-img></div>
   </div>
   <div id="premiumExtrasList"></div>
   <div class="extras-sum" id="premiumExtrasSum"></div>
@@ -579,8 +627,14 @@ body.searching .tab-panel{display:none !important;}
 
 <!-- ================= TAB: OTROS POSTRES ================= -->
 <section class="tab-panel" id="panel-otros">
-  <div class="section-title"><h2 data-t="otros_titulo">Otros postres</h2><p>&nbsp;</p></div>
+  <div class="section-title"><h2 data-t="otros_titulo">Más postres</h2><p data-t="otros_sub">Descubre nuestros flanes y otros postres disponibles.</p></div>
   <div class="card-list" id="otrosList"></div>
+</section>
+
+<!-- ================= TAB: BEBIDAS ================= -->
+<section class="tab-panel" id="panel-bebidas">
+  <div class="section-title"><h2 data-t="bebidas_titulo">Bebidas</h2><p data-t="bebidas_sub">Refresca tu día con nuestras bebidas.</p></div>
+  <div class="card-list" id="bebidasList"></div>
 </section>
 
 <!-- ================= MAS INFORMACION ================= -->
@@ -594,7 +648,11 @@ body.searching .tab-panel{display:none !important;}
 
   <div class="info-block">
     <h4 data-t="ubicacion_titulo">📍 Ubicación</h4>
-    <p><a id="ubicacionText" href="https://maps.app.goo.gl/vyxMdkXAKkUXSp737" target="_blank" rel="noopener" style="color:var(--principal); text-decoration:underline; font-weight:600;"></a></p>
+    <a class="loc-link" id="ubicacionLink" href="https://maps.app.goo.gl/vyxMdkXAKkUXSp737" target="_blank" rel="noopener">
+      <span class="loc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M12 22s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
+      <span class="loc-txt"><span id="ubicacionText"></span><small>Toca para abrir en Google Maps</small></span>
+      <span class="loc-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+    </a>
   </div>
 
   <div class="info-block">
@@ -612,6 +670,11 @@ body.searching .tab-panel{display:none !important;}
 
 <!-- ================= CART DRAWER ================= -->
 <div class="overlay" id="overlay"></div>
+<div class="cartbar" id="cartBar" role="button" tabindex="0" aria-label="Ver mi pedido">
+  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg><span class="cb-n" id="cbN">0</span></span>
+  <span class="cb-txt"><b id="cbT1">Tu carrito está vacío</b><small id="cbT2">Agrega tus postres favoritos</small></span>
+  <span class="cb-go" id="cbGo">Ver pedido ›</span>
+</div>
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <h3 data-t="carrito_titulo">Tu pedido</h3>
@@ -807,7 +870,26 @@ let EXTRAS = DEFAULT_EXTRAS;
 let FAVORITAS = DEFAULT_FAVORITAS;
 let PREMIUM = DEFAULT_PREMIUM;
 let OTROS = DEFAULT_OTROS;
+let BEBIDAS = [];
 /* ----- disponibilidad: lo agotado NO desaparece, se muestra con "¡AGOTADO!" ----- */
+const IC_P = {
+  heart:'<path d="M12 20.5s-7.5-4.7-9.5-9.4A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.5 4.7c-2 4.7-9.5 9.4-9.5 9.4z"/>',
+  gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-1.6 6L12 21M15 3l1.6 6L12 21"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  cake:'<path d="M3 20h18"/><path d="M5 20v-5a7 7 0 0 1 14 0v5"/><path d="M8.5 12c1 1.2 2.2 1.2 3.5 0s2.5-1.2 3.5 0"/>',
+  cup:'<path d="M7 4h10l-1.3 15.2a2 2 0 0 1-2 1.8h-3.4a2 2 0 0 1-2-1.8z"/><path d="M7.4 9h9.2"/><path d="M13 4l1.2-2.4"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>',
+  moto:'<circle cx="5.5" cy="17" r="3"/><circle cx="18.5" cy="17" r="3"/><path d="M8.5 17h6l2.6-5.8h-4.3L11.5 8H8"/><path d="M13 11.2l1.5 5.8"/>',
+  store:'<path d="M3 9l1.6-5h14.8L21 9"/><path d="M4 9v11h16V9"/><path d="M9.5 20v-6h5v6"/>',
+  pin:'<path d="M12 22s7-6.1 7-12a7 7 0 0 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/>',
+  ext:'<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
+};
+const esc = t=> String(t==null?'':t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic = (n, sz)=> `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${sz||18}" height="${sz||18}" aria-hidden="true">${IC_P[n]||''}</svg>`;
 const norm = t=> String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function validarCustom(){        // si lo elegido se agotó, se cambia a la primera opción disponible
   if(TAMANOS.length && !TAMANOS.find(t=>t.id===custom.tamano)) custom.tamano = TAMANOS[0].id;
@@ -831,7 +913,7 @@ function aplicarAutoAgotado(){
   const au = AUTO_AGOT || {};
   ['bases','cremas','frutas','toppings'].forEach(k=> OPT_ALL[k].forEach(x=>{ x.agotadoAuto = !!(au[k] && au[k][x.id]); }));
   const prod = p=>{ p.agotadoAuto = !!(au.productos && au.productos[p.id]); };
-  [FAVORITAS, PREMIUM, OTROS].forEach(l=>l.forEach(prod)); CATEGORIAS_EXTRA.forEach(c=>(c.items||[]).forEach(prod));
+  [FAVORITAS, PREMIUM, OTROS, BEBIDAS].forEach(l=>l.forEach(prod)); CATEGORIAS_EXTRA.forEach(c=>(c.items||[]).forEach(prod));
 }
 
 /* =========================================================
@@ -986,7 +1068,7 @@ function renderPersonalizador(){
     const n = extraCount(opt.id), ch = document.createElement('div');
     if(opt.agotado){ ch.className = 'xchip ag'; ch.innerHTML = `<span class="xn">${nombre}</span><span class="ag-tag">Agotado</span>`; cont.appendChild(ch); return; }
     ch.className = 'xchip' + (n>0 ? ' sel' : '') + (n>1 ? ' multi' : '');
-    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
+    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+RD$${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
     ch.addEventListener('click', e=>{
       if(e.target.closest('.xm')){ removeExtra(opt.id); return; }
       if(e.target.closest('.xplus')){ addExtra(opt.id); return; }
@@ -1044,7 +1126,7 @@ document.getElementById('addCustomBtn').addEventListener('click', ()=>{
    ========================================================= */
 function productImgHTML(img, nombre){
   if(img){
-    return `<img src="${img}" alt="${nombre}">`;
+    return `<img src="${img}" alt="${nombre}" loading="lazy" decoding="async">`;
   }
   return `<div class="placeholder-img"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto próximamente</div>`;
 }
@@ -1064,6 +1146,8 @@ function toppingExtraFor(toppingId, cortesiaAplica){
 const EXTRA_TOPPING_EXCLUIDOS = ['sin_topping','chispas_color','cono'];
 const EXTRA_SALSAS_ORDEN = ['ex_pistacho','ex_nutella','ex_leche_cond','ex_dulce_leche'];
 const EXTRA_TOPPINGS_ORDEN = ['kataifi','granola','chispas_choco','galletas','coco_rallado'];
+let EXTRAS_IMG = '';
+function aplicarExtrasImg(){ document.querySelectorAll('[data-extras-img]').forEach(el=>{ el.innerHTML = EXTRAS_IMG ? `<img src="${EXTRAS_IMG}" alt="Extras" loading="lazy">` : ''; el.classList.toggle('show', !!EXTRAS_IMG); }); }
 let EXTRAS_ORDEN_MANUAL = false;   // true cuando la administradora ya ordenó los extras desde el panel
 function salsasOrdenadas(todos){
   const src = todos ? OPT_ALL.extras : EXTRAS;
@@ -1105,7 +1189,7 @@ function addToCart(item){
 }
 
 function buscarProductoPorId(id){
-  for(const l of [FAVORITAS, PREMIUM, OTROS]){ const p = l.find(x=>x.id===id); if(p) return p; }
+  for(const l of [FAVORITAS, PREMIUM, OTROS, BEBIDAS]){ const p = l.find(x=>x.id===id); if(p) return p; }
   for(const c of CATEGORIAS_EXTRA){ const p = (c.items||[]).find(x=>x.id===id); if(p) return p; }
   return null;
 }
@@ -1117,10 +1201,10 @@ function marcarCard(wrap, p){
   if(ag){
     if(!badge && iw){ badge = document.createElement('div'); badge.className = 'ag-badge'; badge.textContent = '¡AGOTADO!'; iw.appendChild(badge); }
     wrap.querySelectorAll('button,select').forEach(el=>{ if(!antes) el.dataset.agPrev = el.disabled ? '1' : '0'; el.disabled = true; });
-    if(add){ if(!add.dataset.txt) add.dataset.txt = add.textContent; add.textContent = 'Agotado'; }
+    if(add){ const lb = add.querySelector('.lbl') || add; if(!add.dataset.txt) add.dataset.txt = lb.textContent; lb.textContent = 'Agotado'; }
   } else {
     if(badge) badge.remove();
-    if(antes){ wrap.querySelectorAll('button,select').forEach(el=>{ if(el.dataset.agPrev !== '1') el.disabled = false; }); if(add && add.dataset.txt) add.textContent = add.dataset.txt; }
+    if(antes){ wrap.querySelectorAll('button,select').forEach(el=>{ if(el.dataset.agPrev !== '1') el.disabled = false; }); if(add && add.dataset.txt) (add.querySelector('.lbl') || add).textContent = add.dataset.txt; }
   }
   const s = stockDe(p); let nota = wrap.querySelector('.stock-note');
   if(s!==null && s>0 && s<=5){ if(!nota){ nota = document.createElement('div'); nota.className = 'stock-note'; (wrap.querySelector('.pcard-body')||wrap).appendChild(nota); } nota.textContent = s===1 ? '¡Queda 1 porción!' : '¡Quedan solo ' + s + ' porciones!'; }
@@ -1130,7 +1214,7 @@ function actualizarDisponibilidadDOM(){ document.querySelectorAll('.pcard[data-p
 function lineaAgotada(it){
   if(esFlan(it.nombre)){ const s = stockFlan(); if(s!==null && cart.filter(i=>esFlan(i.nombre)).reduce((a,i)=>a+i.cantidad,0) > s) return true; }
   const n = norm(it.nombre);
-  for(const l of [FAVORITAS, PREMIUM, OTROS]){ const p = l.find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
+  for(const l of [FAVORITAS, PREMIUM, OTROS, BEBIDAS]){ const p = l.find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
   for(const c of CATEGORIAS_EXTRA){ const p = (c.items||[]).find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
   const ex = OPT_ALL.extras.find(e=>e.label===it.nombre); if(ex && esAgotado(ex)) return true;
   const m = /^Topping extra: (.*) 2oz$/.exec(it.nombre); if(m){ const t = OPT_ALL.toppings.find(x=>x.label===m[1]); if(t && esAgotado(t)) return true; }
@@ -1143,7 +1227,7 @@ async function refrescarDisponibilidad(){
     const [m, a, st] = await Promise.all([MENU_DOC.get(), MENU_DOC.parent.doc('auto').get(), MENU_DOC.parent.doc('stock').get()]);
     if(m.exists){
       const d = m.data(), upd = (arr, rem)=>{ (rem||[]).forEach(r=>{ const x = arr.find(y=>y.id===r.id); if(x) x.agotado = r.disponible===false; }); };
-      upd(FAVORITAS, d.favoritas); upd(PREMIUM, d.premium); upd(OTROS, d.otros);
+      upd(FAVORITAS, d.favoritas); upd(PREMIUM, d.premium); upd(OTROS, d.otros); upd(BEBIDAS, d.bebidas);
       (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); });
       ['bases','cremas','frutas','toppings','extras'].forEach(k=> upd(OPT_ALL[k], d[k]));
     }
@@ -1231,7 +1315,7 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
         ${toppingHTML}
         <div class="pcard-footer">
           <span class="pcard-price">${money(total)}</span>
-          <button class="btn-mini">${addLabel}</button>
+          <button class="btn-mini">${ic('cart',15)}<span class="lbl">${addLabel}</span></button>
         </div>
       </div>`;
     wrap.querySelectorAll('.size-chip').forEach(chip=>{
@@ -1284,21 +1368,21 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
   });
 }
 
-function renderOtros(){
-  const cont = document.getElementById('otrosList');
+function renderSimpleList(contId, lista){
+  const cont = document.getElementById(contId);
   cont.innerHTML = '';
-  if(!OTROS.length){ cont.innerHTML = '<div class="sr-vacio"><b>Muy pronto</b>Estamos preparando productos para esta categoría.</div>'; return; }
-  OTROS.forEach(p=>{
+  if(!lista.length){ cont.innerHTML = '<div class="sr-vacio"><b>Muy pronto</b>Estamos preparando productos para esta categoría.</div>'; return; }
+  lista.forEach(p=>{
     const wrap = document.createElement('div');
     wrap.className = 'pcard';
     wrap.innerHTML = `
       <div class="pcard-imgwrap">${productImgHTML(p.img, p.nombre)}</div>
       <div class="pcard-body">
         <h4>${p.nombre}</h4>
-        <p class="pcard-desc">${p.desc}</p>
+        <p class="pcard-desc">${p.desc||''}</p>
         <div class="pcard-footer">
           <span class="pcard-price">${money(p.price)}</span>
-          <button class="btn-mini">Agregar</button>
+          <button class="btn-mini">${ic('cart',15)}<span class="lbl">Agregar</span></button>
         </div>
       </div>`;
     wrap.querySelector('.btn-mini').addEventListener('click', ()=>{
@@ -1308,6 +1392,8 @@ function renderOtros(){
     marcarCard(wrap, p); cont.appendChild(wrap);
   });
 }
+function renderOtros(){ renderSimpleList('otrosList', OTROS); }
+function renderBebidas(){ renderSimpleList('bebidasList', BEBIDAS); }
 
 function extraQty(nm){ return cart.filter(i=>i.nombre===nm && !(i.detalles||[]).length).reduce((a,i)=>a+i.cantidad, 0); }
 function refrescarExtras(){
@@ -1336,7 +1422,7 @@ function renderExtrasStandalone(containerId){
     lista.forEach(x=>{
       const ch = document.createElement('div'); ch.className = 'xchip'; ch.dataset.nm = x.nm;
       if(x.agotado){ ch.classList.add('ag'); ch.innerHTML = `<span class="xn">${x.label}</span><span class="ag-tag">Agotado</span>`; w.appendChild(ch); return; }
-      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
+      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+RD$${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
       ch.addEventListener('click', e=>{
         if(e.target.closest('.xm')){                         // − : quitar uno (con 1 se deselecciona)
           const it = cart.find(i=>i.nombre===x.nm && !(i.detalles||[]).length); if(!it) return;
@@ -1369,12 +1455,11 @@ function activarTab(key, desplazar){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active'); panel.classList.add('active');
-  try{ btn.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }catch(e){}
   if(desplazar) irAlPanel(panel);
 }
-function irAlPanel(panel){                         // vuelve al inicio de la sección, justo debajo de las pestañas fijas (sin saltos bruscos)
-  const wrap = document.getElementById('tabsWrap'), top = panel.getBoundingClientRect().top + window.scrollY - wrap.offsetHeight - 4;
-  if(window.scrollY > top - 2) window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
+function irAlPanel(panel){                         // muestra la cuadrícula con la categoría elegida y el inicio de sus productos, justo debajo del buscador fijo
+  const cats = document.getElementById('catsWrap'), top = cats.getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4;
+  window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
 }
 document.getElementById('tabs').addEventListener('click', (e)=>{
   const btn = e.target.closest('.tab-btn');
@@ -1382,14 +1467,15 @@ document.getElementById('tabs').addEventListener('click', (e)=>{
   limpiarBusqueda(true);
   activarTab(btn.dataset.tab, true);
 });
-function actualizarFlechasTabs(){
-  const el = document.getElementById('tabs'); if(!el) return;
-  document.getElementById('fadeL').classList.toggle('show', el.scrollLeft > 6);
-  document.getElementById('fadeR').classList.toggle('show', el.scrollLeft + el.clientWidth < el.scrollWidth - 6);
+function actualizarFlechasTabs(){                 // si hay más categorías de las que caben, se avisa que se puede deslizar
+  const el = document.getElementById('tabs'), h = document.getElementById('catsHint'); if(!el || !h) return;
+  h.classList.toggle('show', el.scrollHeight > el.clientHeight + 4 && el.scrollTop + el.clientHeight < el.scrollHeight - 4);
 }
 document.getElementById('tabs').addEventListener('scroll', actualizarFlechasTabs);
 window.addEventListener('resize', actualizarFlechasTabs);
 window.addEventListener('load', ()=>{ renderNextCat(); actualizarFlechasTabs(); });
+document.getElementById('topCats').addEventListener('click', ()=>{ limpiarBusqueda(true); const top = document.getElementById('catsWrap').getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4; window.scrollTo({top:Math.max(0, top), behavior:'smooth'}); });
+window.addEventListener('scroll', ()=>{ document.getElementById('topbar').classList.toggle('stuck', window.scrollY > document.getElementById('explora').offsetTop + 30); }, {passive:true});
 /* ----- al terminar una sección, se invita a seguir con la siguiente ----- */
 function renderNextCat(){
   const tabs = [...document.querySelectorAll('.tab-btn')].filter(b=>b.style.display!=='none');
@@ -1426,7 +1512,7 @@ function indiceBusqueda(){
     const ing = ingredientesDe(p, tab), precio = p.sizes && p.sizes.length ? Math.min(...p.sizes.map(s=>s.price)) : p.price;
     out.push({tab, id:p.id, nombre:p.nombre, cat:nombresTab(tab), img:(p.sizes&&p.sizes[0]&&p.sizes[0].img)||p.img, precio, agotado:productoAgotado(p), ing, texto:norm(p.nombre+' '+(p.desc||'')+' '+[...ing.keys()].join(' ')+' '+[...ing.values()].join(' '))});
   });
-  meter(FAVORITAS, 'favoritas'); meter(PREMIUM, 'premium'); meter(OTROS, 'otros');
+  meter(FAVORITAS, 'favoritas'); meter(PREMIUM, 'premium'); meter(OTROS, 'otros'); meter(BEBIDAS, 'bebidas');
   CATEGORIAS_EXTRA.forEach(c=> meter(c.items||[], 'extra_'+c.id));
   const todas = [].concat(OPT_ALL.bases, OPT_ALL.cremas, OPT_ALL.toppings, OPT_ALL.extras, OPT_ALL.frutas);
   out.push({tab:'personalizada', id:'__pers', nombre:'Arma la tuya · Personalizada', cat:nombresTab('personalizada'), img:null, precio:(TAMANOS[0]||{}).price, agotado:false, ing:new Map(todas.map(o=>[o.label, nucleo(o.label)])), texto:norm(todas.map(o=>o.label).join(' ')), pers:true});
@@ -1470,7 +1556,7 @@ function irAProducto(tab, id){
   setTimeout(()=>{
     const panel = document.getElementById('panel-'+tab), card = id==='__pers' ? panel : panel.querySelector(`[data-pid="${id}"]`);
     if(!card) return;
-    const top = card.getBoundingClientRect().top + window.scrollY - document.getElementById('tabsWrap').offsetHeight - 14;
+    const top = card.getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 14;
     window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
     if(id!=='__pers'){ card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 2000); }
   }, 120);
@@ -1483,10 +1569,11 @@ document.getElementById('searchClear').addEventListener('click', ()=>{ limpiarBu
    CATEGORÍAS EXTRA (creadas desde el panel de administrador)
    ========================================================= */
 const FIXED_TABS = [
-  {key:'favoritas', defaultLabel:'Las favoritas', defaultDesc:'Combinaciones ya creadas'},
-  {key:'personalizada', defaultLabel:'Personalizada', defaultDesc:'Crea tu antojo'},
-  {key:'premium', defaultLabel:'Premium', defaultDesc:'Dubái, chocolosas y más'},
-  {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
+  {key:'favoritas', defaultLabel:'Favoritas', defaultDesc:'Fresas con crema'},
+  {key:'premium', defaultLabel:'Fresas Dubai', defaultDesc:'Premium'},
+  {key:'personalizada', defaultLabel:'Personalizadas', defaultDesc:'Fresas con crema'},
+  {key:'otros', defaultLabel:'Más postres', defaultDesc:'Flan y más'},
+  {key:'bebidas', defaultLabel:'Bebidas', defaultDesc:'Frías y calientes'},
 ];
 
 function aplicarOrdenYEtiquetas(){ aplicarOrdenYEtiquetasBase(); renderNextCat(); actualizarFlechasTabs(); }
@@ -1559,14 +1646,14 @@ function renderCategoriasExtra(){
     btn.className = 'tab-btn';
     btn.dataset.tab = tabId;
     btn.dataset.extra = '1';
-    btn.innerHTML = `<span class="tab-name">${cat.nombre}</span><span class="tab-desc">${cat.descripcion||'&nbsp;'}</span>`;
+    btn.innerHTML = `<span class="tab-ic">${ic('star')}</span><span class="tab-txt"><span class="tab-name">${cat.nombre}</span><span class="tab-desc">${cat.descripcion||'&nbsp;'}</span></span>`;
     tabsNav.appendChild(btn);
 
     const section = document.createElement('section');
     section.className = 'tab-panel';
     section.id = 'panel-'+tabId;
     section.dataset.extra = '1';
-    section.innerHTML = `<div class="section-title"><h2>${cat.nombre}</h2><p>&nbsp;</p></div><div class="card-list" id="catList_${cat.id}"></div>`;
+    section.innerHTML = `<div class="section-title"><h2>${cat.nombre}</h2><p>${cat.descripcion||'&nbsp;'}</p></div><div class="card-list" id="catList_${cat.id}"></div>`;
     anchor.insertAdjacentElement('afterend', section);
     anchor = section;
 
@@ -1581,7 +1668,7 @@ function renderCategoriasExtra(){
 }
 const overlay = document.getElementById('overlay');
 const drawer = document.getElementById('drawer');
-let orderState = { delivery:null, pago:null, billete:'', ubicacion:'', efectivoTipo:null, telefono:'' };
+let orderState = { delivery:null, pago:null, billete:'', ubicacion:'', ubicacionId:'', ubicTemp:null, efectivoTipo:null, telefono:'' };
 try{ const _c = JSON.parse(localStorage.getItem('fp_cliente')||'null'); if(_c){ orderState.nombre=_c.nombre||''; orderState.telefono=_c.telefono||''; } }catch(e){}
 let ACTIVE_OFERTAS = [];
 /* ----- el carrito no se pierde al refrescar o cerrar el navegador ----- */
@@ -1592,7 +1679,7 @@ function firmaMenu(){
   const t = [p(TAMANOS), p(BASES), p(CREMAS), p(FRUTAS), p(TOPPINGS), p(EXTRAS), p(FAVORITAS), p(PREMIUM), p(OTROS)].join('|'); let h = 5381;
   for(let i=0;i<t.length;i++) h = ((h<<5)+h+t.charCodeAt(i))|0; return String(h);
 }
-function estadoGuardable(){ return {delivery:orderState.delivery, pago:orderState.pago, billete:orderState.billete, ubicacion:orderState.ubicacion, efectivoTipo:orderState.efectivoTipo, notas:orderState.notas||''}; }
+function estadoGuardable(){ return {delivery:orderState.delivery, pago:orderState.pago, billete:orderState.billete, ubicacion:orderState.ubicacion, ubicacionId:(orderState.ubicacionId==='__temp'?'':orderState.ubicacionId)||'', efectivoTipo:orderState.efectivoTipo, notas:orderState.notas||''}; }
 function guardarCarrito(){
   if(!CARRITO_LISTO) return;
   try{
@@ -1676,6 +1763,15 @@ function cartSubtotal(){
   return cart.reduce((s,i)=> s + i.precioUnit*i.cantidad, 0);
 }
 
+function actualizarCartBar(){
+  const n = cart.reduce((a,i)=>a+i.cantidad, 0), bar = document.getElementById('cartBar'); if(!bar) return;
+  bar.classList.toggle('vacio', n === 0);
+  document.getElementById('cbN').textContent = n;
+  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : n + (n===1 ? ' producto' : ' productos') + ' · ' + money(cartSubtotal());
+  document.getElementById('cbT2').textContent = n === 0 ? 'Agrega tus postres favoritos' : 'Toca para revisar y enviar tu pedido';
+}
+document.getElementById('cartBar').addEventListener('click', ()=> openDrawer());
+document.getElementById('cartBar').addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDrawer(); } });
 function renderCart(){
   const count = cart.reduce((s,i)=>s+i.cantidad,0);
   const countEl = document.getElementById('cartCount');
@@ -1687,7 +1783,7 @@ function renderCart(){
     body.innerHTML = '<div class="empty-cart">' + T('carrito_vacio','Tu carrito está vacío 🍓') + '<br>Agrega tus postres favoritos para comenzar.</div>';
     document.getElementById('sendBtn').disabled = true;
     try{ const g = JSON.parse(localStorage.getItem(CARRITO_ULT)||'null'); if(g && Date.now()-g.ts < 3*3600e3) body.innerHTML += '<div style="text-align:center; margin-top:10px;"><button class="btn-mini" onclick="recuperarUltimoPedido()">Recuperar mi último pedido</button><div class="step-note" style="margin-top:4px;">Por si no se llegó a enviar por WhatsApp.</div></div>'; }catch(e){}
-    guardarCarrito(); refrescarExtras();
+    guardarCarrito(); refrescarExtras(); actualizarCartBar();
     return;
   }
   document.getElementById('sendBtn').disabled = cart.some(lineaAgotada);
@@ -1729,23 +1825,32 @@ function renderCart(){
     html += `<div class="form-group">` + ACTIVE_OFERTAS.map(o=>`<div class="step-note">🎉 <b>Oferta activa:</b> ${o.texto}${o.beneficio?' — '+o.beneficio:''}</div>`).join('') + `</div>`;
   }
 
-  // Delivery
+  // Entrega: retiro o delivery
+  if(orderState.delivery==='si' && !ubicSel() && UBIC.items.length) orderState.ubicacionId = (UBIC.items.find(u=>u.id===UBIC.ultimo) || UBIC.items[0]).id;
   html += `
   <div class="form-group">
-    <label class="form-label">${T('delivery_pregunta','¿Deseas delivery?')} (+${CONFIG.deliveryCost})</label>
-    <div class="choice-row">
-      <button class="choice-btn" id="delivSi">Sí</button>
-      <button class="choice-btn" id="delivNo">No</button>
+    <label class="form-label">¿Cómo quieres recibir tu pedido?</label>
+    <div class="entrega-row">
+      <button class="entrega-opt" id="delivNo">${ic('store',24)}<b>Retirar en el local</b><small>Sin costo</small></button>
+      <button class="entrega-opt" id="delivSi">${ic('moto',24)}<b>Delivery a domicilio</b><small>+${money(CONFIG.deliveryCost)} · solo Cotuí</small></button>
     </div>
   </div>`;
 
   if(orderState.delivery==='si'){
+    const sel = ubicSel();
     html += `
-    <div class="form-group">
-      <div class="step-note">${T('delivery_nota','🛵 RD${costo} aplica SOLO dentro de COTUÍ. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.').replace('{costo}', CONFIG.deliveryCost)}</div>
-      <div class="step-note" style="margin-top:8px;">${T('delivery_ubicacion_nota','📍 Debe enviar su ubicación actual para recibir su pedido.')}</div>
-      <label class="form-label" style="margin-top:10px;">${T('delivery_ubicacion_label','Pega aquí el link de tu ubicación (opcional)')}</label>
-      <input type="text" class="form-input" id="ubicacionInput" placeholder="Pega el link, o envíala por WhatsApp al finalizar tu orden">
+    <div class="form-group" id="ubicBox">
+      <label class="form-label">¿Dónde entregamos?</label>
+      ${UBIC.items.map(u=>`
+        <div class="ubic-card${sel && sel.id===u.id ? ' selected' : ''}" data-id="${u.id}">
+          <span class="ubic-ic">${ic('pin',18)}</span>
+          <span class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</span>
+          <span class="ubic-radio"></span>
+        </div>`).join('')}
+      ${orderState.ubicacionId==='__temp' && sel ? `<div class="ubic-card selected" data-id="__temp"><span class="ubic-ic">${ic('pin',18)}</span><span class="ubic-tx"><b>${esc(sel.nombre)}</b> <small>(solo este pedido)</small><small>${esc(sel.direccion||'Solo enlace de Google Maps')}</small></span><span class="ubic-radio"></span></div>` : ''}
+      ${!UBIC.items.length && !sel ? '<div class="step-note">Aún no tienes ubicaciones guardadas. Agrega la de entrega y la tendrás lista para tus próximos pedidos.</div>' : ''}
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn-mini" id="ubicAdd">+ ${UBIC.items.length ? 'Agregar otra ubicación' : 'Agregar mi ubicación'}</button>${UBIC.items.length ? '<button class="btn-mini" id="ubicManage" style="background:#fff; color:var(--principal); border:1.5px solid var(--principal);">Administrar</button>' : ''}</div>
+      <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 RD${costo} aplica SOLO dentro de COTUÍ. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.').replace('{costo}', CONFIG.deliveryCost)}</div>
     </div>`;
   }
 
@@ -1818,7 +1923,7 @@ function renderCart(){
   if(CARRITO_VIEJO) html = `<div class="gift-box" style="margin-bottom:10px;">⚠️ El menú cambió desde que armaste este carrito. Revisa los precios antes de enviar.<div style="margin-top:6px; display:flex; gap:8px;"><button class="btn-mini" onclick="CARRITO_VIEJO=false; renderCart()">Está bien</button><button class="btn-mini" onclick="vaciarCarrito()">Vaciar</button></div></div>` + html;
   html += `<div style="text-align:center; margin-top:10px;"><button style="background:none; border:none; color:var(--gris); font-size:12px; text-decoration:underline;" onclick="vaciarCarrito()">Vaciar carrito</button></div>`;
   body.innerHTML = html;
-  guardarCarrito(); refrescarExtras();
+  guardarCarrito(); refrescarExtras(); actualizarCartBar();
 
   // reattach events
   body.querySelectorAll('.cart-item').forEach(row=>{
@@ -1843,6 +1948,9 @@ function renderCart(){
   delivSi.addEventListener('click', ()=>{ orderState.delivery='si'; renderCart(); });
   delivNo.addEventListener('click', ()=>{ orderState.delivery='no'; orderState.ubicacion=''; renderCart(); });
 
+  body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a')) return; orderState.ubicacionId = c.dataset.id; renderCart(); }));
+  const ubAdd = document.getElementById('ubicAdd'); if(ubAdd) ubAdd.addEventListener('click', ()=> abrirFormUbic(null, true));
+  const ubMan = document.getElementById('ubicManage'); if(ubMan) ubMan.addEventListener('click', abrirUbicaciones);
   const ubicacionInput = document.getElementById('ubicacionInput');
   if(ubicacionInput){
     ubicacionInput.value = orderState.ubicacion || '';
@@ -1917,6 +2025,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   if(!nombre){ showToast('Por favor escribe tu nombre'); document.getElementById('nombreInput')?.focus(); return; }
   if(!orderState.delivery){ showToast('Indica si deseas delivery'); return; }
   if(!orderState.pago){ showToast('Elige un método de pago'); return; }
+  if(orderState.delivery==='si' && !ubicSel() && !(orderState.ubicacion||'').trim()){ showToast('Elige o agrega la ubicación de entrega'); abrirFormUbic(null, true); return; }
   const tel = normTel(orderState.telefono);
   if(tel.length!==10){ showToast('Escribe tu número de WhatsApp (10 dígitos)'); document.getElementById('telefonoInput')?.focus(); return; }
   if(orderState.pago==='efectivo'){
@@ -1947,8 +2056,13 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   const regalos = regalosPedido();
   if(regalos.length){ msg += `*Regalos / premios:*\n`; regalos.forEach(r=>{ msg += `   • ${r}\n`; }); }
   msg += `\n*Delivery:* ${orderState.delivery==='si' ? 'Sí (+'+money(CONFIG.deliveryCost)+')' : 'No'}\n`;
-  if(orderState.delivery==='si' && (orderState.ubicacion||'').trim()){
-    msg += `*Ubicación:* ${orderState.ubicacion.trim()}\n`;
+  if(orderState.delivery==='si'){
+    const uSel = ubicSel();
+    if(uSel){
+      msg += `*Entrega a domicilio — ${uSel.nombre}*\n`;
+      if(uSel.direccion) msg += `*Dirección:* ${uSel.direccion}\n`;
+      if(uSel.link) msg += `*Google Maps:* ${uSel.link}\n`;
+    } else if((orderState.ubicacion||'').trim()) msg += `*Ubicación:* ${orderState.ubicacion.trim()}\n`;
   }
   msg += `*Método de pago:* ${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}`;
   if(orderState.pago==='efectivo'){
@@ -1964,7 +2078,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   if(ACTIVE_OFERTAS.length) msg += `\n🎉 *Oferta activa:* ${ACTIVE_OFERTAS.map(o=>o.texto).join(' / ')}\n`;
 
   msg += `\n`;
-  if(orderState.delivery==='si') msg += T('msg_ubicacion','📍 Si eligió delivery, por favor envíe su ubicación actual.') + `\n`;
+  if(orderState.delivery==='si' && !((ubicSel()||{}).link)) msg += T('msg_ubicacion','📍 Si eligió delivery, por favor envíe su ubicación actual.') + `\n`;
   if(orderState.pago==='transferencia') msg += T('msg_comprobante','🧾 Si pagó con transferencia, por favor envíe el comprobante.') + `\n`;
   if(orderState.pago==='efectivo'){
     msg += orderState.efectivoTipo==='exacto'
@@ -1975,6 +2089,8 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   msg += `\n` + T('msg_vip','Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.') + `\n`;
   msg = limpiarEmoji(msg);
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+  if(!window.__resumenOK){ mostrarResumen(msg, subtotal, deliveryFee, descuento, total, ()=>{ window.__resumenOK = true; document.getElementById('sendBtn').click(); }); return; }
+  window.__resumenOK = false;
   const needFlan = flanEnCarrito();
   if(needFlan > 0 && stockFlan() !== null){                       // las porciones de flan se reservan de verdad (transacción); si ya no alcanzan, no se envía
     const w = window.open('', '_blank');
@@ -1988,10 +2104,31 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   guardarPedidoCliente(tel, nombre, total, regalos, descuento, prEnvio);
   try{ localStorage.setItem(CARRITO_ULT, JSON.stringify({ts:Date.now(), cart, estado:estadoGuardable()})); }catch(e){}
   cart = []; CARRITO_VIEJO = false;
-  Object.assign(orderState, {delivery:null, pago:null, billete:'', ubicacion:'', efectivoTipo:null, notas:''});
+  { const us = ubicSel(); if(us && us.id !== '__temp'){ UBIC.ultimo = us.id; ubicGuardar(); } }
+  Object.assign(orderState, {delivery:null, pago:null, billete:'', ubicacion:'', ubicacionId:'', ubicTemp:null, efectivoTipo:null, notas:''});
   renderCart(); showToast('Pedido enviado ✅ ¡Gracias!');
 });
 
+function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, continuar){
+  const sh = document.getElementById('resumenSheet'), ov = document.getElementById('resumenOverlay'), u = orderState.delivery==='si' ? ubicSel() : null;
+  sh.innerHTML = `<h3>Revisa tu pedido</h3>
+    <div class="rs-box">${cart.map(it=>`<div class="rs-item"><div><b>${it.cantidad}× ${it.nombre}</b>${(it.detalles||[]).map(d=>`<small>${esc(d)}</small>`).join('')}</div><span>${money(it.precioUnit*it.cantidad)}</span></div>`).join('')}</div>
+    <div class="rs-box">
+      <div class="rs-row"><span>${orderState.delivery==='si' ? ic('moto',18) : ic('store',18)} Entrega</span><b>${orderState.delivery==='si' ? 'Delivery a domicilio' : 'Retiro en el local'}</b></div>
+      ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</div>` : ''}
+      <div class="rs-row"><span>Pago</span><b>${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}</b></div>
+      ${(orderState.nombre||'').trim() ? `<div class="rs-row"><span>A nombre de</span><b>${esc(orderState.nombre.trim())}</b></div>` : ''}
+    </div>
+    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
+    <button class="btn-whatsapp" id="rsEnviar">Enviar por WhatsApp</button>
+    <div style="display:flex; gap:8px; margin-top:8px;"><button class="choice-btn" id="rsEditar" style="flex:1;">Editar pedido</button><button class="choice-btn" id="rsCopiar" style="flex:1;">Copiar mensaje</button></div>
+    <div class="step-note" style="margin-top:8px; text-align:center;">Se abrirá WhatsApp con tu pedido listo. Si no abre (por ejemplo desde Instagram), toca “Copiar mensaje” y pégalo en el chat.</div>`;
+  document.getElementById('rsEnviar').addEventListener('click', ()=>{ ov.classList.remove('open'); continuar(); });
+  document.getElementById('rsEditar').addEventListener('click', ()=> ov.classList.remove('open'));
+  document.getElementById('rsCopiar').addEventListener('click', ()=>{ try{ navigator.clipboard.writeText(limpiarEmoji(msg)); document.getElementById('rsCopiar').textContent = '¡Copiado!'; }catch(e){ showToast('No se pudo copiar'); } });
+  ov.onclick = e=>{ if(e.target===ov) ov.classList.remove('open'); };
+  ov.classList.add('open');
+}
 async function reservarFlan(n){
   const ref = MENU_DOC.parent.doc('stock');
   const res = await db.runTransaction(async tx=>{
@@ -2030,6 +2167,120 @@ async function guardarPedidoCliente(tel, nombre, total, regalos, descuento, prem
     });
     cargarClienteActual();
   }catch(e){ console.warn('No se pudo registrar el pedido en la tarjeta', e); }
+}
+
+/* =========================================================
+   MIS UBICACIONES GUARDADAS
+   Sin cuentas de usuario: se guardan en el celular y una copia privada en la nube bajo un código aleatorio que solo tiene el cliente
+   (no depende del teléfono ni de nombres: nadie puede listarlas ni adivinarlas).
+   ========================================================= */
+const UBIC_LS = 'fp_ubic';
+let UBIC = {key:'', items:[], ultimo:'', ts:0};
+function ubicLeer(){ try{ const g = JSON.parse(localStorage.getItem(UBIC_LS)||'null'); if(g && Array.isArray(g.items)) UBIC = {key:g.key||'', items:g.items.filter(u=>u && u.id && u.nombre), ultimo:g.ultimo||'', ts:g.ts||0}; }catch(e){} }
+function ubicClave(){ if(!UBIC.key){ const a = new Uint8Array(16); (window.crypto||window.msCrypto).getRandomValues(a); UBIC.key = Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join(''); } return UBIC.key; }
+function ubicGuardar(){ UBIC.ts = Date.now(); try{ localStorage.setItem(UBIC_LS, JSON.stringify(UBIC)); }catch(e){} clearTimeout(window.__ubT); window.__ubT = setTimeout(ubicSubir, 500); }
+async function ubicSubir(){
+  if(!UBIC.key) return;
+  try{ if(!UBIC.items.length){ await db.collection('ubicaciones').doc(UBIC.key).delete(); return; } await db.collection('ubicaciones').doc(UBIC.key).set({items:UBIC.items, ts:UBIC.ts}); }catch(e){}
+}
+async function ubicSincronizar(){
+  if(!UBIC.key) return;
+  try{
+    const sn = await db.collection('ubicaciones').doc(UBIC.key).get();
+    if(sn.exists){ const d = sn.data(); if((d.ts||0) > UBIC.ts){ UBIC.items = d.items||[]; UBIC.ts = d.ts; try{ localStorage.setItem(UBIC_LS, JSON.stringify(UBIC)); }catch(e){} renderCart(); } else if(UBIC.ts > (d.ts||0)) ubicSubir(); }
+    else if(UBIC.items.length) ubicSubir();
+  }catch(e){}
+}
+ubicLeer();
+const ubicCodigo = ()=> UBIC.key ? 'FP-' + UBIC.key.toUpperCase().match(/.{1,4}/g).join('-') : '';
+function ubicSel(){
+  if(orderState.ubicacionId === '__temp') return orderState.ubicTemp || null;
+  return UBIC.items.find(u=>u.id===orderState.ubicacionId) || null;
+}
+/* ----- enlace de Google Maps: se valida el formato y se evita confundirlo con el del local ----- */
+function validarMapsLink(txt){
+  let u = String(txt||'').trim(); if(!u) return {ok:true, link:''};
+  const m = u.match(/^(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})$/);                       // también se aceptan coordenadas
+  if(m) return {ok:true, link:'https://www.google.com/maps?q=' + m[1] + ',' + m[2]};
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  let url; try{ url = new URL(u); }catch(e){ return {ok:false, msg:'Ese enlace no parece válido. Cópialo otra vez desde Google Maps.'}; }
+  const h = url.hostname.toLowerCase().replace(/^www\./,''), p = url.pathname;
+  const okHost = h==='maps.app.goo.gl' || (h==='goo.gl' && p.startsWith('/maps')) || h==='maps.google.com' || (/^google\.[a-z.]+$/.test(h) && p.startsWith('/maps')) || h==='g.co' || h==='g.page';
+  if(!okHost) return {ok:false, msg:'Usa un enlace de Google Maps (maps.app.goo.gl o google.com/maps).'};
+  url.protocol = 'https:';
+  const link = url.toString();
+  if(CONFIG.ubicacionLink && link.replace(/\/$/,'') === CONFIG.ubicacionLink.replace(/\/$/,'')) return {ok:false, msg:'Ese es el enlace de nuestro local. Pega el enlace de TU ubicación de entrega.'};
+  return {ok:true, link};
+}
+document.body.insertAdjacentHTML('beforeend', `
+<div class="acct-overlay" id="ubicOverlay"><div class="acct-sheet" id="ubicSheet"></div></div>
+<div class="acct-overlay" id="resumenOverlay"><div class="acct-sheet" id="resumenSheet"></div></div>`);
+const ubicOv = document.getElementById('ubicOverlay'), ubicSheet = document.getElementById('ubicSheet');
+ubicOv.addEventListener('click', e=>{ if(e.target===ubicOv) cerrarUbic(); });
+function cerrarUbic(){ ubicOv.classList.remove('open'); }
+function abrirUbicaciones(){
+  const lista = UBIC.items.map(u=>`<div class="ubic-item"><div class="ubic-ic">${ic('pin',18)}</div><div class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</div>
+      <div class="ubic-acts"><button class="mini-ic" data-ed="${u.id}" aria-label="Editar">${ic('edit',16)}</button><button class="mini-ic" data-del="${u.id}" aria-label="Eliminar">${ic('trash',16)}</button></div></div>`).join('');
+  ubicSheet.innerHTML = `<h3>📍 Mis ubicaciones guardadas</h3>
+    <div class="step-note" style="margin:0 0 10px;">Guárdalas una vez y elígelas cuando pidas delivery. Puedes tener varias (Casa, Trabajo, Familiar…).</div>
+    ${lista || '<div class="sr-vacio" style="padding:14px 6px;"><b>Aún no tienes ubicaciones</b>Agrega la primera para no escribirla en cada pedido.</div>'}
+    <button class="btn-add" id="ubNueva" style="width:100%; margin-top:8px;">+ Agregar ubicación</button>
+    ${UBIC.key ? `<div class="ubic-code"><b>Tu código privado:</b> <span id="ubCodigo">${ubicCodigo()}</span> <button class="btn-mini" id="ubCopiar">Copiar</button><small>Con este código recuperas tus ubicaciones en otro celular. No lo compartas.</small></div>` : ''}
+    <details class="ubic-rest"><summary>Usar un código de otro celular</summary><input class="form-input" id="ubCodigoIn" placeholder="FP-XXXX-XXXX-…"><button class="btn-mini" id="ubRestaurar" style="margin-top:6px;">Restaurar</button><div class="step-note" id="ubRestMsg"></div></details>
+    <button class="choice-btn" id="ubCerrar" style="margin-top:12px; width:100%;">Cerrar</button>`;
+  ubicSheet.querySelectorAll('[data-ed]').forEach(b=> b.addEventListener('click', ()=> abrirFormUbic(b.dataset.ed, false)));
+  ubicSheet.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+    const u = UBIC.items.find(x=>x.id===b.dataset.del); if(!u || !confirm('¿Eliminar "' + u.nombre + '"?')) return;
+    UBIC.items = UBIC.items.filter(x=>x.id!==u.id); if(orderState.ubicacionId===u.id) orderState.ubicacionId = ''; if(UBIC.ultimo===u.id) UBIC.ultimo = '';
+    ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación eliminada');
+  }));
+  document.getElementById('ubNueva').addEventListener('click', ()=> abrirFormUbic(null, false));
+  document.getElementById('ubCerrar').addEventListener('click', cerrarUbic);
+  const cp = document.getElementById('ubCopiar'); if(cp) cp.addEventListener('click', ()=>{ try{ navigator.clipboard.writeText(ubicCodigo()); cp.textContent = '¡Copiado!'; }catch(e){} });
+  document.getElementById('ubRestaurar').addEventListener('click', async ()=>{
+    const raw = document.getElementById('ubCodigoIn').value.replace(/^FP-?/i,'').replace(/[^0-9a-f]/gi,'').toLowerCase(), msg = document.getElementById('ubRestMsg');
+    if(raw.length !== 32){ msg.textContent = 'El código no está completo.'; return; }
+    msg.textContent = 'Buscando…';
+    try{ const sn = await db.collection('ubicaciones').doc(raw).get(); if(!sn.exists){ msg.textContent = 'No encontramos ese código.'; return; }
+      const d = sn.data(); UBIC = {key:raw, items:d.items||[], ultimo:'', ts:d.ts||Date.now()}; try{ localStorage.setItem(UBIC_LS, JSON.stringify(UBIC)); }catch(e){} abrirUbicaciones(); renderCart(); showToast('Ubicaciones recuperadas ✅'); }
+    catch(e){ msg.textContent = 'No se pudo conectar. Intenta de nuevo.'; }
+  });
+  ubicOv.classList.add('open');
+}
+function abrirFormUbic(id, desdeCheckout){
+  const u = id ? UBIC.items.find(x=>x.id===id) : {nombre:'', direccion:'', link:''};
+  ubicSheet.innerHTML = `<h3>${id ? 'Editar ubicación' : 'Nueva ubicación'}</h3>
+    <label class="form-label">Nombre</label>
+    <div class="ubic-chips">${['Casa','Trabajo','Familiar'].map(n=>`<button type="button" class="opt" data-n="${n}">${n}</button>`).join('')}</div>
+    <input class="form-input" id="ufNombre" placeholder="Ej. Casa de mi mamá" value="${esc(u.nombre)}" maxlength="40">
+    <label class="form-label" style="margin-top:10px;">Dirección o referencia</label>
+    <textarea class="form-input" id="ufDir" rows="2" placeholder="Calle, número, sector y una referencia" maxlength="200">${esc(u.direccion||'')}</textarea>
+    <label class="form-label" style="margin-top:10px;">Enlace de Google Maps (opcional)</label>
+    <input class="form-input" id="ufLink" placeholder="Pega aquí el enlace" value="${esc(u.link||'')}" inputmode="url" autocapitalize="off">
+    <div class="step-note" style="margin-top:4px;">En Google Maps: toca tu ubicación → Compartir → Copiar enlace.</div>
+    <button class="btn-mini" id="ufProbar" style="margin-top:6px;">${ic('ext',13)} Probar enlace</button>
+    <div class="uf-err" id="ufErr"></div>
+    ${id ? '' : `<label class="uf-check"><input type="checkbox" id="ufGuardar" checked> Guardar para mis próximos pedidos</label>`}
+    <div style="display:flex; gap:8px; margin-top:12px;"><button class="choice-btn" id="ufCancel" style="flex:1;">Cancelar</button><button class="btn-add" id="ufOk" style="flex:1;">Guardar</button></div>`;
+  ubicSheet.querySelectorAll('[data-n]').forEach(b=> b.addEventListener('click', ()=>{ document.getElementById('ufNombre').value = b.dataset.n; }));
+  const err = t=>{ document.getElementById('ufErr').textContent = t || ''; };
+  document.getElementById('ufProbar').addEventListener('click', ()=>{ const v = validarMapsLink(document.getElementById('ufLink').value); if(!v.ok) return err(v.msg); if(!v.link) return err('Pega primero el enlace.'); err(''); window.open(v.link, '_blank'); });
+  document.getElementById('ufCancel').addEventListener('click', ()=>{ if(id) abrirUbicaciones(); else if(UBIC.items.length && !desdeCheckout) abrirUbicaciones(); else cerrarUbic(); });
+  document.getElementById('ufOk').addEventListener('click', ()=>{
+    const nombre = document.getElementById('ufNombre').value.trim(), dir = document.getElementById('ufDir').value.trim(), v = validarMapsLink(document.getElementById('ufLink').value);
+    if(!nombre) return err('Ponle un nombre (Casa, Trabajo…).');
+    if(!v.ok) return err(v.msg);
+    if(!dir && !v.link) return err('Escribe la dirección o pega el enlace de Google Maps.');
+    const guardar = id ? true : document.getElementById('ufGuardar').checked;
+    if(id){ Object.assign(u, {nombre, direccion:dir, link:v.link}); ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación actualizada'); return; }
+    if(!guardar){ orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
+    const nu = {id:'u' + Date.now().toString(36), nombre, direccion:dir, link:v.link};
+    ubicClave(); UBIC.items.push(nu); UBIC.ultimo = nu.id; ubicGuardar();
+    if(desdeCheckout || orderState.delivery==='si'){ orderState.ubicacionId = nu.id; orderState.ubicTemp = null; }
+    if(desdeCheckout){ cerrarUbic(); } else abrirUbicaciones();
+    renderCart(); showToast('Ubicación guardada ✅');
+  });
+  ubicOv.classList.add('open');
 }
 
 /* =========================================================
@@ -2233,7 +2484,7 @@ function renderInfo(){
   document.getElementById('sloganText').textContent = CONFIG.slogan;
   document.getElementById('horarioText').textContent = CONFIG.horario;
   document.getElementById('ubicacionText').textContent = CONFIG.ubicacion;
-  document.getElementById('ubicacionText').href = CONFIG.ubicacionLink;
+  document.getElementById('ubicacionLink').href = CONFIG.ubicacionLink;
   document.getElementById('faqList').innerHTML = CONFIG.faq.map(f=>`
     <div class="faq-item"><div class="faq-q">${f.q}</div><div class="faq-a">${f.a}</div></div>
   `).join('');
@@ -2283,7 +2534,9 @@ function construirSeedInicial(){
     otros: marcar(DEFAULT_OTROS).map(({img, ...r})=>r),
     faq: CONFIG.faq,
     categoriasExtra: [],
-    categoriasOrden: ['favoritas','personalizada','premium','otros'],
+    bebidas: [],
+    categoriasOrden: ['favoritas','premium','personalizada','otros','bebidas'],
+    categoriasV3: true,
     categoriasOcultas: [],
     categoriasLabels: {},
   };
@@ -2321,25 +2574,32 @@ async function cargarDatosRemotos(){
       }
       if(d.premium) PREMIUM = fusionarConImagenLocal(d.premium, DEFAULT_PREMIUM);
       if(d.otros) OTROS = fusionarConImagenLocal(d.otros, DEFAULT_OTROS);
+      if(d.bebidas) BEBIDAS = fusionarConImagenLocal(d.bebidas, []);
       if(d.faq && d.faq.length) CONFIG.faq = d.faq;
       if(d.ordenExtrasInicial) EXTRAS_ORDEN_MANUAL = true;
+      if(d.extrasImg) EXTRAS_IMG = d.extrasImg;
       if(d.textos){ TEXTOS = d.textos; aplicarConfigTextos(); }
       if(d.ruleta && d.ruleta.length > 1) RULETA_PREMIOS = d.ruleta;
       if(d.categoriasExtra) CATEGORIAS_EXTRA = d.categoriasExtra;
       if(d.categoriasOrden) CATEGORIAS_ORDEN = d.categoriasOrden;
       if(d.categoriasOcultas) CATEGORIAS_OCULTAS = d.categoriasOcultas;
       if(d.categoriasLabels) CATEGORIAS_LABELS = d.categoriasLabels;
+      if(!d.categoriasV3){                                       // nuevos nombres, orden y descripciones de las categorías
+        CATEGORIAS_ORDEN = []; CATEGORIAS_LABELS = {};
+        if(d.textos) ['fav_titulo','fav_sub','pers_titulo','pers_sub','prem_titulo','prem_sub','otros_titulo','otros_sub'].forEach(k=>{ delete d.textos[k]; });
+      }
     } else {
       await MENU_DOC.set(construirSeedInicial());
     }
   }catch(e){
     console.warn('No se pudo conectar con el panel de administrador, usando datos locales', e);
+    const av = document.getElementById('avisoOffline'); if(av) av.style.display = 'block';
   }
 
   { // nombre completo en lugar de "choco" (también en lo que ya estaba guardado en el panel)
     const choc = t=> String(t||'').replace(/Choco [Cc]rema/g,'Crema de chocolate').replace(/(g)alletas de choco(?!late)/gi,(m,g)=>g+'alletas de chocolate').replace(/(c)rema de choco(?!late)/gi,(m,c)=>c+'rema de chocolate');
     OPT_ALL.cremas.forEach(x=>{ x.label = choc(x.label); }); OPT_ALL.toppings.forEach(x=>{ x.label = choc(x.label); });
-    [FAVORITAS, PREMIUM, OTROS].forEach(l=> l.forEach(p=>{ p.desc = choc(p.desc); }));
+    [FAVORITAS, PREMIUM, OTROS, BEBIDAS].forEach(l=> l.forEach(p=>{ p.desc = choc(p.desc); }));
     const cp = FAVORITAS.find(x=>x.id==='choco_pop'); if(cp && /^(Choco|Crema de chocolate|Base de Nutella \+ crema tradicional \+ crema de chocolate)/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado';
   }
   try{ AUTO_AGOT = (await MENU_DOC.parent.doc('auto').get()).data() || {}; }catch(e){}     // lo que se acabó en el inventario (lo publica Finanzas)
@@ -2355,8 +2615,8 @@ async function cargarDatosRemotos(){
   renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
   renderCardList('premiumList', PREMIUM, premSize, 'Agregar', premTopping, true);
   renderExtrasStandalone('favoritasExtrasList');
-  renderExtrasStandalone('premiumExtrasList');
-  renderOtros();
+  renderExtrasStandalone('premiumExtrasList'); aplicarExtrasImg();
+  renderOtros(); renderBebidas();
   MENU_FIRMA = firmaMenu(); if(CARRITO_FIRMA && CARRITO_FIRMA !== MENU_FIRMA && cart.length) CARRITO_VIEJO = true;
   renderCart();
   renderInfo();
@@ -2371,7 +2631,11 @@ async function cargarDatosRemotos(){
 document.addEventListener('input', e=>{ if(e.target.closest && e.target.closest('#drawerBody')){ clearTimeout(window.__gc); window.__gc = setTimeout(guardarCarrito, 400); } });
 restaurarCarrito();
 document.body.insertAdjacentHTML('afterbegin', '<div id="ofertaBanner" class="oferta-banner" style="display:none;"></div>');
-cargarDatosRemotos();
+ubicSincronizar();
+document.body.classList.add('cargando');
+const quitarCarga = ()=> document.body.classList.remove('cargando');
+setTimeout(quitarCarga, 6000);
+cargarDatosRemotos().then(quitarCarga, quitarCarga);
 </script>
 </body>
 </html>
