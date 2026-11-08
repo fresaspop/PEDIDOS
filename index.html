@@ -115,45 +115,44 @@ img{max-width:100%; display:block;}
 .cart-count.hidden{display:none;}
 
 /* ---------- NAV TABS ---------- */
-.tabs-wrap{position:relative; background:var(--blanco);}
-.tabs{
-  display:grid;
-  grid-template-rows: repeat(2, 1fr);
-  grid-auto-flow: column;
-  grid-auto-columns: 50%;
-  column-gap:8px; row-gap:8px;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-  scroll-snap-type:x mandatory;
-  padding:12px 40px 12px 16px; scrollbar-width:none;
-}
+.explore{max-width:560px; margin:0 auto; padding:18px 16px 8px; text-align:center;}
+.explore-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:800; letter-spacing:1.6px; color:var(--vino); margin:0 0 10px;}
+.search{position:relative; margin:0 auto;}
+.search svg{position:absolute; left:15px; top:50%; transform:translateY(-50%); width:19px; height:19px; stroke:var(--principal);}
+.search input{width:100%; height:46px; border:2px solid #f0d7dc; border-radius:23px; padding:0 44px 0 42px; font-size:14px; font-family:inherit; background:#fff; color:var(--texto); box-shadow:var(--sombra); outline:none; -webkit-appearance:none;}
+.search input:focus{border-color:var(--principal);}
+.search input::-webkit-search-cancel-button{display:none;}
+.search-clear{position:absolute; right:8px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:14px; font-weight:700;}
+.tabs-wrap{position:sticky; top:0; z-index:40; background:rgba(255,255,255,.97); backdrop-filter:blur(6px); border-bottom:1px solid #f0d7dc; box-shadow:0 3px 10px rgba(86,9,31,.06);}
+.tabs{display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; padding:9px 46px 9px 14px; scrollbar-width:none; max-width:620px; margin:0 auto;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab-btn{
-  scroll-snap-align:start;
-  border:1.5px solid var(--principal);
-  background:var(--blanco); color:var(--principal);
-  border-radius:20px; padding:7px 10px 6px;
-  font-weight:700; font-size:11.5px;
-  text-align:center; transition:.15s;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
-  white-space:nowrap; overflow:hidden;
-  height:44px;
-}
-.tab-btn .tab-name{overflow:hidden; text-overflow:ellipsis; max-width:100%;}
-.tab-btn .tab-desc{font-size:8.5px; font-weight:500; opacity:.8; line-height:1.1; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
-.tab-btn.active .tab-desc{opacity:.9;}
-.tab-btn.active{
-  background:var(--principal); color:#fff;
-  box-shadow:var(--sombra);
-}
-.tabs-arrow{
-  position:absolute; right:0; top:0; bottom:0; width:56px;
-  display:flex; align-items:center; justify-content:flex-end; gap:2px;
-  background:linear-gradient(to right, rgba(255,255,255,0), var(--blanco) 55%);
-  pointer-events:none;
-}
-.tabs-arrow-text{font-size:10.5px; font-weight:700; color:var(--principal); text-transform:uppercase; letter-spacing:.3px;}
-.tabs-arrow svg{width:16px; height:16px;}
-.tabs-arrow path{stroke:var(--principal); stroke-width:2.4; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+.tabs::before,.tabs::after{content:''; margin:auto;}
+.tab-btn{flex:none; scroll-snap-align:center; border:1.5px solid var(--principal); background:var(--blanco); color:var(--principal); border-radius:20px; height:36px; padding:0 16px; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; white-space:nowrap; transition:.15s;}
+.tab-btn .tab-desc{display:none;}
+.tab-btn.active{background:var(--principal); color:#fff; box-shadow:var(--sombra);}
+.tabs-fade{position:absolute; top:0; bottom:0; width:44px; pointer-events:none; display:flex; align-items:center; opacity:0; transition:opacity .2s;}
+.tabs-fade.show{opacity:1;}
+.tabs-fade.right{right:0; justify-content:flex-end; gap:1px; padding-right:8px; background:linear-gradient(to right, rgba(255,255,255,0), #fff 55%);}
+.tabs-fade.left{left:0; background:linear-gradient(to left, rgba(255,255,255,0), #fff 55%);}
+.tabs-fade span{font-size:10.5px; font-weight:800; color:var(--principal); text-transform:uppercase; letter-spacing:.3px;}
+.tabs-fade svg{width:15px; height:15px;} .tabs-fade path{stroke:var(--principal); stroke-width:2.6; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+.search-results{max-width:560px; margin:0 auto; padding:14px 16px 10px;}
+.sr-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; font-size:13px; color:var(--gris);}
+.sr-head button{border:1.5px solid var(--principal); background:#fff; color:var(--principal); border-radius:18px; padding:6px 12px; font-weight:700; font-size:12px;}
+.sres{display:flex; gap:12px; align-items:center; background:#fff; border-radius:16px; padding:10px; margin-bottom:9px; box-shadow:var(--sombra); cursor:pointer;}
+.sres .th{width:62px; height:62px; flex:none; border-radius:12px; overflow:hidden; background:var(--crema); display:flex; align-items:center; justify-content:center; position:relative;}
+.sres .th img{width:100%; height:100%; object-fit:contain;} .sres .th svg{width:26px; opacity:.4;}
+.sres .bd{flex:1; min-width:0;} .sres h4{margin:0; font-size:14.5px; color:var(--vino);} .sres .cat{font-size:10.5px; color:var(--gris); text-transform:uppercase; letter-spacing:.4px;}
+.sres .tags{font-size:11.5px; color:var(--principal); font-weight:600; margin-top:2px;} .sres .pr{font-size:12px; color:var(--texto); margin-top:2px;}
+.sres .go{border:none; background:var(--principal); color:#fff; border-radius:16px; padding:8px 14px; font-weight:700; font-size:12px; flex:none;}
+.sres.ag{opacity:.75;}
+.sr-vacio{text-align:center; padding:26px 10px; color:var(--gris); font-size:14px;} .sr-vacio b{display:block; color:var(--vino); font-size:15px; margin-bottom:6px;}
+body.searching .tab-panel{display:none !important;}
+.pcard.pulse{animation:pulseCard 1.8s ease;}
+@keyframes pulseCard{0%,100%{box-shadow:var(--sombra);} 25%,75%{box-shadow:0 0 0 4px rgba(219,82,117,.45);}}
+.next-cat{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:22px 0 4px; padding:14px 16px; border-radius:16px; background:linear-gradient(135deg,#fff0f3,#ffe3ea); border:1.5px solid #f6c9d4; cursor:pointer;}
+.next-cat .nc-txt span{display:block; font-size:11px; color:var(--gris); text-transform:uppercase; letter-spacing:.5px;} .next-cat .nc-txt b{font-size:16px; color:var(--vino); font-family:'Baloo 2',sans-serif;}
+.next-cat .nc-btn{border:none; background:var(--principal); color:#fff; border-radius:18px; padding:8px 16px; font-weight:800; font-size:13px; pointer-events:none;}
 .tab-panel{display:none; padding:18px 16px 10px; max-width:560px; margin:0 auto;}
 .tab-panel.active{display:block; animation:fadeIn .25s ease;}
 @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
@@ -247,8 +246,18 @@ img{max-width:100%; display:block;}
 .pcard-imgwrap{
   width:100px; height:100px; flex-shrink:0; background:var(--crema);
   border-radius:14px; display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
+  overflow:hidden; position:relative;
 }
+.ag-badge{position:absolute; left:0; right:0; bottom:0; background:var(--principal); color:#fff; text-align:center; font-weight:800; font-size:11.5px; letter-spacing:.6px; padding:5px 0; box-shadow:0 -2px 8px rgba(86,9,31,.25);}
+.pcard.agotado .pcard-imgwrap img{filter:grayscale(.55) opacity(.55);}
+.pcard.agotado h4, .pcard.agotado .pcard-price{opacity:.75;}
+.pcard .btn-mini:disabled, .pcard .btn-add:disabled{background:#d9c6ca; color:#fff; box-shadow:none; cursor:not-allowed;}
+.stock-note{margin-top:6px; font-size:11.5px; font-weight:700; color:var(--rojo);}
+.ag-tag{background:var(--principal); color:#fff; font-size:9.5px; font-weight:800; letter-spacing:.4px; padding:2px 6px; border-radius:8px; margin-left:4px; white-space:nowrap;}
+.opt:disabled{opacity:.6;}
+.xchip.ag{opacity:.65; cursor:not-allowed; background:#f6eef0; box-shadow:none;}
+.cart-item.agotada{border:1.5px solid var(--principal); border-radius:14px; background:#fff0f3;}
+.ag-line{color:var(--principal); font-weight:800; font-size:12px; margin:2px 0 4px;}
 .pcard-imgwrap img{width:100%; height:100%; object-fit:contain;}
 .pcard-body{flex:1; min-width:0;}
 .pcard-body h4{margin:0 0 3px; font-size:16px; color:var(--vino);}
@@ -280,6 +289,12 @@ img{max-width:100%; display:block;}
 .xchip .xctl{display:none; align-items:center; gap:3px; flex:none;} .xchip.sel .xctl{display:inline-flex;}
 .xchip .xq{font-size:11px; font-weight:800; min-width:12px; text-align:center;}
 .xchip .xm, .xchip .xplus{border:none; background:#fff; color:var(--principal); width:20px; height:20px; border-radius:50%; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center;}
+.extras-intro{margin:26px 0 12px; padding:16px; border-radius:18px; background:linear-gradient(135deg,#fff0f3,#ffe6ec); text-align:center;}
+.extras-intro h3{margin:0 0 4px; font-family:'Baloo 2',sans-serif; font-size:19px; color:var(--vino);}
+.extras-intro p{margin:0 0 8px; font-size:13px; color:var(--texto); line-height:1.45;}
+.extras-note{font-size:11.5px; color:var(--principal); font-weight:700;}
+.extras-sum{display:none; margin:2px 0 8px; padding:9px 12px; border-radius:12px; background:#fff; border:1.5px solid var(--principal); font-size:12.5px; color:var(--vino); line-height:1.4;}
+.extras-sum.show{display:block;}
 .xhead{font-size:11px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.4px; margin:6px 0 6px;}
 .fav-hint{flex:1 1 100%; background:#fff0f3; border:1.5px solid var(--principal); color:var(--vino); border-radius:12px; padding:6px 10px; font-size:12px; margin-bottom:8px;}
 #panel-personalizada .opt-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px;}
@@ -322,10 +337,11 @@ img{max-width:100%; display:block;}
 .qty-stepper .n{font-weight:700; min-width:16px; text-align:center;}
 
 /* ---------- MAS INFO ---------- */
-.info-block{
-  background:#fff; border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:var(--sombra);
-}
-.info-block h4{margin:0 0 8px; color:var(--vino); font-size:15px; display:flex; gap:8px; align-items:center;}
+.info-sec{margin-top:30px; background:#fff; padding:6px 0 4px;}
+.info-inner{max-width:560px; margin:0 auto; padding:22px 16px 6px;}
+.info-block{padding:14px 0; margin:0; border-bottom:1px solid rgba(86,9,31,.10);}
+.info-block:last-child{border-bottom:none;}
+.info-block h4{margin:0 0 6px; color:var(--gris); font-size:11.5px; text-transform:uppercase; letter-spacing:.7px; display:flex; gap:7px; align-items:center;}
 .info-block p{margin:0; font-size:13.5px; line-height:1.55; color:var(--texto);}
 .faq-item{border-top:1px solid #f4e3e6; padding-top:10px; margin-top:10px;}
 .faq-item:first-child{border-top:none; padding-top:0; margin-top:0;}
@@ -452,23 +468,38 @@ img{max-width:100%; display:block;}
 </header>
 
 <!-- ================= TABS ================= -->
-<div class="tabs-wrap">
-<nav class="tabs" id="tabs">
+<section class="explore" id="explora">
+  <h2 class="explore-title" data-t="explora_titulo">EXPLORA NUESTRO MENÚ</h2>
+  <div class="search" id="searchBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="menuSearch" type="search" enterkeyhint="search" autocomplete="off" placeholder="Busca un postre o ingrediente…" aria-label="Buscar en el menú">
+    <button class="search-clear" id="searchClear" aria-label="Limpiar búsqueda" style="display:none;">✕</button>
+  </div>
+</section>
+<div class="tabs-wrap" id="tabsWrap">
+  <div class="tabs-fade left" id="fadeL"></div>
+  <nav class="tabs" id="tabs">
   <button class="tab-btn active" data-tab="favoritas"><span class="tab-name">Las favoritas</span><span class="tab-desc">Combinaciones ya creadas</span></button>
   <button class="tab-btn" data-tab="personalizada"><span class="tab-name">Personalizada</span><span class="tab-desc">Crea tu antojo</span></button>
   <button class="tab-btn" data-tab="premium"><span class="tab-name">Premium</span><span class="tab-desc">Dubái, chocolosas y más</span></button>
   <button class="tab-btn" data-tab="otros"><span class="tab-name">Otros postres</span><span class="tab-desc">Brownies y más</span></button>
-</nav>
-<div class="tabs-arrow"><span class="tabs-arrow-text">más</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+  </nav>
+  <div class="tabs-fade right" id="fadeR"><span>más</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
 </div>
+<div class="search-results" id="searchResults" style="display:none;"></div>
 
 <!-- ================= TABS ================= -->
 <main>
 <section class="tab-panel active" id="panel-favoritas">
   <div class="section-title"><h2 data-t="fav_titulo">Favoritas de Fresas Pop</h2><p data-t="fav_sub">Combinaciones ya creadas</p></div>
   <div class="card-list" id="favoritasList"></div>
-  <div class="section-title" style="margin-top:22px;"><h2 data-t="extras_titulo">Extras</h2><p data-t="extras_sub">Agrega un poco más a tu pedido</p></div>
-  <div id="favoritasExtrasList" style="display:flex; flex-direction:column;"></div>
+  <div class="extras-intro">
+    <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
+    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos para crear una combinación a tu gusto.</p>
+    <div class="extras-note" data-t="extras_nota">Los extras tienen un costo adicional y se suman al total de tu pedido.</div>
+  </div>
+  <div id="favoritasExtrasList"></div>
+  <div class="extras-sum" id="favoritasExtrasSum"></div>
 </section>
 
 <!-- ================= TAB: PERSONALIZADA ================= -->
@@ -537,8 +568,13 @@ img{max-width:100%; display:block;}
 <section class="tab-panel" id="panel-premium">
   <div class="section-title"><h2 data-t="prem_titulo">Línea Premium</h2><p data-t="prem_sub">Dubái, chocolosas y más</p></div>
   <div class="card-list" id="premiumList"></div>
-  <div class="section-title" style="margin-top:22px;"><h2 data-t="extras_titulo">Extras</h2><p data-t="extras_sub">Agrega un poco más a tu pedido</p></div>
-  <div id="premiumExtrasList" style="display:flex; flex-direction:column;"></div>
+  <div class="extras-intro">
+    <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
+    <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos para crear una combinación a tu gusto.</p>
+    <div class="extras-note" data-t="extras_nota">Los extras tienen un costo adicional y se suman al total de tu pedido.</div>
+  </div>
+  <div id="premiumExtrasList"></div>
+  <div class="extras-sum" id="premiumExtrasSum"></div>
 </section>
 
 <!-- ================= TAB: OTROS POSTRES ================= -->
@@ -548,7 +584,7 @@ img{max-width:100%; display:block;}
 </section>
 
 <!-- ================= MAS INFORMACION ================= -->
-<section style="padding:26px 16px 6px; max-width:560px; margin:0 auto;">
+<section class="info-sec"><div class="info-inner">
   <div class="section-title"><h2 data-t="info_titulo">Más información</h2></div>
 
   <div class="info-block" style="margin-top:14px;">
@@ -565,7 +601,7 @@ img{max-width:100%; display:block;}
     <h4 data-t="faq_titulo">❓ Preguntas frecuentes</h4>
     <div id="faqList"></div>
   </div>
-</section>
+</div></section>
 
 <footer class="footer">
   <div class="social-row" id="socialRow"></div>
@@ -771,6 +807,32 @@ let EXTRAS = DEFAULT_EXTRAS;
 let FAVORITAS = DEFAULT_FAVORITAS;
 let PREMIUM = DEFAULT_PREMIUM;
 let OTROS = DEFAULT_OTROS;
+/* ----- disponibilidad: lo agotado NO desaparece, se muestra con "¡AGOTADO!" ----- */
+const norm = t=> String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function validarCustom(){        // si lo elegido se agotó, se cambia a la primera opción disponible
+  if(TAMANOS.length && !TAMANOS.find(t=>t.id===custom.tamano)) custom.tamano = TAMANOS[0].id;
+  if(BASES.length && !BASES.find(b=>b.id===custom.base)) custom.base = BASES[0].id;
+  if(CREMAS.length && !CREMAS.find(c=>c.id===custom.crema)) custom.crema = CREMAS[0].id;
+  if(custom.crema2 && !CREMAS.find(c=>c.id===custom.crema2)) custom.crema2 = null;
+  if(FRUTAS.length && !FRUTAS.find(f=>f.id===custom.fruta)) custom.fruta = FRUTAS[0].id;
+  if(TOPPINGS.length && !TOPPINGS.find(t=>t.id===custom.topping)) custom.topping = TOPPINGS[0].id;
+}
+const mkAg = arr=> (arr||[]).map(x=>({...x, agotado: x.disponible===false}));
+let OPT_ALL = {bases:mkAg(DEFAULT_BASES), cremas:mkAg(DEFAULT_CREMAS), frutas:mkAg(DEFAULT_FRUTAS), toppings:mkAg(DEFAULT_TOPPINGS), extras:mkAg(DEFAULT_EXTRAS)};
+let AUTO_AGOT = {}, STOCK = {};
+const esAgotado = x=> !!(x && (x.agotado || x.agotadoAuto));
+const stockFlan = ()=> (typeof STOCK.flan === 'number') ? STOCK.flan : null;
+const esFlan = p=> /flan/i.test((p && p.nombre !== undefined ? p.nombre : p) || '');
+const stockDe = p=> esFlan(p) ? stockFlan() : null;
+const productoAgotado = p=> esAgotado(p) || (stockDe(p)!==null && stockDe(p) <= 0);
+const sinAg = arr=>{ const r = arr.filter(x=>!esAgotado(x)); return r.length ? r : arr; };
+function recomputarOpciones(){ BASES = sinAg(OPT_ALL.bases); CREMAS = sinAg(OPT_ALL.cremas); FRUTAS = sinAg(OPT_ALL.frutas); TOPPINGS = sinAg(OPT_ALL.toppings); EXTRAS = OPT_ALL.extras.filter(x=>!esAgotado(x)); }
+function aplicarAutoAgotado(){
+  const au = AUTO_AGOT || {};
+  ['bases','cremas','frutas','toppings'].forEach(k=> OPT_ALL[k].forEach(x=>{ x.agotadoAuto = !!(au[k] && au[k][x.id]); }));
+  const prod = p=>{ p.agotadoAuto = !!(au.productos && au.productos[p.id]); };
+  [FAVORITAS, PREMIUM, OTROS].forEach(l=>l.forEach(prod)); CATEGORIAS_EXTRA.forEach(c=>(c.items||[]).forEach(prod));
+}
 
 /* =========================================================
    ESTADO
@@ -797,7 +859,7 @@ function renderOptGroup(container, list, selectedId, onPick, disabledIds=[]){
     btn.className = 'opt' + (opt.id===selectedId ? ' selected':'');
     const isDisabled = disabledIds.includes(opt.id);
     btn.disabled = isDisabled;
-    btn.innerHTML = opt.label + (opt.extra ? ` <span class="extra">+${opt.extra}</span>` : '');
+    btn.innerHTML = opt.label + (opt.extra ? ` <span class="extra">+${opt.extra}</span>` : '') + (esAgotado(opt) ? ' <span class="ag-tag">Agotado</span>' : '');
     btn.addEventListener('click', ()=>{ if(!isDisabled) onPick(opt.id); });
     container.appendChild(btn);
   });
@@ -875,12 +937,12 @@ function calcCustomPrice(){
 function renderPersonalizador(){
   renderSizeOpts();
   const czNow = calcCustomPrice().cortesia || custom.tamano==='canasta';
-  const cremasView = CREMAS.map(c=> (czNow && c.extra>0) ? {...c, extra:0, label:c.label+' 🎁 Gratis'} : c);
+  const cremasView = OPT_ALL.cremas.map(c=> (czNow && c.extra>0 && !esAgotado(c)) ? {...c, extra:0, label:c.label+' 🎁 Gratis'} : c);
   const disabledBase = [];
-  renderOptGroup(document.getElementById('baseOpts'), BASES, custom.base, id=>{custom.base=id; renderPersonalizador();});
+  renderOptGroup(document.getElementById('baseOpts'), OPT_ALL.bases, custom.base, id=>{custom.base=id; renderPersonalizador();}, OPT_ALL.bases.filter(esAgotado).map(x=>x.id));
   if(custom.tamano==='canasta' || !MEZCLA_CREMAS) custom.crema2 = null;
   if(custom.crema2 === custom.crema) custom.crema2 = null;
-  renderOptGroup(document.getElementById('cremaOpts'), cremasView, custom.crema, id=>{ custom.crema=id; if(custom.crema2===id) custom.crema2=null; renderPersonalizador(); });
+  renderOptGroup(document.getElementById('cremaOpts'), cremasView, custom.crema, id=>{ custom.crema=id; if(custom.crema2===id) custom.crema2=null; renderPersonalizador(); }, OPT_ALL.cremas.filter(esAgotado).map(x=>x.id));
   const w2 = document.getElementById('crema2Wrap');
   if(custom.tamano==='canasta' || !MEZCLA_CREMAS){ w2.innerHTML = ''; }
   else if(!custom.crema2){
@@ -894,7 +956,7 @@ function renderPersonalizador(){
 
   const frutaDisabled = custom.tamano==='canasta' ? ['mixto'] : [];
   document.getElementById('frutaNote').style.display = custom.tamano==='canasta' ? 'block':'none';
-  renderOptGroup(document.getElementById('frutaOpts'), FRUTAS, custom.fruta, id=>{custom.fruta=id; renderPersonalizador();}, frutaDisabled);
+  renderOptGroup(document.getElementById('frutaOpts'), OPT_ALL.frutas, custom.fruta, id=>{custom.fruta=id; renderPersonalizador();}, frutaDisabled.concat(OPT_ALL.frutas.filter(esAgotado).map(x=>x.id)));
 
   const {total, cortesia} = calcCustomPrice();
   document.getElementById('cortesiaNote').style.display = cortesia ? 'block':'none';
@@ -902,16 +964,19 @@ function renderPersonalizador(){
 
   const toppingCont = document.getElementById('toppingOpts');
   toppingCont.innerHTML = '';
-  TOPPINGS.forEach(opt=>{
+  OPT_ALL.toppings.forEach(opt=>{
     const btn = document.createElement('button');
     btn.className = 'opt' + (opt.id===custom.topping?' selected':'');
+    btn.disabled = esAgotado(opt);
     let priceShown = opt.extra;
-    if(cortesia && cortesiaCubre(opt)) {
+    if(esAgotado(opt)) {
+      btn.innerHTML = opt.label + ' <span class="ag-tag">Agotado</span>';
+    } else if(cortesia && cortesiaCubre(opt)) {
       btn.innerHTML = opt.label + ` <span class="extra" style="text-decoration:line-through;opacity:.7;">+${opt.extra}</span> <span class="extra">🎁 Gratis</span>`;
     } else {
       btn.innerHTML = opt.label + (opt.extra ? ` <span class="extra">+${opt.extra}</span>` : '');
     }
-    btn.addEventListener('click', ()=>{ custom.topping=opt.id; renderPersonalizador(); });
+    btn.addEventListener('click', ()=>{ if(!esAgotado(opt)){ custom.topping=opt.id; renderPersonalizador(); } });
     toppingCont.appendChild(btn);
   });
 
@@ -919,6 +984,7 @@ function renderPersonalizador(){
   extraCont.className = 'xwrap'; extraCont.innerHTML = '';
   const chipPers = (opt, nombre, cont)=>{
     const n = extraCount(opt.id), ch = document.createElement('div');
+    if(opt.agotado){ ch.className = 'xchip ag'; ch.innerHTML = `<span class="xn">${nombre}</span><span class="ag-tag">Agotado</span>`; cont.appendChild(ch); return; }
     ch.className = 'xchip' + (n>0 ? ' sel' : '') + (n>1 ? ' multi' : '');
     ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
     ch.addEventListener('click', e=>{
@@ -928,11 +994,11 @@ function renderPersonalizador(){
     });
     cont.appendChild(ch);
   };
-  salsasOrdenadas().forEach(opt=> chipPers(opt, opt.label, extraCont));
+  salsasOrdenadas(true).forEach(opt=> chipPers({...opt, agotado:esAgotado(opt)}, opt.label, extraCont));
   const topWrap = document.getElementById('extraToppingWrap');
   topWrap.innerHTML = `<div class="xhead">${T('toppings_label','Toppings (2 oz)')}</div><div class="xwrap" id="extraTopChips"></div>`;
   const tc = document.getElementById('extraTopChips');
-  extraToppings().forEach(t=> chipPers({id:t.id, extra:t.extra}, t.nombre, tc));
+  extraToppings(true).forEach(t=> chipPers({id:t.id, extra:t.extra, agotado:t.agotado}, t.nombre, tc));
   const fav = favoritaDeCombo(), hint = document.getElementById('favHint');
   hint.style.display = fav ? 'block' : 'none';
   if(fav) hint.innerHTML = `✨ ¡Esta combinación es <b>${fav.nombre}</b>! Así quedará en tu pedido.`;
@@ -999,15 +1065,16 @@ const EXTRA_TOPPING_EXCLUIDOS = ['sin_topping','chispas_color','cono'];
 const EXTRA_SALSAS_ORDEN = ['ex_pistacho','ex_nutella','ex_leche_cond','ex_dulce_leche'];
 const EXTRA_TOPPINGS_ORDEN = ['kataifi','granola','chispas_choco','galletas','coco_rallado'];
 let EXTRAS_ORDEN_MANUAL = false;   // true cuando la administradora ya ordenó los extras desde el panel
-function salsasOrdenadas(){
-  if(EXTRAS_ORDEN_MANUAL) return EXTRAS.slice();
+function salsasOrdenadas(todos){
+  const src = todos ? OPT_ALL.extras : EXTRAS;
+  if(EXTRAS_ORDEN_MANUAL) return src.slice();
   const pos = e=>{ const i = EXTRA_SALSAS_ORDEN.indexOf(e.id); return i<0 ? 99 : i; };
-  return EXTRAS.slice().sort((a,b)=>pos(a)-pos(b));
+  return src.slice().sort((a,b)=>pos(a)-pos(b));
 }
-function extraToppings(){
+function extraToppings(todos){
   const pos = t=>{ const i = EXTRA_TOPPINGS_ORDEN.indexOf(t.id); return i<0 ? 99 : i; };
-  return TOPPINGS.filter(t=>!EXTRA_TOPPING_EXCLUIDOS.includes(t.id)).slice().sort((a,b)=>pos(a)-pos(b)).map(t=>({
-    id:'extop_'+t.id, nombre:t.label, label:'Extra '+t.label+' 2oz', extra: t.id==='kataifi' ? EXTRA_KATAIFI_PRECIO : EXTRA_TOPPING_PRECIO
+  return (todos ? OPT_ALL.toppings : TOPPINGS).filter(t=>!EXTRA_TOPPING_EXCLUIDOS.includes(t.id)).slice().sort((a,b)=>pos(a)-pos(b)).map(t=>({
+    id:'extop_'+t.id, nombre:t.label, label:'Extra '+t.label+' 2oz', extra: t.id==='kataifi' ? EXTRA_KATAIFI_PRECIO : EXTRA_TOPPING_PRECIO, agotado: esAgotado(t)
   }));
 }
 function allExtras(){ return EXTRAS.concat(extraToppings()); }
@@ -1027,15 +1094,70 @@ function resolveVariante(v){
   return v.options || [];
 }
 
+function stockToast(s){ window.__stkTs = Date.now(); showToast(s>0 ? 'Solo quedan ' + s + ' porciones de flan' : 'El flan está agotado'); }
+const flanEnCarrito = ()=> cart.filter(i=>esFlan(i.nombre)).reduce((a,i)=>a+i.cantidad, 0);
 function addToCart(item){
+  const lim = stockDe({nombre:item.nombre});
+  if(lim!==null && flanEnCarrito() + item.cantidad > lim){ stockToast(Math.max(0, lim - flanEnCarrito())); return; }
   const key = JSON.stringify([item.nombre, item.detalles, item.precioUnit]);
   const ex = cart.find(i=> JSON.stringify([i.nombre, i.detalles, i.precioUnit])===key);
   if(ex) ex.cantidad += item.cantidad; else cart.push(item);
 }
 
+function buscarProductoPorId(id){
+  for(const l of [FAVORITAS, PREMIUM, OTROS]){ const p = l.find(x=>x.id===id); if(p) return p; }
+  for(const c of CATEGORIAS_EXTRA){ const p = (c.items||[]).find(x=>x.id===id); if(p) return p; }
+  return null;
+}
+function marcarCard(wrap, p){
+  wrap.dataset.pid = p.id;
+  const ag = productoAgotado(p), antes = wrap.classList.contains('agotado'), iw = wrap.querySelector('.pcard-imgwrap'), add = wrap.querySelector('.pcard-footer button');
+  wrap.classList.toggle('agotado', ag);
+  let badge = wrap.querySelector('.ag-badge');
+  if(ag){
+    if(!badge && iw){ badge = document.createElement('div'); badge.className = 'ag-badge'; badge.textContent = '¡AGOTADO!'; iw.appendChild(badge); }
+    wrap.querySelectorAll('button,select').forEach(el=>{ if(!antes) el.dataset.agPrev = el.disabled ? '1' : '0'; el.disabled = true; });
+    if(add){ if(!add.dataset.txt) add.dataset.txt = add.textContent; add.textContent = 'Agotado'; }
+  } else {
+    if(badge) badge.remove();
+    if(antes){ wrap.querySelectorAll('button,select').forEach(el=>{ if(el.dataset.agPrev !== '1') el.disabled = false; }); if(add && add.dataset.txt) add.textContent = add.dataset.txt; }
+  }
+  const s = stockDe(p); let nota = wrap.querySelector('.stock-note');
+  if(s!==null && s>0 && s<=5){ if(!nota){ nota = document.createElement('div'); nota.className = 'stock-note'; (wrap.querySelector('.pcard-body')||wrap).appendChild(nota); } nota.textContent = s===1 ? '¡Queda 1 porción!' : '¡Quedan solo ' + s + ' porciones!'; }
+  else if(nota) nota.remove();
+}
+function actualizarDisponibilidadDOM(){ document.querySelectorAll('.pcard[data-pid]').forEach(w=>{ const p = buscarProductoPorId(w.dataset.pid); if(p) marcarCard(w, p); }); }
+function lineaAgotada(it){
+  if(esFlan(it.nombre)){ const s = stockFlan(); if(s!==null && cart.filter(i=>esFlan(i.nombre)).reduce((a,i)=>a+i.cantidad,0) > s) return true; }
+  const n = norm(it.nombre);
+  for(const l of [FAVORITAS, PREMIUM, OTROS]){ const p = l.find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
+  for(const c of CATEGORIAS_EXTRA){ const p = (c.items||[]).find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
+  const ex = OPT_ALL.extras.find(e=>e.label===it.nombre); if(ex && esAgotado(ex)) return true;
+  const m = /^Topping extra: (.*) 2oz$/.exec(it.nombre); if(m){ const t = OPT_ALL.toppings.find(x=>x.label===m[1]); if(t && esAgotado(t)) return true; }
+  return false;
+}
+function textoAgotada(it){ const s = esFlan(it.nombre) ? stockFlan() : null; return (s!==null && s>0) ? 'Solo quedan ' + s + ' porciones. Ajusta la cantidad para continuar.' : '¡AGOTADO! Quítalo para continuar con tu pedido.'; }
+/* ----- sincronización en vivo: cambios del panel / inventario mientras el cliente navega ----- */
+async function refrescarDisponibilidad(){
+  try{
+    const [m, a, st] = await Promise.all([MENU_DOC.get(), MENU_DOC.parent.doc('auto').get(), MENU_DOC.parent.doc('stock').get()]);
+    if(m.exists){
+      const d = m.data(), upd = (arr, rem)=>{ (rem||[]).forEach(r=>{ const x = arr.find(y=>y.id===r.id); if(x) x.agotado = r.disponible===false; }); };
+      upd(FAVORITAS, d.favoritas); upd(PREMIUM, d.premium); upd(OTROS, d.otros);
+      (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); });
+      ['bases','cremas','frutas','toppings','extras'].forEach(k=> upd(OPT_ALL[k], d[k]));
+    }
+    AUTO_AGOT = a.exists ? a.data() : {}; STOCK = st.exists ? st.data() : {};
+    aplicarAutoAgotado(); recomputarOpciones(); validarCustom();
+    actualizarDisponibilidadDOM(); renderPersonalizador(); renderExtrasStandalone('favoritasExtrasList'); renderExtrasStandalone('premiumExtrasList'); renderCart();
+  }catch(e){}
+}
+setInterval(()=>{ if(!document.hidden) refrescarDisponibilidad(); }, 30000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refrescarDisponibilidad(); });
 function renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn){
   const cont = document.getElementById(containerId);
   cont.innerHTML = '';
+  if(!items.length){ cont.innerHTML = '<div class="sr-vacio"><b>Muy pronto</b>Estamos preparando productos para esta categoría.</div>'; return; }
   items.forEach(p=>{
     const wrap = document.createElement('div');
     wrap.className = 'pcard';
@@ -1158,13 +1280,14 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
       addToCart({uid:uid(), nombre:p.nombre, detalles, cantidad:1, precioUnit});
       renderCart(); showToast('Agregado al carrito');
     });
-    cont.appendChild(wrap);
+    marcarCard(wrap, p); cont.appendChild(wrap);
   });
 }
 
 function renderOtros(){
   const cont = document.getElementById('otrosList');
   cont.innerHTML = '';
+  if(!OTROS.length){ cont.innerHTML = '<div class="sr-vacio"><b>Muy pronto</b>Estamos preparando productos para esta categoría.</div>'; return; }
   OTROS.forEach(p=>{
     const wrap = document.createElement('div');
     wrap.className = 'pcard';
@@ -1182,16 +1305,24 @@ function renderOtros(){
       addToCart({uid:uid(), nombre:p.nombre, detalles:[], cantidad:1, precioUnit:p.price});
       renderCart(); showToast('Agregado al carrito');
     });
-    cont.appendChild(wrap);
+    marcarCard(wrap, p); cont.appendChild(wrap);
   });
 }
 
 function extraQty(nm){ return cart.filter(i=>i.nombre===nm && !(i.detalles||[]).length).reduce((a,i)=>a+i.cantidad, 0); }
 function refrescarExtras(){
+  const nombres = new Set();
   document.querySelectorAll('.xchip[data-nm]').forEach(ch=>{
+    nombres.add(ch.dataset.nm);
     const q = extraQty(ch.dataset.nm);
     ch.classList.toggle('sel', q>0); ch.classList.toggle('multi', q>1);
     const b = ch.querySelector('.xq'); if(b) b.textContent = q;
+  });
+  const lineas = cart.filter(i=> nombres.has(i.nombre) && !(i.detalles||[]).length);        // el precio de los extras se ve al instante
+  const total = lineas.reduce((a,i)=>a + i.precioUnit*i.cantidad, 0);
+  document.querySelectorAll('.extras-sum').forEach(el=>{
+    el.classList.toggle('show', lineas.length > 0);
+    el.innerHTML = lineas.length ? '<b>Tus extras:</b> ' + lineas.map(i=> i.nombre.replace(/^Topping extra: /,'').replace(/ 2oz$/,'') + (i.cantidad>1 ? ' ×'+i.cantidad : '')).join(', ') + ' · <b>+' + money(total) + '</b> a tu total' : '';
   });
 }
 function renderExtrasStandalone(containerId){
@@ -1204,6 +1335,7 @@ function renderExtrasStandalone(containerId){
     const w = document.createElement('div'); w.className = 'xwrap';
     lista.forEach(x=>{
       const ch = document.createElement('div'); ch.className = 'xchip'; ch.dataset.nm = x.nm;
+      if(x.agotado){ ch.classList.add('ag'); ch.innerHTML = `<span class="xn">${x.label}</span><span class="ag-tag">Agotado</span>`; w.appendChild(ch); return; }
       ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
       ch.addEventListener('click', e=>{
         if(e.target.closest('.xm')){                         // − : quitar uno (con 1 se deselecciona)
@@ -1223,31 +1355,129 @@ function renderExtrasStandalone(containerId){
     });
     cont.appendChild(w);
   };
-  grupo(T('salsas_label','Salsas (2 oz)'), salsasOrdenadas().map(ex=>({nm:ex.label, label:ex.label, extra:ex.extra})));
-  grupo(T('toppings_label','Toppings (2 oz)'), extraToppings().map(t=>({nm:'Topping extra: '+t.nombre+' 2oz', label:t.nombre, extra:t.extra})));
+  grupo(T('salsas_label','Salsas y bases (2 oz)'), salsasOrdenadas(true).map(ex=>({nm:ex.label, label:ex.label, extra:ex.extra, agotado:esAgotado(ex)})));
+  grupo(T('toppings_label','Toppings (2 oz)'), extraToppings(true).map(t=>({nm:'Topping extra: '+t.nombre+' 2oz', label:t.nombre, extra:t.extra, agotado:t.agotado})));
   refrescarExtras();
 }
 
 /* =========================================================
    TABS
    ========================================================= */
+function activarTab(key, desplazar){
+  const btn = document.querySelector(`.tab-btn[data-tab="${key}"]`), panel = document.getElementById('panel-'+key);
+  if(!btn || !panel) return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active'); panel.classList.add('active');
+  try{ btn.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }catch(e){}
+  if(desplazar) irAlPanel(panel);
+}
+function irAlPanel(panel){                         // vuelve al inicio de la sección, justo debajo de las pestañas fijas (sin saltos bruscos)
+  const wrap = document.getElementById('tabsWrap'), top = panel.getBoundingClientRect().top + window.scrollY - wrap.offsetHeight - 4;
+  if(window.scrollY > top - 2) window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
+}
 document.getElementById('tabs').addEventListener('click', (e)=>{
   const btn = e.target.closest('.tab-btn');
   if(!btn) return;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
+  limpiarBusqueda(true);
+  activarTab(btn.dataset.tab, true);
 });
-
-document.getElementById('tabs').addEventListener('scroll', ()=>{
-  const el = document.getElementById('tabs');
-  const arrow = document.querySelector('.tabs-arrow');
-  if(!arrow) return;
-  const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
-  arrow.style.opacity = atEnd ? '0' : '1';
-});
+function actualizarFlechasTabs(){
+  const el = document.getElementById('tabs'); if(!el) return;
+  document.getElementById('fadeL').classList.toggle('show', el.scrollLeft > 6);
+  document.getElementById('fadeR').classList.toggle('show', el.scrollLeft + el.clientWidth < el.scrollWidth - 6);
+}
+document.getElementById('tabs').addEventListener('scroll', actualizarFlechasTabs);
+window.addEventListener('resize', actualizarFlechasTabs);
+window.addEventListener('load', ()=>{ renderNextCat(); actualizarFlechasTabs(); });
+/* ----- al terminar una sección, se invita a seguir con la siguiente ----- */
+function renderNextCat(){
+  const tabs = [...document.querySelectorAll('.tab-btn')].filter(b=>b.style.display!=='none');
+  document.querySelectorAll('.tab-panel').forEach(p=>{
+    const viejo = p.querySelector('.next-cat'); if(viejo) viejo.remove();
+    const key = p.id.replace('panel-',''), i = tabs.findIndex(b=>b.dataset.tab===key);
+    if(i < 0 || tabs.length < 2) return;
+    const nxt = tabs[(i+1) % tabs.length], nombre = nxt.querySelector('.tab-name').textContent;
+    const n = document.createElement('div'); n.className = 'next-cat';
+    n.innerHTML = `<div class="nc-txt"><span>Seguir explorando</span><b>${nombre}</b></div><span class="nc-btn">Ver ›</span>`;
+    n.addEventListener('click', ()=> activarTab(nxt.dataset.tab, true));
+    p.appendChild(n);
+  });
+}
+/* ----- buscador del menú: por nombre, ingredientes, cremas, bases, salsas y toppings ----- */
+function nucleo(label){ return norm(label).replace(/\b(crema|de|del|la|el|extra|gratis|2oz|oz|con|sin)\b/g,' ').replace(/[^a-z0-9ñ ]/g,' ').replace(/\s+/g,' ').trim(); }
+function ingredientesDe(p, tab){
+  const set = new Map();                                  // etiqueta -> núcleo normalizado
+  const add = l=>{ if(l && !set.has(l)) set.set(l, nucleo(l)); };
+  const todas = [].concat(OPT_ALL.bases, OPT_ALL.cremas, OPT_ALL.toppings, OPT_ALL.extras, OPT_ALL.frutas);
+  const lbl = (arr,id)=> (arr.find(x=>x.id===id)||{}).label;
+  const c = COMBOS_FAVORITAS.find(x=>x.id===p.id);
+  if(c){ add(lbl(OPT_ALL.bases, c.base)); c.cremas.forEach(cr=>add(lbl(OPT_ALL.cremas, cr))); if(c.topping) add(lbl(OPT_ALL.toppings, c.topping)); }
+  if(p.toppingDefault) add(lbl(OPT_ALL.toppings, p.toppingDefault));
+  (p.variantes||[]).forEach(v=> resolveVariante(v).forEach(o=>add(o.label)));
+  const texto = norm((p.nombre||'') + ' ' + (p.desc||''));                       // lo que dice la descripción, comparado con los ingredientes reales del menú
+  todas.forEach(o=>{ const n = nucleo(o.label); if(n.length>=4 && texto.includes(n)) add(o.label); });
+  if(tab==='favoritas' || tab==='premium') add((OPT_ALL.frutas.find(f=>f.id==='fresa')||{label:'Fresas'}).label);
+  return set;
+}
+function indiceBusqueda(){
+  const out = [], nombresTab = k=>{ const b = document.querySelector(`.tab-btn[data-tab="${k}"] .tab-name`); return b ? b.textContent : k; };
+  const meter = (lista, tab)=> lista.forEach(p=>{
+    const ing = ingredientesDe(p, tab), precio = p.sizes && p.sizes.length ? Math.min(...p.sizes.map(s=>s.price)) : p.price;
+    out.push({tab, id:p.id, nombre:p.nombre, cat:nombresTab(tab), img:(p.sizes&&p.sizes[0]&&p.sizes[0].img)||p.img, precio, agotado:productoAgotado(p), ing, texto:norm(p.nombre+' '+(p.desc||'')+' '+[...ing.keys()].join(' ')+' '+[...ing.values()].join(' '))});
+  });
+  meter(FAVORITAS, 'favoritas'); meter(PREMIUM, 'premium'); meter(OTROS, 'otros');
+  CATEGORIAS_EXTRA.forEach(c=> meter(c.items||[], 'extra_'+c.id));
+  const todas = [].concat(OPT_ALL.bases, OPT_ALL.cremas, OPT_ALL.toppings, OPT_ALL.extras, OPT_ALL.frutas);
+  out.push({tab:'personalizada', id:'__pers', nombre:'Arma la tuya · Personalizada', cat:nombresTab('personalizada'), img:null, precio:(TAMANOS[0]||{}).price, agotado:false, ing:new Map(todas.map(o=>[o.label, nucleo(o.label)])), texto:norm(todas.map(o=>o.label).join(' ')), pers:true});
+  return out;
+}
+const coincide = (texto, tok)=> texto.includes(tok) || (tok.length>3 && tok.endsWith('s') && texto.includes(tok.slice(0,-1))) || (tok.length>4 && tok.endsWith('es') && texto.includes(tok.slice(0,-2)));
+function buscarMenu(q){
+  const toks = norm(q).split(/\s+/).filter(Boolean); if(!toks.length) return [];
+  return indiceBusqueda().filter(e=> toks.every(t=>coincide(e.texto, t))).map(e=>{
+    const hits = [...e.ing.entries()].filter(([l,n])=> toks.some(t=> coincide(norm(l), t) || (n && coincide(n, t)))).map(([l])=>l);
+    const vistos = new Set(), unicos = hits.filter(l=>{ const k = nucleo(l) || norm(l); if(vistos.has(k)) return false; vistos.add(k); return true; });
+    return {...e, hits: unicos.slice(0,4)};
+  }).sort((a,b)=> (a.pers?1:0)-(b.pers?1:0) || (norm(a.nombre).includes(toks[0])?0:1)-(norm(b.nombre).includes(toks[0])?0:1));
+}
+function renderResultados(q){
+  const cont = document.getElementById('searchResults'), res = buscarMenu(q);
+  const cab = `<div class="sr-head"><span>${res.length ? '<b>'+res.length+'</b> resultado'+(res.length>1?'s':'')+' para “'+q.replace(/</g,'&lt;')+'”' : ''}</span><button id="srTodo">Ver todo el menú</button></div>`;
+  if(!res.length){
+    cont.innerHTML = cab + `<div class="sr-vacio"><b>No encontramos “${q.replace(/</g,'&lt;')}”</b>Prueba con otro ingrediente, como pistacho, Nutella, granola o chocolate, o explora todo el menú.</div>`;
+  } else {
+    cont.innerHTML = cab + res.map((e,i)=>`<div class="sres${e.agotado?' ag':''}" data-i="${i}"><div class="th">${e.img ? `<img src="${e.img}" alt="">` : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'}</div>
+      <div class="bd"><div class="cat">${e.cat}${e.agotado?' · <span style="color:var(--principal); font-weight:800;">¡AGOTADO!</span>':''}</div><h4>${e.nombre}</h4>${e.hits.length ? `<div class="tags">Con ${e.hits.join(' · ')}</div>` : ''}${e.precio ? `<div class="pr">${e.pers?'Desde ':'Desde '}${money(e.precio)}</div>` : ''}</div><button class="go">Ver</button></div>`).join('');
+    cont.querySelectorAll('.sres').forEach(el=> el.addEventListener('click', ()=>{ const e = res[+el.dataset.i]; irAProducto(e.tab, e.id); }));
+  }
+  document.getElementById('srTodo').addEventListener('click', ()=> limpiarBusqueda());
+}
+let busT = null;
+function actualizarBusqueda(){
+  const inp = document.getElementById('menuSearch'), q = inp.value.trim();
+  document.getElementById('searchClear').style.display = inp.value ? 'block' : 'none';
+  const on = q.length > 0;
+  document.body.classList.toggle('searching', on);
+  document.getElementById('searchResults').style.display = on ? 'block' : 'none';
+  if(on) renderResultados(q);
+}
+function limpiarBusqueda(sinFoco){
+  const inp = document.getElementById('menuSearch'); inp.value = ''; actualizarBusqueda(); if(!sinFoco) inp.blur();
+}
+function irAProducto(tab, id){
+  limpiarBusqueda(true); activarTab(tab, false);
+  setTimeout(()=>{
+    const panel = document.getElementById('panel-'+tab), card = id==='__pers' ? panel : panel.querySelector(`[data-pid="${id}"]`);
+    if(!card) return;
+    const top = card.getBoundingClientRect().top + window.scrollY - document.getElementById('tabsWrap').offsetHeight - 14;
+    window.scrollTo({top:Math.max(0, top), behavior:'smooth'});
+    if(id!=='__pers'){ card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 2000); }
+  }, 120);
+}
+document.getElementById('menuSearch').addEventListener('input', ()=>{ clearTimeout(busT); busT = setTimeout(actualizarBusqueda, 90); });
+document.getElementById('menuSearch').addEventListener('keydown', e=>{ if(e.key==='Escape') limpiarBusqueda(); });
+document.getElementById('searchClear').addEventListener('click', ()=>{ limpiarBusqueda(); document.getElementById('menuSearch').focus(); });
 
 /* =========================================================
    CATEGORÍAS EXTRA (creadas desde el panel de administrador)
@@ -1259,7 +1489,8 @@ const FIXED_TABS = [
   {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
 ];
 
-function aplicarOrdenYEtiquetas(){
+function aplicarOrdenYEtiquetas(){ aplicarOrdenYEtiquetasBase(); renderNextCat(); actualizarFlechasTabs(); }
+function aplicarOrdenYEtiquetasBase(){
   const orden = (CATEGORIAS_ORDEN && CATEGORIAS_ORDEN.length) ? CATEGORIAS_ORDEN.slice() : FIXED_TABS.map(f=>f.key).concat(CATEGORIAS_EXTRA.map(c=>'extra_'+c.id));
   const ocultas = CATEGORIAS_OCULTAS || [];
   const etiquetas = CATEGORIAS_LABELS || {};
@@ -1340,7 +1571,7 @@ function renderCategoriasExtra(){
     anchor = section;
 
     if(!extraSizeState[cat.id]) extraSizeState[cat.id] = {};
-    const items = (cat.items||[]).filter(i=>i.disponible!==false);
+    const items = (cat.items||[]).map(i=>({...i, agotado: i.disponible===false, agotadoAuto: !!(AUTO_AGOT.productos && AUTO_AGOT.productos[i.id])}));
     items.forEach(it=>{ if(!(it.id in extraSizeState[cat.id])) extraSizeState[cat.id][it.id] = it.sizes[0].id; });
     renderCardList('catList_'+cat.id, items, extraSizeState[cat.id], 'Agregar');
   });
@@ -1459,14 +1690,16 @@ function renderCart(){
     guardarCarrito(); refrescarExtras();
     return;
   }
-  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').disabled = cart.some(lineaAgotada);
 
   let html = '';
   cart.forEach(item=>{
+    const agItem = lineaAgotada(item);
     html += `
-    <div class="cart-item" data-uid="${item.uid}">
+    <div class="cart-item${agItem?' agotada':''}" data-uid="${item.uid}">
       <div class="cart-item-body">
         <div class="cart-item-name">${item.nombre}</div>
+        ${agItem ? `<div class="ag-line">${textoAgotada(item)}</div>` : ''}
         ${item.detalles.length ? `<div class="cart-item-details">${item.detalles.join(' · ')}</div>`:''}
         <div class="cart-item-foot">
           <div class="qty-stepper">
@@ -1591,7 +1824,7 @@ function renderCart(){
   body.querySelectorAll('.cart-item').forEach(row=>{
     const itemUid = row.dataset.uid;
     row.querySelector('.qty-plus').addEventListener('click', ()=>{
-      const it = cart.find(i=>i.uid===itemUid); it.cantidad++; renderCart();
+      const it = cart.find(i=>i.uid===itemUid); const lim = stockDe({nombre:it.nombre}); if(lim!==null && flanEnCarrito() + 1 > lim){ stockToast(Math.max(0, lim - flanEnCarrito())); return; } it.cantidad++; renderCart();
     });
     row.querySelector('.qty-minus').addEventListener('click', ()=>{
       const it = cart.find(i=>i.uid===itemUid);
@@ -1667,6 +1900,7 @@ function renderCart(){
 }
 
 function showToast(msg){
+  if(window.__stkTs && Date.now() - window.__stkTs < 600 && msg === 'Agregado al carrito') return;
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
@@ -1676,8 +1910,9 @@ function showToast(msg){
 /* =========================================================
    ENVIAR PEDIDO POR WHATSAPP
    ========================================================= */
-document.getElementById('sendBtn').addEventListener('click', ()=>{
+document.getElementById('sendBtn').addEventListener('click', async ()=>{
   if(cart.length===0) return;
+  if(cart.some(lineaAgotada)){ showToast('Quita lo agotado de tu carrito para continuar'); return; }
   const nombre = (orderState.nombre||'').trim();
   if(!nombre){ showToast('Por favor escribe tu nombre'); document.getElementById('nombreInput')?.focus(); return; }
   if(!orderState.delivery){ showToast('Indica si deseas delivery'); return; }
@@ -1740,7 +1975,13 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   msg += `\n` + T('msg_vip','Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.') + `\n`;
   msg = limpiarEmoji(msg);
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
+  const needFlan = flanEnCarrito();
+  if(needFlan > 0 && stockFlan() !== null){                       // las porciones de flan se reservan de verdad (transacción); si ya no alcanzan, no se envía
+    const w = window.open('', '_blank');
+    try{ await reservarFlan(needFlan); }
+    catch(e){ if(w) w.close(); await refrescarDisponibilidad(); showToast(e && e.restante !== undefined ? (e.restante>0 ? 'Solo quedan ' + e.restante + ' porciones de flan' : 'El flan se agotó') : 'No pudimos confirmar el flan. Intenta de nuevo.'); return; }
+    if(w) w.location.href = url; else { const w2 = window.open(url, '_blank'); if(!w2) location.href = url; }
+  } else window.open(url, '_blank');
 
   // la web recuerda al cliente y registra el pedido (punto "pendiente") en su tarjeta
   try{ localStorage.setItem('fp_cliente', JSON.stringify({nombre, telefono:tel})); }catch(e){}
@@ -1751,6 +1992,17 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   renderCart(); showToast('Pedido enviado ✅ ¡Gracias!');
 });
 
+async function reservarFlan(n){
+  const ref = MENU_DOC.parent.doc('stock');
+  const res = await db.runTransaction(async tx=>{
+    const sn = await tx.get(ref), d = sn.exists ? sn.data() : {};
+    if(typeof d.flan !== 'number') return null;                     // sin límite configurado
+    if(n > d.flan){ const e = new Error('SIN_STOCK'); e.restante = d.flan; throw e; }
+    tx.update(ref, {flan: d.flan - n}); return d.flan - n;
+  });
+  if(res !== null) STOCK.flan = res;
+  return res;
+}
 // Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
 function limpiarEmoji(texto){
   return texto
@@ -2042,11 +2294,12 @@ function fusionarConImagenLocal(remoto, local){
   // con las propiedades de comportamiento definidas en el código (variantes, tipo de topping, etc.)
   // que los datos guardados anteriormente en Firebase podrían no tener todavía.
   if(!remoto) return [];
-  return remoto.filter(x=>x.disponible!==false).map(item=>{
+  return remoto.map(item=>{
     const orig = local.find(l=>l.id===item.id) || {};
     const merged = {...orig, ...item};
     if(!item.img && orig.img) merged.img = orig.img;
     ['variantes','toppingSelect','toppingIncluido','cortesia','toppingDefault'].forEach(k=>{ if(k in orig) merged[k] = orig[k]; });
+    merged.agotado = item.disponible === false;
     return merged;
   });
 }
@@ -2056,12 +2309,12 @@ async function cargarDatosRemotos(){
     const snap = await MENU_DOC.get();
     if(snap.exists){
       const d = snap.data();
-      if(d.tamanos) TAMANOS = fusionarConImagenLocal(d.tamanos, DEFAULT_TAMANOS);
-      if(d.bases) BASES = d.bases.filter(x=>x.disponible!==false);
-      if(d.cremas) CREMAS = d.cremas.filter(x=>x.disponible!==false);
-      if(d.frutas) FRUTAS = d.frutas.filter(x=>x.disponible!==false);
-      if(d.toppings) TOPPINGS = d.toppings.filter(x=>x.disponible!==false);
-      if(d.extras) EXTRAS = d.extras.filter(x=>x.disponible!==false);
+      if(d.tamanos) TAMANOS = fusionarConImagenLocal(d.tamanos, DEFAULT_TAMANOS).filter(x=>!x.agotado);
+      if(d.bases) OPT_ALL.bases = mkAg(d.bases);
+      if(d.cremas) OPT_ALL.cremas = mkAg(d.cremas);
+      if(d.frutas) OPT_ALL.frutas = mkAg(d.frutas);
+      if(d.toppings) OPT_ALL.toppings = mkAg(d.toppings);
+      if(d.extras) OPT_ALL.extras = mkAg(d.extras);
       if(d.favoritas) FAVORITAS = fusionarConImagenLocal(d.favoritas, DEFAULT_FAVORITAS);
       if(!d.favoritasV2){                                   // antes de que el panel las guarde, se muestran igual
         ['duopop','la_fit'].forEach(id=>{ if(!FAVORITAS.some(x=>x.id===id)){ const f = DEFAULT_FAVORITAS.find(x=>x.id===id); const k = FAVORITAS.findIndex(x=>x.id==='canasta_pop'); if(f) FAVORITAS.splice(k<0?FAVORITAS.length:k, 0, f); } });
@@ -2085,28 +2338,18 @@ async function cargarDatosRemotos(){
 
   { // nombre completo en lugar de "choco" (también en lo que ya estaba guardado en el panel)
     const choc = t=> String(t||'').replace(/Choco [Cc]rema/g,'Crema de chocolate').replace(/(g)alletas de choco(?!late)/gi,(m,g)=>g+'alletas de chocolate').replace(/(c)rema de choco(?!late)/gi,(m,c)=>c+'rema de chocolate');
-    CREMAS.forEach(x=>{ x.label = choc(x.label); }); TOPPINGS.forEach(x=>{ x.label = choc(x.label); });
+    OPT_ALL.cremas.forEach(x=>{ x.label = choc(x.label); }); OPT_ALL.toppings.forEach(x=>{ x.label = choc(x.label); });
     [FAVORITAS, PREMIUM, OTROS].forEach(l=> l.forEach(p=>{ p.desc = choc(p.desc); }));
     const cp = FAVORITAS.find(x=>x.id==='choco_pop'); if(cp && /^(Choco|Crema de chocolate|Base de Nutella \+ crema tradicional \+ crema de chocolate)/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado';
   }
-  try{                                         // lo que se acabó en el inventario (lo publica Finanzas)
-    const au = (await MENU_DOC.parent.doc('auto').get()).data() || {};
-    const quita = (arr, m)=>{ if(!m) return arr; const r = arr.filter(x=>!m[x.id]); return r.length ? r : arr; };
-    BASES = quita(BASES, au.bases); CREMAS = quita(CREMAS, au.cremas); FRUTAS = quita(FRUTAS, au.frutas); TOPPINGS = quita(TOPPINGS, au.toppings);
-    const sinProd = arr=> au.productos ? arr.filter(p=>!au.productos[p.id]) : arr;
-    FAVORITAS = sinProd(FAVORITAS); PREMIUM = sinProd(PREMIUM); OTROS = sinProd(OTROS);
-    CATEGORIAS_EXTRA = CATEGORIAS_EXTRA.map(c=>({...c, items: sinProd(c.items||[])}));
-  }catch(e){}
+  try{ AUTO_AGOT = (await MENU_DOC.parent.doc('auto').get()).data() || {}; }catch(e){}     // lo que se acabó en el inventario (lo publica Finanzas)
+  try{ STOCK = (await MENU_DOC.parent.doc('stock').get()).data() || {}; }catch(e){}         // unidades disponibles de flan (las pone el panel)
+  aplicarAutoAgotado(); recomputarOpciones();
   // reconstruir estados que dependen de los arreglos ya actualizados
   FAVORITAS.forEach(f=>{ if(!(f.id in favSize)) favSize[f.id]=f.sizes[0].id; if(!(f.id in favTopping)) favTopping[f.id]=f.toppingDefault; });
   PREMIUM.forEach(p=>{ if(!(p.id in premSize)) premSize[p.id]=p.sizes[0].id; if(p.toppingSelect && !(p.id in premTopping)) premTopping[p.id]=p.toppingDefault; });
   OTROS.forEach(o=>{ if(!(o.id in otrosQty)) otrosQty[o.id]=0; });
-  if(TAMANOS.length && !TAMANOS.find(t=>t.id===custom.tamano)) custom.tamano = TAMANOS[0].id;
-  if(BASES.length && !BASES.find(b=>b.id===custom.base)) custom.base = BASES[0].id;
-  if(CREMAS.length && !CREMAS.find(c=>c.id===custom.crema)) custom.crema = CREMAS[0].id;
-  if(custom.crema2 && !CREMAS.find(c=>c.id===custom.crema2)) custom.crema2 = null;
-  if(FRUTAS.length && !FRUTAS.find(f=>f.id===custom.fruta)) custom.fruta = FRUTAS[0].id;
-  if(TOPPINGS.length && !TOPPINGS.find(t=>t.id===custom.topping)) custom.topping = TOPPINGS[0].id;
+  validarCustom();
 
   renderPersonalizador();
   renderCardList('favoritasList', FAVORITAS, favSize, 'Agregar', favTopping);
