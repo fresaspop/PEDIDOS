@@ -266,6 +266,12 @@ body.searching .tab-panel{display:none !important;}
 .pcard.agotado .pcard-imgwrap img{filter:grayscale(.55) opacity(.55);}
 .pcard.agotado h4, .pcard.agotado .pcard-price{opacity:.75;}
 .pcard .btn-mini:disabled, .pcard .btn-add:disabled{background:#d9c6ca; color:#fff; box-shadow:none; cursor:not-allowed;}
+.pcard.agotado .qm{display:none;}
+.pf-left{display:flex; flex-direction:column; align-items:flex-start; gap:5px;}
+.qm{display:inline-flex; align-items:center; gap:2px; background:#fff0f3; border-radius:16px; padding:2px;}
+.qm button{width:26px; height:26px; border-radius:50%; border:none; background:var(--principal); color:#fff; font-size:16px; font-weight:700; line-height:1; padding:0; display:flex; align-items:center; justify-content:center;}
+.qm button:disabled{background:#e7c9d1; color:#fff;}
+.qm-n{min-width:24px; text-align:center; font-size:13px; font-weight:800; color:var(--vino);}
 .stock-note{margin-top:6px; font-size:11.5px; font-weight:700; color:var(--rojo);}
 .ag-tag{background:var(--principal); color:#fff; font-size:9.5px; font-weight:800; letter-spacing:.4px; padding:2px 6px; border-radius:8px; margin-left:4px; white-space:nowrap;}
 .opt:disabled{opacity:.6;}
@@ -301,7 +307,7 @@ body.searching .tab-panel{display:none !important;}
 }
 .xwrap{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:8px;}
 .xchip{display:flex; align-items:center; gap:5px; min-height:34px; border:1.5px solid #f0d7dc; background:#fff; border-radius:12px; padding:4px 6px 4px 9px; font-size:10.5px; font-weight:600; color:var(--texto); cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; box-shadow:0 1px 3px rgba(86,9,31,.10); transition:.12s;}
-.xchip .xn{flex:1; min-width:0; line-height:1.15;} .xchip .xp{color:var(--principal); font-size:10.5px; font-weight:700; white-space:nowrap;}
+.xchip .xn{flex:1; min-width:0; line-height:1.15; overflow-wrap:anywhere;} .xchip .xp{flex:none;} .xchip .xctl{flex:none;} .xchip.sel .xn{font-size:10px;} .xchip .xp{color:var(--principal); font-size:10.5px; font-weight:700; white-space:nowrap;}
 .xchip.sel{background:var(--principal); border-color:var(--principal); color:#fff;} .xchip.sel .xp{color:#ffe1ea;}
 .xchip .xctl{display:none; align-items:center; gap:3px; flex:none;} .xchip.sel .xctl{display:inline-flex;}
 .xchip .xq{font-size:11px; font-weight:800; min-width:12px; text-align:center;}
@@ -349,9 +355,9 @@ body.searching .tab-panel{display:none !important;}
 .form-group.pulso{animation:pulsoGrupo 1.3s ease;} @keyframes pulsoGrupo{0%,100%{box-shadow:none;} 30%{box-shadow:0 0 0 3px rgba(219,82,117,.35); border-radius:12px;}}
 .ruleta-banner{display:flex; align-items:center; justify-content:space-between; gap:10px; background:linear-gradient(135deg,#fff0f3,#ffe3ea); border:1.5px solid #f6c9d4; border-radius:14px; padding:10px 12px; margin-bottom:10px; font-size:13px; color:var(--vino);} .ruleta-banner small{font-size:11.5px; color:var(--gris);}
 .extras-card{background:#fff; border-radius:var(--radius); padding:14px 14px 12px; box-shadow:var(--sombra);}
+.extras-lead{margin:-2px 0 10px; font-size:12.5px; color:var(--gris); line-height:1.35;} .extras-lead b{font-family:'Baloo 2',sans-serif; font-size:15px; color:var(--vino);}
 .extras-card h3{margin:0 0 2px; font-family:'Baloo 2',sans-serif; font-size:16.5px; color:var(--vino);}
 .extras-card p{margin:0 0 10px; font-size:12.5px; color:var(--gris);}
-.extras-card .xchip{background:#fffafb;}
 .extras-intro{margin:26px 0 12px; padding:16px; border-radius:18px; background:linear-gradient(135deg,#fff0f3,#ffe6ec); text-align:center;}
 .extras-intro h3{margin:0 0 4px; font-family:'Baloo 2',sans-serif; font-size:19px; color:var(--vino);}
 .extras-intro p{margin:0 0 8px; font-size:13px; color:var(--texto); line-height:1.45;}
@@ -633,10 +639,13 @@ body.en-pers .cartfab{bottom:calc(92px + env(safe-area-inset-bottom));}
   </div>
 
   <div class="step-card">
-    <div class="step-head"><div class="step-num">+</div><h3 data-t="paso_extras">Extras 2 oz (opcional)</h3></div>
-    <div class="topping-label" data-t="salsas_label" style="margin:0 0 6px;">Salsas (2 oz)</div>
+    <div class="step-head"><div class="step-num">+</div><h3 data-t="paso_extras">Extras</h3></div>
+    <p class="extras-lead"><b data-t="extras_hero">¡Hazlo aún más especial!</b><br><span data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos</span></p>
+    <div class="extras-img" data-extras-img></div>
+    <div class="xhead" data-t="salsas_label">Salsas y bases (2 oz)</div>
     <div class="opt-grid" id="extraOpts"></div>
     <div class="topping-select-wrap" id="extraToppingWrap" style="margin-top:12px;"></div>
+    <div class="extras-sum" id="persExtrasSum"></div>
   </div>
 
   <div class="price-bar">
@@ -1125,6 +1134,11 @@ function renderPersonalizador(){
   topWrap.innerHTML = `<div class="xhead">${T('toppings_label','Toppings (2 oz)')}</div><div class="xwrap" id="extraTopChips"></div>`;
   const tc = document.getElementById('extraTopChips');
   extraToppings(true).forEach(t=> chipPers({id:t.id, extra:t.extra, agotado:t.agotado}, t.nombre, tc));
+  { const cuenta = {}; custom.extras.forEach(id=>{ cuenta[id] = (cuenta[id]||0) + 1; });
+    const ids = Object.keys(cuenta), el = document.getElementById('persExtrasSum');
+    const tot = ids.reduce((a,id)=> a + ((allExtras().find(e=>e.id===id)||{extra:0}).extra||0) * cuenta[id], 0);
+    el.classList.toggle('show', ids.length>0);
+    el.innerHTML = ids.length ? '<b>Tus extras:</b> ' + ids.map(id=> ((allExtras().find(e=>e.id===id)||{label:id}).label).replace(/^Extra /,'').replace(/ 2oz$/,'') + (cuenta[id]>1 ? ' ×' + cuenta[id] : '')).join(', ') + ' · <b>+' + money(tot) + '</b> a tu total' : ''; }
   const fav = favoritaDeCombo(), hint = document.getElementById('favHint');
   hint.style.display = fav ? 'block' : 'none';
   if(fav) hint.innerHTML = `✨ ¡Esta combinación es <b>${fav.nombre}</b>! Así quedará en tu pedido.`;
@@ -1245,8 +1259,9 @@ function buscarProductoPorId(id){
 }
 function marcarCard(wrap, p){
   wrap.dataset.pid = p.id;
-  const ag = productoAgotado(p), antes = wrap.classList.contains('agotado'), iw = wrap.querySelector('.pcard-imgwrap'), add = wrap.querySelector('.pcard-footer button');
+  const ag = productoAgotado(p), antes = wrap.classList.contains('agotado'), iw = wrap.querySelector('.pcard-imgwrap'), add = wrap.querySelector('.pcard-footer .btn-mini');
   wrap.classList.toggle('agotado', ag);
+  if(wrap._pintarQty) wrap._pintarQty();
   let badge = wrap.querySelector('.ag-badge');
   if(ag){
     if(!badge && iw){ badge = document.createElement('div'); badge.className = 'ag-badge'; badge.textContent = '¡AGOTADO!'; iw.appendChild(badge); }
@@ -1288,7 +1303,19 @@ async function refrescarDisponibilidad(){
 }
 setInterval(()=>{ if(!document.hidden) refrescarDisponibilidad(); }, 30000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refrescarDisponibilidad(); });
-function renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn){
+const unitState = {};
+function topeUnidades(p){ const lim = stockDe(p); return lim !== null ? Math.max(0, lim - flanEnCarrito()) : 20; }
+function qmHTML(p){ return `<div class="qm"><button class="qm-m" aria-label="Menos">−</button><span class="qm-n">1</span><button class="qm-p" aria-label="Más">+</button></div>`; }
+function ligarStepper(wrap, p, precioFn){
+  const n = wrap.querySelector('.qm-n'), pr = wrap.querySelector('.pcard-price'), m = wrap.querySelector('.qm-m'), pl = wrap.querySelector('.qm-p');
+  const pintar = ()=>{ const tope = topeUnidades(p); let q = unitState[p.id] || 1; if(q > Math.max(1, tope)) q = Math.max(1, tope); unitState[p.id] = q;
+    n.textContent = q; m.disabled = q <= 1; pl.disabled = q >= tope; pr.textContent = money(precioFn() * q); };
+  m.addEventListener('click', ()=>{ if((unitState[p.id]||1) > 1){ unitState[p.id]--; pintar(); } });
+  pl.addEventListener('click', ()=>{ if((unitState[p.id]||1) < topeUnidades(p)){ unitState[p.id] = (unitState[p.id]||1) + 1; pintar(); } else if(stockDe(p) !== null) stockToast(topeUnidades(p)); });
+  wrap._pintarQty = pintar; pintar();
+}
+function ajustarSteppers(){ document.querySelectorAll('.pcard[data-pid]').forEach(w=>{ if(w._pintarQty) w._pintarQty(); }); }
+function renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn, conCantidad){
   const cont = document.getElementById(containerId);
   cont.innerHTML = '';
   if(!items.length){ cont.innerHTML = '<div class="sr-vacio"><b>Muy pronto</b>Estamos preparando productos para esta categoría.</div>'; return; }
@@ -1363,32 +1390,33 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
         ${p.sizes.length > 1 ? `<div class="pcard-sizes">${p.sizes.map(s=>`<div class="size-chip-wrap"><button class="size-chip${s.id===selSize?' selected':''}" data-size="${s.id}">${s.label}${sizeSub(s.label)}</button>${s.id!==selSize?`<span class="size-chip-price">${money(s.price)}</span>`:''}</div>`).join('')}</div>` : ''}
         <div class="sel-grid">${variantesHTML}${toppingHTML}</div>
         <div class="pcard-footer">
-          <span class="pcard-price">${money(total)}</span>
+          <div class="pf-left"><span class="pcard-price">${money(total)}</span>${conCantidad ? qmHTML(p) : ''}</div>
           <button class="btn-mini">${ic('cart',15)}<span class="lbl">${addLabel}</span></button>
         </div>
       </div>`;
+    if(conCantidad) ligarStepper(wrap, p, ()=> total);
     wrap.querySelectorAll('.size-chip').forEach(chip=>{
       chip.addEventListener('click', ()=>{
         sizeState[p.id] = chip.dataset.size;
-        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
+        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn, conCantidad);
       });
     });
     wrap.querySelectorAll('.variante-select').forEach(sel=>{
       sel.addEventListener('change', ()=>{
         itemVariantes[p.id][sel.dataset.key] = sel.value;
-        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
+        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn, conCantidad);
       });
     });
     wrap.querySelectorAll('.variante-chip').forEach(chip=>{
       chip.addEventListener('click', ()=>{
         itemVariantes[p.id][chip.dataset.key] = chip.dataset.opt;
-        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
+        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn, conCantidad);
       });
     });
     if(allowTopping){
       wrap.querySelector('.topping-select').addEventListener('change', (e)=>{
         toppingState[p.id] = e.target.value;
-        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn);
+        renderCardList(containerId, items, sizeState, addLabel, toppingState, requireOptIn, conCantidad);
       });
     }
     wrap.querySelector('.btn-mini').addEventListener('click', ()=>{
@@ -1410,7 +1438,9 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
           precioUnit += ex;
         });
       }
-      addToCart({uid:uid(), nombre:p.nombre, detalles, cantidad:1, precioUnit});
+      const cant = conCantidad ? (unitState[p.id] || 1) : 1;
+      addToCart({uid:uid(), nombre:p.nombre, detalles, cantidad:cant, precioUnit});
+      if(conCantidad){ unitState[p.id] = 1; if(wrap._pintarQty) wrap._pintarQty(); }
       renderCart(); showToast('Agregado al carrito');
     });
     marcarCard(wrap, p); cont.appendChild(wrap);
@@ -1430,12 +1460,14 @@ function renderSimpleList(contId, lista){
         <h4>${p.nombre}</h4>
         <p class="pcard-desc">${p.desc||''}</p>
         <div class="pcard-footer">
-          <span class="pcard-price">${money(p.price)}</span>
+          <div class="pf-left"><span class="pcard-price">${money(p.price)}</span>${qmHTML(p)}</div>
           <button class="btn-mini">${ic('cart',15)}<span class="lbl">Agregar</span></button>
         </div>
       </div>`;
+    ligarStepper(wrap, p, ()=> p.price);
     wrap.querySelector('.btn-mini').addEventListener('click', ()=>{
-      addToCart({uid:uid(), nombre:p.nombre, detalles:[], cantidad:1, precioUnit:p.price});
+      addToCart({uid:uid(), nombre:p.nombre, detalles:[], cantidad:(unitState[p.id] || 1), precioUnit:p.price});
+      unitState[p.id] = 1; wrap._pintarQty();
       renderCart(); showToast('Agregado al carrito');
     });
     marcarCard(wrap, p); cont.appendChild(wrap);
@@ -1445,7 +1477,7 @@ function renderOtros(){ renderSimpleList('otrosList', OTROS); }
 const bebSize = {};
 function renderBebidas(){
   BEBIDAS.forEach(p=>{ if(!p.sizes || !p.sizes.length) p.sizes = [{id:'u', label:'Único', price:p.price||0}]; if(!(p.id in bebSize)) bebSize[p.id] = p.sizes[0].id; });
-  renderCardList('bebidasList', BEBIDAS, bebSize, 'Agregar');
+  renderCardList('bebidasList', BEBIDAS, bebSize, 'Agregar', undefined, undefined, true);
 }
 
 function extraQty(nm){ return cart.filter(i=>i.nombre===nm && !(i.detalles||[]).length).reduce((a,i)=>a+i.cantidad, 0); }
@@ -1723,7 +1755,7 @@ function renderCategoriasExtra(){
     if(!extraSizeState[cat.id]) extraSizeState[cat.id] = {};
     const items = (cat.items||[]).map(i=>({...i, agotado: i.disponible===false, agotadoAuto: !!(AUTO_AGOT.productos && AUTO_AGOT.productos[i.id])}));
     items.forEach(it=>{ if(!(it.id in extraSizeState[cat.id])) extraSizeState[cat.id][it.id] = it.sizes[0].id; });
-    renderCardList('catList_'+cat.id, items, extraSizeState[cat.id], 'Agregar');
+    renderCardList('catList_'+cat.id, items, extraSizeState[cat.id], 'Agregar', undefined, undefined, true);
   });
 
   aplicarOrdenYEtiquetas();
@@ -1928,7 +1960,7 @@ function renderCart(){
   }
 
   // Entrega: retiro o delivery
-  if(orderState.delivery==='si' && !ubicSel() && UBIC.items.length) orderState.ubicacionId = (UBIC.items.find(u=>u.id===UBIC.ultimo) || UBIC.items[0]).id;
+  if(orderState.delivery==='si' && !ubicSel() && UBIC.items.length && !orderState.ubicNinguna) orderState.ubicacionId = (UBIC.items.find(u=>u.id===UBIC.ultimo) || UBIC.items[0]).id;
   html += `
   <div class="form-group">
     <label class="form-label" data-paso="entrega">¿Cómo quieres recibir tu pedido?</label>
@@ -1951,6 +1983,7 @@ function renderCart(){
         </div>`).join('')}
       ${orderState.ubicacionId==='__temp' && sel ? `<div class="ubic-card selected" data-id="__temp"><span class="ubic-ic">${ic('pin',18)}</span><span class="ubic-tx"><b>${esc(sel.nombre)}</b> <small>(solo este pedido)</small><small>${esc(sel.direccion||'Solo enlace de Google Maps')}</small></span><span class="ubic-radio"></span></div>` : ''}
       ${!UBIC.items.length && !sel ? '<div class="step-note">Aún no tienes ubicaciones guardadas. Agrega la de entrega y la tendrás lista para tus próximos pedidos.</div>' : ''}
+      ${sel ? '<div class="step-note" style="margin:2px 0 0;">Toca la ubicación elegida otra vez para quitarla.</div>' : ''}
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn-mini" id="ubicAdd">+ ${UBIC.items.length ? 'Agregar otra ubicación' : 'Agregar mi ubicación'}</button>${UBIC.items.length ? '<button class="btn-mini" id="ubicManage" style="background:#fff; color:var(--principal); border:1.5px solid var(--principal);">Administrar</button>' : ''}</div>
       <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 En Cotuí desde RD${costo}; varía si la ubicación está muy lejos.').replace('{costo}', CONFIG.deliveryCost)}</div>
       <div class="step-note ubic-aviso">${T('delivery_ubic_aviso','📍 Si no la agregas aquí, envíala por WhatsApp para recibir tu pedido.')}</div>
@@ -2026,7 +2059,7 @@ function renderCart(){
   if(CARRITO_VIEJO) html = `<div class="gift-box" style="margin-bottom:10px;">⚠️ El menú cambió desde que armaste este carrito. Revisa los precios antes de enviar.<div style="margin-top:6px; display:flex; gap:8px;"><button class="btn-mini" onclick="CARRITO_VIEJO=false; renderCart()">Está bien</button><button class="btn-mini" onclick="vaciarCarrito()">Vaciar</button></div></div>` + html;
   html += `<div style="text-align:center; margin-top:10px;"><button style="background:none; border:none; color:var(--gris); font-size:12px; text-decoration:underline;" onclick="vaciarCarrito()">Vaciar carrito</button></div>`;
   body.innerHTML = html;
-  guardarCarrito(); refrescarExtras(); actualizarCartBar();
+  guardarCarrito(); refrescarExtras(); actualizarCartBar(); ajustarSteppers();
 
   // reattach events
   body.querySelectorAll('.cart-item').forEach(row=>{
@@ -2049,9 +2082,9 @@ function renderCart(){
   if(orderState.delivery==='si') delivSi.classList.add('selected');
   if(orderState.delivery==='no') delivNo.classList.add('selected');
   delivSi.addEventListener('click', ()=>{ orderState.delivery='si'; renderCart(); });
-  delivNo.addEventListener('click', ()=>{ orderState.delivery='no'; orderState.ubicacion=''; renderCart(); });
+  delivNo.addEventListener('click', ()=>{ orderState.delivery='no'; orderState.ubicacion=''; orderState.ubicNinguna=false; renderCart(); });
 
-  body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a') || e.target.closest('.copy-link')) return; orderState.ubicacionId = c.dataset.id; renderCart(); }));
+  body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a') || e.target.closest('.copy-link')) return; if(orderState.ubicacionId === c.dataset.id){ orderState.ubicacionId = ''; orderState.ubicNinguna = true; } else { orderState.ubicacionId = c.dataset.id; orderState.ubicNinguna = false; } renderCart(); }));
   { const ps = pasoSiguiente(), lb = ps ? body.querySelector('[data-paso="' + ps + '"]') : null; if(lb) lb.classList.add('siguiente'); }
   const gdp = document.getElementById('girarDesdePedido'); if(gdp) gdp.addEventListener('click', ()=> abrirRuleta());
   const ubAdd = document.getElementById('ubicAdd'); if(ubAdd) ubAdd.addEventListener('click', ()=> abrirFormUbic(null, true));
@@ -2162,7 +2195,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   try{ localStorage.setItem(CARRITO_ULT, JSON.stringify({ts:Date.now(), cart, estado:estadoGuardable()})); }catch(e){}
   cart = []; CARRITO_VIEJO = false;
   { const us = ubicSel(); if(us && us.id !== '__temp'){ UBIC.ultimo = us.id; ubicGuardar(); } }
-  Object.assign(orderState, {delivery:null, pago:null, billete:'', ubicacion:'', ubicacionId:'', ubicTemp:null, efectivoTipo:null, notas:''});
+  Object.assign(orderState, {delivery:null, pago:null, billete:'', ubicacion:'', ubicacionId:'', ubicNinguna:false, ubicTemp:null, efectivoTipo:null, notas:''});
   renderCart(); showToast('Pedido enviado ✅ ¡Gracias!');
 });
 
@@ -2178,12 +2211,11 @@ function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, bloque, co
       ${regalosPedido().map(r=>`<div class="rs-row"><span>🎁 ${esc(r)}</span></div>`).join('')}
     </div>
     <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuentosDetalle().map(d=>`<div class="rs-row"><span>${esc(d.label)}</span><span>-${money(d.monto)}</span></div>`).join('')}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
-    ${orderState.delivery==='si' ? `<div class="rs-note"><div>El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia, solo si está muy lejos.</div>${(!u && !(orderState.ubicacion||'').trim()) ? '<div>Recuerda enviar tu ubicación actual por WhatsApp</div>' : ''}</div><button class="rs-copy" id="rsCopiarEntrega">📋 Copiar datos de entrega</button>` : ''}
+    ${orderState.delivery==='si' ? `<div class="rs-note"><div>El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia, solo si está muy lejos.</div>${(!u && !(orderState.ubicacion||'').trim()) ? '<div>Recuerda enviar tu ubicación actual por WhatsApp</div>' : ''}</div>` : ''}
     <button class="btn-whatsapp" id="rsEnviar">Enviar por WhatsApp</button>
     <button class="rs-edit" id="rsEditar">Editar pedido</button>`;
   document.getElementById('rsEnviar').addEventListener('click', ()=>{ ov.classList.remove('open'); continuar(); });
   document.getElementById('rsEditar').addEventListener('click', ()=> ov.classList.remove('open'));
-  const ce = document.getElementById('rsCopiarEntrega'); if(ce) ce.addEventListener('click', ()=>{ copiarTexto(bloque, 'Datos de entrega copiados'); });
   ov.onclick = e=>{ if(e.target===ov) ov.classList.remove('open'); };
   ov.classList.add('open');
 }
@@ -2222,7 +2254,7 @@ function lineasProductos(){
     out.push('*' + g.nombre + ':* ' + g.tam.map(x=> 'x' + x.n + (x.s ? ' ' + x.s : '')).join(' + '));
     if(g.ingr) out.push('• ' + g.ingr);
     if(g.tops.length){
-      if(new Set(g.tops.map(x=>x.t)).size === 1) out.push('• Topping: x' + g.tops.reduce((a,x)=>a+x.n, 0) + ' ' + g.tops[0].t);
+      if(new Set(g.tops.map(x=>x.t)).size === 1){ const nT = g.tops.reduce((a,x)=>a+x.n, 0); out.push('• Topping: ' + (nT > 1 ? 'x' + nT + ' ' : '') + g.tops[0].t); }
       else { const conTam = new Set(g.tops.map(x=>x.s)).size > 1; out.push('• Topping:'); g.tops.forEach(x=> out.push('- x' + x.n + (conTam && x.s ? ' ' + x.s : '') + ' ' + x.t)); }
     }
     if(g.ext) out.push('• Extras: ' + g.ext);
@@ -2237,33 +2269,35 @@ function armarMensajes(c){
   const exacto = efectivo && orderState.efectivoTipo === 'exacto', paga = billeteNum(), cambio = paga - total;
   const uSel = esDel ? ubicSel() : null, link = uSel && uSel.link ? uSel.link : '';
   const ubTxt = uSel ? uSel.nombre + (uSel.direccion ? ' — ' + uSel.direccion : '') : ((orderState.ubicacion||'').trim());
-  const ubicLineas = (ubTxt || link) ? [ubTxt, link].filter(Boolean).join('\n') : 'pendiente (la enviará por WhatsApp)';
-  let msg = T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + '\n\n';
-  if(!esDel) msg += 'Cliente: ' + nombre + ' · ' + fmtTel(tel) + '\n\n';          // con delivery, nombre y número van en el bloque final
-  msg += lineasProductos() + '\n';
+  const ubicLineas = (ubTxt || link) ? [ubTxt, link].filter(Boolean).join('\n') : 'la enviará por WhatsApp';
+  let msg = T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + '\n\n' + lineasProductos() + '\n';
   const premios = regalosPedido();
-  if(premios.length) msg += '\n' + premios.map(r=>'🎁 ' + r).join('\n') + '\n';      // premios de la ruleta o de la tarjeta VIP, bien aclarados
-  msg += '\n' + (esDel ? '🛵 Delivery' : '🏠 Retiro en el local') + '\n';
-  if(efectivo){
-    msg += '💳 Método de pago: Efectivo\nPagará con: ' + money(exacto ? total : paga) + '\n' + (exacto ? 'No necesita cambio' : 'Su cambio será: ' + money(cambio)) + '\n';
-  } else {
-    msg += '💳 Método de pago: Transferencia\n' + T('msg_comprobante','🧾 Pagos por transferencia: por favor envíe el comprobante.') + '\n';
-  }
+  if(premios.length) msg += '\n' + premios.map(r=>'🎁 ' + r).join('\n') + '\n';
+  // entrega + datos del cliente (una sola vez)
+  msg += '\n' + (esDel ? '🛵 Delivery' : '🏠 Retiro en el local') + '\n👤 ' + nombre + '\n📞 ' + fmtTel(tel) + '\n';
+  if(esDel) msg += '📍 ' + ubicLineas + '\n';
+  // total (una sola vez)
   if(deliveryFee > 0 || descuento > 0){
     msg += '\nSubtotal: ' + money(subtotal) + '\n';
     if(deliveryFee > 0) msg += 'Delivery: ' + money(deliveryFee) + '\n';
     descuentosDetalle().forEach(d=>{ msg += d.label + ': -' + money(d.monto) + '\n'; });
     msg += '*Total: ' + money(total) + '*\n';
   } else msg += '\n*Total: ' + money(total) + '*\n';
+  // pago: solo lo que corresponde
+  if(efectivo){
+    msg += '\n💳 Método de pago: Efectivo\n' + (exacto ? 'No necesita cambio' : 'Pagará con: ' + money(paga) + '\nSu cambio será: ' + money(cambio)) + '\n';
+  } else {
+    msg += '\n💳 Pagará por transferencia\n' + T('msg_comprobante','🧾 Por favor envíe el comprobante.') + '\n';
+  }
   if(orderState.notas && orderState.notas.trim()) msg += '\nNotas: ' + orderState.notas.trim() + '\n';
   { const sinDesc = ACTIVE_OFERTAS.filter(o=> !descuentosDetalle().some(d=>d.oferta===o)); if(sinDesc.length) msg += '\n🎉 Oferta activa: ' + sinDesc.map(o=>o.texto).join(' / ') + '\n'; }
   msg += '\n' + T('msg_vip','🎀 ¡Gracias por elegir Fresas Pop! Ya tienes tu tarjeta VIP: consúltala cuando quieras en nuestra página de pedidos. 💗') + '\n';
+  // datos de entrega para el panel (se guardan con el pedido; ahí está el botón de copiar)
   let bloque = '';
   if(esDel){
-    bloque = '📦 INFORMACIÓN PARA DELIVERY · USO INTERNO\n\n👤 Nombre: ' + nombre + '\n📞 Número: ' + fmtTel(tel) + '\n📍 Ubicación: ' + ubicLineas + '\n';
-    if(efectivo) bloque += 'Total del pedido: ' + money(total) + '\nPagará con: ' + money(exacto ? total : paga) + '\nSu cambio será: ' + (exacto ? 'No necesita cambio' : money(cambio));
-    else bloque += 'Su cambio será: Pago por transferencia';
-    msg += '\n' + bloque + '\n';
+    bloque = '📦 Datos de entrega\n👤 ' + nombre + '\n📞 ' + fmtTel(tel) + '\n📍 ' + ubicLineas + '\n';
+    if(efectivo) bloque += 'Total del pedido: ' + money(total) + '\n' + (exacto ? 'No necesita cambio' : 'Pagará con: ' + money(paga) + '\nSu cambio será: ' + money(cambio));
+    else bloque += 'Pagará por transferencia';
   }
   return {msg: msg.replace(/\n{3,}/g, '\n\n').replace(/\s+$/, '') + '\n', bloque};
 }
@@ -2411,11 +2445,11 @@ function abrirFormUbic(id, desdeCheckout){
     const guardar = id ? true : document.getElementById('ufGuardar').checked;
     if(guardar && !v.link) return err('Para guardar la ubicación pega el enlace de Google Maps o Waze.');
     if(id){ Object.assign(u, {nombre, direccion:dir, link:v.link}); ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación actualizada'); return; }
-    if(!guardar){ orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
+    if(!guardar){ orderState.ubicNinguna = false; orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
     if(UBIC.items.length >= 10) return err('Puedes guardar hasta 10 ubicaciones. Elimina una para agregar otra.');
     const nu = {id:'u' + Date.now().toString(36), nombre, direccion:dir, link:v.link};
     ubicClave(); UBIC.items.push(nu); UBIC.ultimo = nu.id; ubicGuardar();
-    if(desdeCheckout || orderState.delivery==='si'){ orderState.ubicacionId = nu.id; orderState.ubicTemp = null; }
+    if(desdeCheckout || orderState.delivery==='si'){ orderState.ubicacionId = nu.id; orderState.ubicTemp = null; orderState.ubicNinguna = false; }
     if(desdeCheckout){ cerrarUbic(); } else abrirUbicaciones();
     renderCart(); showToast('Ubicación guardada ✅');
   });
@@ -2735,6 +2769,7 @@ async function cargarDatosRemotos(){
       }
       if(!d.deliveryV2 && d.textos) delete d.textos.delivery_nota;
       if(!d.textosV5 && d.textos) delete d.textos.msg_vip;
+      if(!d.textosV6 && d.textos){ delete d.textos.msg_comprobante; delete d.textos.paso_extras; delete d.textos.salsas_label; }
       if(!d.textosV4 && d.textos) ['delivery_nota','delivery_ubic_aviso','msg_vip','msg_comprobante','msg_ubicacion','msg_saludo'].forEach(k=>{ delete d.textos[k]; });
     } else {
       await MENU_DOC.set(construirSeedInicial());
