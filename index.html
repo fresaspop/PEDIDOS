@@ -300,8 +300,8 @@ body.searching .tab-panel{display:none !important;}
 .xchip .xm, .xchip .xplus{border:none; background:#fff; color:var(--principal); width:20px; height:20px; border-radius:50%; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center;}
 #ubicOverlay, #resumenOverlay{z-index:75;}
 .entrega-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-.entrega-opt{display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 6px; border:1.5px solid #f0d7dc; background:#fff; border-radius:16px; color:var(--vino); text-align:center; transition:.15s;}
-.entrega-opt svg{color:var(--principal);} .entrega-opt b{font-size:12.5px;} .entrega-opt small{font-size:11px; color:var(--gris);}
+.entrega-opt{display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; padding:6px 8px; border:1.5px solid #f0d7dc; background:#fff; border-radius:14px; color:var(--vino); text-align:left; transition:.15s;}
+.entrega-opt svg{color:var(--principal); flex:none;} .eo-t{display:flex; flex-direction:column; line-height:1.15; min-width:0;} .entrega-opt b{font-size:12px;} .entrega-opt small{font-size:10px; color:var(--gris);}
 .entrega-opt.selected{border-color:var(--principal); background:#fff0f3; box-shadow:0 0 0 3px rgba(219,82,117,.18);}
 .ubic-card, .ubic-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:2px solid #f0d7dc; border-radius:14px; background:#fff; margin-bottom:8px; cursor:pointer;}
 .ubic-item{cursor:default;}
@@ -318,12 +318,21 @@ body.searching .tab-panel{display:none !important;}
 .uf-err{color:var(--rojo); font-size:12.5px; font-weight:700; min-height:16px; margin-top:6px;} .uf-check{display:flex; gap:8px; align-items:center; font-size:12.5px; margin-top:8px;}
 .ubic-code{margin-top:12px; padding:10px 12px; background:#fff0f3; border-radius:12px; font-size:12px; word-break:break-all;} .ubic-code small{display:block; color:var(--gris); margin-top:4px;}
 .ubic-rest{margin-top:10px; font-size:12.5px;} .ubic-rest summary{cursor:pointer; color:var(--principal); font-weight:700;}
-.rs-edit{display:block; margin:8px auto 0; background:none; border:none; color:var(--gris); font-size:12.5px; font-weight:600; text-decoration:underline; padding:6px 12px;}
+.rs-edit{display:block; margin:8px auto 0; background:#fff; border:1.5px solid #f0d7dc; color:var(--vino); border-radius:12px; font-size:12px; font-weight:700; padding:6px 18px;}
+.rs-note{font-size:12px; color:var(--gris); line-height:1.45; margin:0 0 10px;} .rs-note div+div{margin-top:2px; color:var(--vino); font-weight:600;}
+.rs-copy{display:block; margin:0 auto 10px; background:#fff; border:1.5px solid var(--principal); color:var(--principal); border-radius:12px; font-size:12px; font-weight:700; padding:6px 14px;}
 .rs-box{background:#fffafb; border:1.5px solid #f6dfe4; border-radius:14px; padding:8px 12px; margin-bottom:10px;}
 .rs-item{display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid #f6e6e9; font-size:13.5px;} .rs-item:last-child{border:none;} .rs-item small{display:block; color:var(--gris); font-size:11.5px; font-weight:400;}
 .rs-row{display:flex; justify-content:space-between; gap:10px; padding:5px 0; font-size:13px; align-items:center;} .rs-row span{display:inline-flex; gap:6px; align-items:center;}
 .rs-dir{font-size:12.5px; color:var(--texto); padding:4px 0 6px 24px; line-height:1.4;}
 .rs-tot{padding:4px 2px 10px;} .rs-row.total{font-size:17px; font-weight:800; color:var(--vino); border-top:1px solid #f0d7dc; margin-top:4px; padding-top:8px;}
+.sel-grid{display:flex; flex-direction:column; gap:5px; margin-bottom:8px;}
+.sel-grid:empty{display:none;}
+.sel-grid > *{min-width:0; margin:0 !important;}
+.sel-grid .topping-select-wrap, .sel-grid .variante-wrap{display:block;}
+.sel-grid .topping-label{display:block; font-size:9px; line-height:1.1; margin:0 0 2px 2px; text-transform:uppercase; letter-spacing:.3px;}
+.sel-grid .topping-select{width:100%; padding:5px 24px 5px 10px; font-size:12.5px; border-radius:11px; border-width:1.5px; height:32px;}
+.sel-grid .topping-cortesia-note{display:none;}
 .extras-card{background:#fff; border-radius:var(--radius); padding:14px 14px 12px; box-shadow:var(--sombra);}
 .extras-card h3{margin:0 0 2px; font-family:'Baloo 2',sans-serif; font-size:16.5px; color:var(--vino);}
 .extras-card p{margin:0 0 10px; font-size:12.5px; color:var(--gris);}
@@ -423,6 +432,7 @@ body.searching .tab-panel{display:none !important;}
   background:#fff; padding:16px; display:flex; align-items:center; justify-content:space-between;
   box-shadow:0 2px 10px rgba(86,9,31,.06); flex-shrink:0;
 }
+.drawer-menu{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
 .drawer-head h3{margin:0; color:var(--vino); font-size:18px;}
 .drawer-close{background:none; border:none; font-size:22px; color:var(--gris); line-height:1; padding:4px;}
 .drawer-body{flex:1; overflow-y:auto; padding:14px 16px 20px;}
@@ -487,7 +497,8 @@ body.searching .tab-panel{display:none !important;}
 
 .cartbar{position:fixed; left:14px; right:14px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; z-index:45; display:flex; align-items:center; gap:10px; padding:6px 8px 6px 8px; border-radius:18px; background:rgba(255,255,255,.97); color:var(--vino); border:1.5px solid #f3cdd6; box-shadow:0 4px 14px rgba(86,9,31,.12); cursor:pointer; transition:.2s; backdrop-filter:blur(6px);}
 .cartbar.vacio{opacity:.92; color:var(--gris);}
-.cb-ic{width:32px; height:32px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
+.cb-ic{position:relative; width:40px; height:36px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
+.cb-n{position:absolute; left:57%; top:43%; transform:translate(-50%,-50%); font-size:11.5px; font-weight:800; color:var(--vino); line-height:1; pointer-events:none;} .cb-n.dos{font-size:9.5px; letter-spacing:-.3px;}
 .cb-txt{flex:1; min-width:0; font-size:14px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;} .cartbar.vacio .cb-txt{font-weight:600; font-size:13px;}
 .cb-go{flex:none; background:#fff0f3; color:var(--principal); padding:6px 12px; border-radius:14px; font-weight:700; font-size:12px;} .cartbar.vacio .cb-go{display:none;}
 .toast{
@@ -681,14 +692,15 @@ body.searching .tab-panel{display:none !important;}
 <!-- ================= CART DRAWER ================= -->
 <div class="overlay" id="overlay"></div>
 <div class="cartbar" id="cartBar" role="button" tabindex="0" aria-label="Ver mi pedido">
-  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></span>
+  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="30" height="30"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg><span class="cb-n" id="cbN"></span></span>
   <span class="cb-txt" id="cbT1">Tu carrito está vacío</span>
   <span class="cb-go" id="cbGo">Ver pedido ›</span>
 </div>
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <h3 data-t="carrito_titulo">Tu pedido</h3>
-    <button class="drawer-close" id="drawerClose">✕</button>
+    <span style="display:flex; align-items:center; gap:6px;"><button class="drawer-menu" id="drawerMenu" aria-label="Ir al menú para agregar más" title="Ir al menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg></button>
+    <button class="drawer-close" id="drawerClose">✕</button></span>
   </div>
   <div class="drawer-body" id="drawerBody">
     <!-- llenado por JS -->
@@ -813,31 +825,31 @@ const DEFAULT_EXTRAS = [
 
 // ---- Favoritas (recetas fijas) ----
 const DEFAULT_FAVORITAS = [
-  {id:'la_clasica', nombre:'La Clásica', desc:'Dulce de leche + crema tradicional + galletas de chocolate', img:IMG.laClasica,
+  {id:'la_clasica', nombre:'La Clásica', desc:'Dulce de leche + crema tradicional', img:IMG.laClasica,
     toppingDefault:'galletas', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
-  {id:'choco_pop', nombre:'Choco Pop', desc:'Base de Nutella + crema de chocolate + cono triturado', img:IMG.chocoPop,
+  {id:'choco_pop', nombre:'Choco Pop', desc:'Nutella + crema de chocolate', img:IMG.chocoPop,
     toppingDefault:'cono', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
-  {id:'oasis_exotico', nombre:'Oasis Exótico', desc:'Coco crema + base de pistacho + galletas de chocolate', img:IMG.oasisExotico,
+  {id:'oasis_exotico', nombre:'Oasis Exótico', desc:'Pistacho + crema de coco', img:IMG.oasisExotico,
     toppingDefault:'galletas', cortesia:true,
     sizes:[{id:'12oz',label:'12 oz',price:450},{id:'9oz',label:'9 oz',price:350}]},
-  {id:'pistacho_paradise', nombre:'Pistacho Paradise', desc:'Crema de chocolate + base de pistacho + galletas de chocolate', img:IMG.pistachoParadise,
+  {id:'pistacho_paradise', nombre:'Pistacho Paradise', desc:'Pistacho + crema de chocolate', img:IMG.pistachoParadise,
     toppingDefault:'galletas', cortesia:true,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
-  {id:'balance', nombre:'Balance', desc:'Crema tradicional + leche condensada + cono', img:IMG.balance,
+  {id:'balance', nombre:'Balance', desc:'Leche condensada + crema tradicional', img:IMG.balance,
     toppingDefault:'cono', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
-  {id:'nutipop', nombre:'Nutipop', desc:'Base de Nutella + crema tradicional + galletas de chocolate', img:IMG.nutipop,
+  {id:'nutipop', nombre:'Nutipop', desc:'Nutella + crema tradicional', img:IMG.nutipop,
     toppingDefault:'galletas', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:400},{id:'9oz',label:'9 oz',price:300}]},
-  {id:'duopop', nombre:'DuoPop', desc:'Una deliciosa combinación de crema de pistacho y nuestra crema tradicional, creando un contraste de sabores y cremosidad.', img:null,
+  {id:'duopop', nombre:'DuoPop', desc:'Pistacho + crema tradicional', img:null,
     toppingDefault:'galletas', cortesia:true,
     sizes:[{id:'12oz',label:'12 oz',price:450},{id:'9oz',label:'9 oz',price:350}]},
-  {id:'la_fit', nombre:'La Fit', desc:'Una versión más ligera y fresca, preparada con capas de crema tradicional, fresas frescas y granola crujiente. Sin base.', img:null,
+  {id:'la_fit', nombre:'La Fit', desc:'Sin base + crema tradicional', img:null,
     toppingDefault:'granola', cortesia:false,
     sizes:[{id:'12oz',label:'12 oz',price:350},{id:'9oz',label:'9 oz',price:250}]},
-  {id:'canasta_pop', nombre:'Canasta Pop', desc:'Crema tradicional + dulce de leche + granola', img:IMG.canastaPop,
+  {id:'canasta_pop', nombre:'Canasta Pop', desc:'Syrup + crema a tu elección', img:IMG.canastaPop,
     toppingDefault:'granola', cortesia:false,
     variantes:[
       {key:'cremaCanasta', label:'Elige tu crema', msgLabel:'Crema', source:'cremas', type:'select', gratis:true},
@@ -880,6 +892,7 @@ let EXTRAS = DEFAULT_EXTRAS;
 let FAVORITAS = DEFAULT_FAVORITAS;
 let PREMIUM = DEFAULT_PREMIUM;
 let OTROS = DEFAULT_OTROS;
+const DESC_FAV = {"la_clasica": "Dulce de leche + crema tradicional", "choco_pop": "Nutella + crema de chocolate", "oasis_exotico": "Pistacho + crema de coco", "pistacho_paradise": "Pistacho + crema de chocolate", "balance": "Leche condensada + crema tradicional", "nutipop": "Nutella + crema tradicional", "duopop": "Pistacho + crema tradicional", "la_fit": "Sin base + crema tradicional", "canasta_pop": "Syrup + crema a tu elección"};
 let BEBIDAS = [];
 /* ----- disponibilidad: lo agotado NO desaparece, se muestra con "¡AGOTADO!" ----- */
 const IC_P = {
@@ -1323,9 +1336,8 @@ function renderCardList(containerId, items, sizeState, addLabel, toppingState, r
       <div class="pcard-body">
         <h4>${p.nombre}</h4>
         <p class="pcard-desc">${p.desc}</p>
-        <div class="pcard-sizes">${p.sizes.map(s=>`<div class="size-chip-wrap"><button class="size-chip${s.id===selSize?' selected':''}" data-size="${s.id}">${s.label}</button>${s.id!==selSize?`<span class="size-chip-price">${money(s.price)}</span>`:''}</div>`).join('')}</div>
-        ${variantesHTML}
-        ${toppingHTML}
+        ${p.sizes.length > 1 ? `<div class="pcard-sizes">${p.sizes.map(s=>`<div class="size-chip-wrap"><button class="size-chip${s.id===selSize?' selected':''}" data-size="${s.id}">${s.label}</button>${s.id!==selSize?`<span class="size-chip-price">${money(s.price)}</span>`:''}</div>`).join('')}</div>` : ''}
+        <div class="sel-grid">${variantesHTML}${toppingHTML}</div>
         <div class="pcard-footer">
           <span class="pcard-price">${money(total)}</span>
           <button class="btn-mini">${ic('cart',15)}<span class="lbl">${addLabel}</span></button>
@@ -1491,7 +1503,9 @@ function actualizarFlechasTabs(){                 // si hay más categorías de 
 document.getElementById('tabs').addEventListener('scroll', actualizarFlechasTabs);
 window.addEventListener('resize', actualizarFlechasTabs);
 window.addEventListener('load', ()=>{ renderNextCat(); actualizarFlechasTabs(); });
-document.getElementById('topCats').addEventListener('click', ()=>{ limpiarBusqueda(true); const top = document.getElementById('catsWrap').getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4; window.scrollTo({top:Math.max(0, top), behavior:'smooth'}); });
+function irAlMenu(){ limpiarBusqueda(true); const top = document.getElementById('catsWrap').getBoundingClientRect().top + window.scrollY - document.getElementById('topbar').offsetHeight - 4; window.scrollTo({top:Math.max(0, top), behavior:'smooth'}); }
+document.getElementById('topCats').addEventListener('click', irAlMenu);
+document.getElementById('drawerMenu').addEventListener('click', ()=>{ closeDrawer(); setTimeout(irAlMenu, 120); });
 window.addEventListener('scroll', ()=>{ document.getElementById('topbar').classList.toggle('stuck', window.scrollY > document.getElementById('explora').offsetTop + 30); }, {passive:true});
 /* ----- al terminar una sección, se invita a seguir con la siguiente ----- */
 function renderNextCat(){
@@ -1783,7 +1797,8 @@ function cartSubtotal(){
 function actualizarCartBar(){
   const n = cart.reduce((a,i)=>a+i.cantidad, 0), bar = document.getElementById('cartBar'); if(!bar) return;
   bar.classList.toggle('vacio', n === 0);
-  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : n + '  ·  ' + money(cartSubtotal());
+  const cn = document.getElementById('cbN'); cn.textContent = n === 0 ? '' : (n > 99 ? '99+' : n); cn.classList.toggle('dos', n > 9);
+  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : money(cartSubtotal());
 }
 document.getElementById('cartBar').addEventListener('click', ()=> openDrawer());
 document.getElementById('cartBar').addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDrawer(); } });
@@ -1846,8 +1861,8 @@ function renderCart(){
   <div class="form-group">
     <label class="form-label">¿Cómo quieres recibir tu pedido?</label>
     <div class="entrega-row">
-      <button class="entrega-opt" id="delivNo">${ic('store',24)}<b>Retirar en el local</b><small>Sin costo</small></button>
-      <button class="entrega-opt" id="delivSi">${icMoto(26)}<b>Delivery a domicilio</b><small>Desde ${money(CONFIG.deliveryCost)} · dentro de Cotuí</small></button>
+      <button class="entrega-opt" id="delivNo">${ic('store',20)}<span class="eo-t"><b>Retirar en el local</b><small>Sin costo</small></span></button>
+      <button class="entrega-opt" id="delivSi">${icMoto(18)}<span class="eo-t"><b>Delivery</b><small>Desde ${money(CONFIG.deliveryCost)} · Cotuí</small></span></button>
     </div>
   </div>`;
 
@@ -1859,14 +1874,14 @@ function renderCart(){
       ${UBIC.items.map(u=>`
         <div class="ubic-card${sel && sel.id===u.id ? ' selected' : ''}" data-id="${u.id}">
           <span class="ubic-ic">${ic('pin',18)}</span>
-          <span class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</span>
+          <span class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver ubicación</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</span>
           <span class="ubic-radio"></span>
         </div>`).join('')}
       ${orderState.ubicacionId==='__temp' && sel ? `<div class="ubic-card selected" data-id="__temp"><span class="ubic-ic">${ic('pin',18)}</span><span class="ubic-tx"><b>${esc(sel.nombre)}</b> <small>(solo este pedido)</small><small>${esc(sel.direccion||'Solo enlace de Google Maps')}</small></span><span class="ubic-radio"></span></div>` : ''}
       ${!UBIC.items.length && !sel ? '<div class="step-note">Aún no tienes ubicaciones guardadas. Agrega la de entrega y la tendrás lista para tus próximos pedidos.</div>' : ''}
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn-mini" id="ubicAdd">+ ${UBIC.items.length ? 'Agregar otra ubicación' : 'Agregar mi ubicación'}</button>${UBIC.items.length ? '<button class="btn-mini" id="ubicManage" style="background:#fff; color:var(--principal); border:1.5px solid var(--principal);">Administrar</button>' : ''}</div>
-      <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 Dentro de COTUÍ el delivery parte de RD${costo} y puede variar según la distancia del destino. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.').replace('{costo}', CONFIG.deliveryCost)}</div>
-      <div class="step-note ubic-aviso">${T('delivery_ubic_aviso','📍 Si no agregas tu ubicación aquí, envíala por WhatsApp para recibir tu pedido.')}</div>
+      <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 En Cotuí desde RD${costo}; varía si la ubicación está muy lejos.').replace('{costo}', CONFIG.deliveryCost)}</div>
+      <div class="step-note ubic-aviso">${T('delivery_ubic_aviso','📍 Si no la agregas aquí, envíala por WhatsApp para recibir tu pedido.')}</div>
     </div>`;
   }
 
@@ -1932,7 +1947,7 @@ function renderCart(){
 
   html += `<div class="divider"></div>`;
   html += `<div class="summary-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>`;
-  if(orderState.delivery==='si') html += `<div class="summary-row"><span>Delivery (desde)</span><span>${money(CONFIG.deliveryCost)}</span></div>`;
+  if(orderState.delivery==='si') html += `<div class="summary-row"><span>Delivery</span><span>${money(CONFIG.deliveryCost)}</span></div>`;
   if(descuento) html += `<div class="summary-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>`;
   html += `<div class="summary-row total"><span>Total</span><span>${money(total)}</span></div>`;
 
@@ -2055,56 +2070,13 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   const descuento = descuentoPremio();
   const total = subtotal + deliveryFee - descuento;
 
-  let msg = T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + `\n\n`;
-  msg += `*Cliente:* ${nombre}\n`;
-  msg += `*Teléfono:* ${fmtTel(tel)}\n\n`;
-  msg += `*Productos:*\n`;
-  cart.forEach((item, idx)=>{
-    msg += `${idx+1}. ${item.cantidad}x ${item.nombre} — ${money(item.precioUnit*item.cantidad)}\n`;
-    if(item.detalles.length){
-      item.detalles.forEach((d)=>{
-        msg += `   • ${d}\n`;
-      });
-    }
-    msg += `\n`;
-  });
+  const { msg: msgBase, bloque } = armarMensajes({nombre, tel, subtotal, deliveryFee, descuento, total});
+  let msg = msgBase;
   const regalos = regalosPedido();
-  if(regalos.length){ msg += `*Regalos / premios:*\n`; regalos.forEach(r=>{ msg += `   • ${r}\n`; }); }
-  msg += `\n*Delivery:* ${orderState.delivery==='si' ? 'Sí (desde '+money(CONFIG.deliveryCost)+', varía según la distancia)' : 'No'}\n`;
-  if(orderState.delivery==='si'){
-    const uSel = ubicSel();
-    if(uSel){
-      msg += `*Entrega a domicilio — ${uSel.nombre}*\n`;
-      if(uSel.direccion) msg += `*Dirección:* ${uSel.direccion}\n`;
-      if(uSel.link) msg += `*Google Maps:* ${uSel.link}\n`;
-    } else if((orderState.ubicacion||'').trim()) msg += `*Ubicación:* ${orderState.ubicacion.trim()}\n`;
-  }
-  msg += `*Método de pago:* ${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}`;
-  if(orderState.pago==='efectivo'){
-    msg += orderState.efectivoTipo==='exacto'
-      ? ` — dinero completo, no necesita cambio`
-      : ` — paga con ${money(billeteNum())} · cambio a devolver: ${money(billeteNum()-total)}`;
-  }
-  msg += `\n\n*Subtotal:* ${money(subtotal)}\n`;
-  if(deliveryFee) msg += `*Delivery (desde):* ${money(deliveryFee)}\n`;
-  if(descuento) msg += `*Descuento premio:* -${money(descuento)}\n`;
-  msg += `*Total:* ${money(total)}\n`;
-  if(orderState.notas && orderState.notas.trim()) msg += `\n*Notas:* ${orderState.notas.trim()}\n`;
-  if(ACTIVE_OFERTAS.length) msg += `\n🎉 *Oferta activa:* ${ACTIVE_OFERTAS.map(o=>o.texto).join(' / ')}\n`;
-
-  msg += `\n`;
-  if(orderState.delivery==='si' && !((ubicSel()||{}).link)) msg += T('msg_ubicacion','📍 Si eligió delivery, por favor envíe su ubicación actual.') + `\n`;
-  if(orderState.pago==='transferencia') msg += T('msg_comprobante','🧾 Si pagó con transferencia, por favor envíe el comprobante.') + `\n`;
-  if(orderState.pago==='efectivo'){
-    msg += orderState.efectivoTipo==='exacto'
-      ? `💵 Pagará con el dinero exacto, no necesita cambio.\n`
-      : `💵 Pagará con ${money(billeteNum())}, su cambio será ${money(billeteNum()-total)}.\n`;
-  }
-
-  msg += `\n` + T('msg_vip','Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.') + `\n`;
-  msg = limpiarEmoji(msg);
+  window.__bloqueEntrega = bloque;
+  if(enNavegadorApp()){ msg = limpiarEmoji(msg); window.__bloqueEntrega = limpiarEmoji(bloque); }      // Instagram/TikTok muestran los emojis como "?"
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
-  if(!window.__resumenOK){ mostrarResumen(msg, subtotal, deliveryFee, descuento, total, ()=>{ window.__resumenOK = true; document.getElementById('sendBtn').click(); }); return; }
+  if(!window.__resumenOK){ mostrarResumen(msg, subtotal, deliveryFee, descuento, total, window.__bloqueEntrega, ()=>{ window.__resumenOK = true; document.getElementById('sendBtn').click(); }); return; }
   window.__resumenOK = false;
   const needFlan = flanEnCarrito();
   if(needFlan > 0 && stockFlan() !== null){                       // las porciones de flan se reservan de verdad (transacción); si ya no alcanzan, no se envía
@@ -2124,22 +2096,23 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   renderCart(); showToast('Pedido enviado ✅ ¡Gracias!');
 });
 
-function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, continuar){
+function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, bloque, continuar){
   const sh = document.getElementById('resumenSheet'), ov = document.getElementById('resumenOverlay'), u = orderState.delivery==='si' ? ubicSel() : null;
   sh.innerHTML = `<h3>Revisa tu pedido</h3>
     <div class="rs-box">${cart.map(it=>`<div class="rs-item"><div><b>${it.cantidad}× ${it.nombre}</b>${(it.detalles||[]).map(d=>`<small>${esc(d)}</small>`).join('')}</div><span>${money(it.precioUnit*it.cantidad)}</span></div>`).join('')}</div>
     <div class="rs-box">
-      <div class="rs-row"><span>${orderState.delivery==='si' ? icMoto(17) : ic('store',18)} Entrega</span><b>${orderState.delivery==='si' ? 'Delivery a domicilio' : 'Retiro en el local'}</b></div>
-      ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>` : ''}
+      <div class="rs-row"><span>${orderState.delivery==='si' ? icMoto(17) : ic('store',18)} Entrega</span><b>${orderState.delivery==='si' ? 'Delivery' : 'Retiro en el local'}</b></div>
+      ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver ubicación</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>` : ''}
       <div class="rs-row"><span>Pago</span><b>${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}</b></div>
       ${(orderState.nombre||'').trim() ? `<div class="rs-row"><span>A nombre de</span><b>${esc(orderState.nombre.trim())}</b></div>` : ''}
     </div>
-    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery (desde)</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
-    ${orderState.delivery==='si' ? `<div class="step-note" style="margin:0 0 10px;">El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia. Te confirmamos el monto por WhatsApp.${u && u.link ? '' : ' Recuerda enviar tu ubicación por WhatsApp.'}</div>` : ''}
+    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
+    ${orderState.delivery==='si' ? `<div class="rs-note"><div>El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia, solo si está muy lejos.</div>${(!u && !(orderState.ubicacion||'').trim()) ? '<div>Recuerda enviar tu ubicación actual por WhatsApp</div>' : ''}</div><button class="rs-copy" id="rsCopiarEntrega">📋 Copiar datos de entrega</button>` : ''}
     <button class="btn-whatsapp" id="rsEnviar">Enviar por WhatsApp</button>
     <button class="rs-edit" id="rsEditar">Editar pedido</button>`;
   document.getElementById('rsEnviar').addEventListener('click', ()=>{ ov.classList.remove('open'); continuar(); });
   document.getElementById('rsEditar').addEventListener('click', ()=> ov.classList.remove('open'));
+  const ce = document.getElementById('rsCopiarEntrega'); if(ce) ce.addEventListener('click', ()=>{ copiarTexto(bloque, 'Datos de entrega copiados'); });
   ov.onclick = e=>{ if(e.target===ov) ov.classList.remove('open'); };
   ov.classList.add('open');
 }
@@ -2155,6 +2128,58 @@ async function reservarFlan(n){
   return res;
 }
 // Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
+const enNavegadorApp = ()=> /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedance|Snapchat/i.test(navigator.userAgent || '');
+function armarMensajes(c){
+  const {nombre, tel, subtotal, deliveryFee, descuento, total} = c;
+  const esDel = orderState.delivery === 'si', efectivo = orderState.pago === 'efectivo';
+  const exacto = efectivo && orderState.efectivoTipo === 'exacto', paga = billeteNum(), cambio = paga - total;
+  const uSel = esDel ? ubicSel() : null, link = uSel && uSel.link ? uSel.link : '';
+  const ubTxt = uSel ? uSel.nombre + (uSel.direccion ? ' — ' + uSel.direccion : '') : ((orderState.ubicacion||'').trim());
+  const ubicLineas = (ubTxt || link) ? [ubTxt, link].filter(Boolean).join('\n') : 'pendiente (la enviará por WhatsApp)';
+  // 1) agradecimiento de la tarjeta VIP, arriba
+  let msg = T('msg_vip', `🎀 ¡Gracias por elegir Fresas Pop!
+
+Ya tienes tu tarjeta VIP. Disfruta de beneficios y promociones especiales. 💗
+
+Puedes consultarla cuando quieras desde nuestra página de pedidos.`) + `\n\n`;
+  msg += T('msg_saludo','¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:') + `\n\n`;
+  msg += `*Cliente:* ${nombre}\n*Teléfono:* ${fmtTel(tel)}\n\n*Productos:*\n`;
+  cart.forEach((item, idx)=>{
+    msg += `${idx+1}. ${item.cantidad}x ${item.nombre} — ${money(item.precioUnit*item.cantidad)}\n`;
+    (item.detalles||[]).filter(Boolean).forEach(d=>{ msg += `   • ${d}\n`; });                 // sin líneas vacías si no hay detalles
+  });
+  const regalos = regalosPedido();
+  if(regalos.length){ msg += `\n*Regalos / premios:*\n`; regalos.forEach(r=>{ msg += `   • ${r}\n`; }); }
+  // 2) solo la opción elegida
+  msg += `\n${esDel ? '🛵 Delivery' : '🏠 Retiro en el local'}\n`;
+  if(esDel) msg += `📍 Ubicación: ${ubicLineas}\n`;
+  // 3) pago
+  if(efectivo){
+    msg += `💳 Método de pago: Efectivo\n💵 Pagará con: ${money(exacto ? total : paga)}\n`;
+    msg += exacto ? `💸 No necesita cambio\n` : `💸 Su cambio será: ${money(cambio)}\n`;
+  } else {
+    msg += `💳 Método de pago: Transferencia\n` + T('msg_comprobante','🧾 Pagos por transferencia: por favor envíe el comprobante.') + `\n`;
+  }
+  // 4) totales: el subtotal solo si hay delivery o descuento
+  if(deliveryFee > 0 || descuento > 0){
+    msg += `\n*Subtotal:* ${money(subtotal)}\n`;
+    if(deliveryFee > 0) msg += `*Delivery:* ${money(deliveryFee)}\n`;
+    if(descuento > 0) msg += `*Descuento premio:* -${money(descuento)}\n`;
+    msg += `💵 Total: ${money(total)}\n`;
+  } else msg += `\n💵 Total: ${money(total)}\n`;
+  if(orderState.notas && orderState.notas.trim()) msg += `\n*Notas:* ${orderState.notas.trim()}\n`;
+  if(ACTIVE_OFERTAS.length) msg += `\n🎉 *Oferta activa:* ${ACTIVE_OFERTAS.map(o=>o.texto).join(' / ')}\n`;
+  // 5) bloque para el repartidor (solo delivery)
+  let bloque = '';
+  if(esDel){
+    bloque = `📦 INFORMACIÓN PARA DELIVERY · USO INTERNO\n\n👤 Nombre: ${nombre}\n📞 Número: ${fmtTel(tel)}\n📍 Ubicación: ${ubicLineas}\n`;
+    if(efectivo){
+      bloque += `💵 Total del pedido: ${money(total)}\n💸 Pagará con: ${money(exacto ? total : paga)}\n💸 Su cambio será: ${exacto ? 'No necesita cambio' : money(cambio)}`;
+    } else bloque += `💸 Su cambio será: Pago por transferencia`;
+    msg += `\n` + bloque + `\n`;
+  }
+  return {msg: msg.replace(/\n{3,}/g, '\n\n').replace(/\s+$/, '') + '\n', bloque};
+}
 function limpiarEmoji(texto){
   return texto
     .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]+/gu, '\u0001')
@@ -2176,7 +2201,7 @@ async function guardarPedidoCliente(tel, nombre, total, regalos, descuento, prem
     await ref.collection('pedidos').add({
       fecha: FV.serverTimestamp(), nombre, total, descuento: descuento||0, regalos: regalos||[],
       items: cart.map(i=>({nombre:i.nombre, cantidad:i.cantidad, detalles:i.detalles, precioUnit:i.precioUnit})),
-      delivery: orderState.delivery==='si', pago: orderState.pago, estado:'pendiente',
+      delivery: orderState.delivery==='si', pago: orderState.pago, estado:'pendiente', datosEntrega: window.__bloqueEntrega || '',
       notas: (orderState.notas||'').trim()
     });
     cargarClienteActual();
@@ -2212,22 +2237,25 @@ function ubicSel(){
   return UBIC.items.find(u=>u.id===orderState.ubicacionId) || null;
 }
 /* ----- enlace de Google Maps: se valida el formato y se evita confundirlo con el del local ----- */
-function copiarTexto(t){
-  const ok = ()=> showToast('Enlace copiado');
-  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(ok, ()=>copiaAlterna(t)); return; } }catch(e){}
-  copiaAlterna(t);
+function copiarTexto(t, aviso){
+  const ok = ()=> showToast(aviso || 'Enlace copiado');
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(ok, ()=>copiaAlterna(t, aviso)); return; } }catch(e){}
+  copiaAlterna(t, aviso);
 }
-function copiaAlterna(t){ const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed; opacity:0;'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); showToast('Enlace copiado'); }catch(e){ showToast('No se pudo copiar'); } ta.remove(); }
+function copiaAlterna(t, aviso){ const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed; opacity:0;'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); showToast(aviso || 'Enlace copiado'); }catch(e){ showToast('No se pudo copiar'); } ta.remove(); }
 document.addEventListener('click', e=>{ const b = e.target.closest('.copy-link'); if(!b) return; e.preventDefault(); e.stopPropagation(); copiarTexto(b.dataset.copy || CONFIG.ubicacionLink); });
 function validarMapsLink(txt){
   let u = String(txt||'').trim(); if(!u) return {ok:true, link:''};
   const m = u.match(/^(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})$/);                       // también se aceptan coordenadas
   if(m) return {ok:true, link:'https://www.google.com/maps?q=' + m[1] + ',' + m[2]};
+  const enTexto = u.match(/https?:\/\/[^\s]+/i);                                               // si pegan un mensaje compartido, se toma solo el enlace
+  u = enTexto ? enTexto[0] : u;
   if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
-  let url; try{ url = new URL(u); }catch(e){ return {ok:false, msg:'Ese enlace no parece válido. Cópialo otra vez desde Google Maps.'}; }
+  let url; try{ url = new URL(u); }catch(e){ return {ok:false, msg:'Ese enlace no parece válido. Cópialo otra vez desde Google Maps o Waze.'}; }
   const h = url.hostname.toLowerCase().replace(/^www\./,''), p = url.pathname;
-  const okHost = h==='maps.app.goo.gl' || (h==='goo.gl' && p.startsWith('/maps')) || h==='maps.google.com' || (/^google\.[a-z.]+$/.test(h) && p.startsWith('/maps')) || h==='g.co' || h==='g.page';
-  if(!okHost) return {ok:false, msg:'Usa un enlace de Google Maps (maps.app.goo.gl o google.com/maps).'};
+  const okHost = h==='maps.app.goo.gl' || (h==='goo.gl' && p.startsWith('/maps')) || h==='maps.google.com' || (/^google\.[a-z.]+$/.test(h) && p.startsWith('/maps')) || h==='g.co' || h==='g.page'
+    || h==='waze.com' || h==='ul.waze.com' || h.endsWith('.waze.com');
+  if(!okHost) return {ok:false, msg:'Usa un enlace de Google Maps o de Waze.'};
   url.protocol = 'https:';
   const link = url.toString();
   if(CONFIG.ubicacionLink && link.replace(/\/$/,'') === CONFIG.ubicacionLink.replace(/\/$/,'')) return {ok:false, msg:'Ese es el enlace de nuestro local. Pega el enlace de TU ubicación de entrega.'};
@@ -2240,7 +2268,7 @@ const ubicOv = document.getElementById('ubicOverlay'), ubicSheet = document.getE
 ubicOv.addEventListener('click', e=>{ if(e.target===ubicOv) cerrarUbic(); });
 function cerrarUbic(){ ubicOv.classList.remove('open'); }
 function abrirUbicaciones(){
-  const lista = UBIC.items.map(u=>`<div class="ubic-item"><div class="ubic-ic">${ic('pin',18)}</div><div class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>
+  const lista = UBIC.items.map(u=>`<div class="ubic-item"><div class="ubic-ic">${ic('pin',18)}</div><div class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver ubicación</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>
       <div class="ubic-acts"><button class="mini-ic" data-ed="${u.id}" aria-label="Editar">${ic('edit',16)}</button><button class="mini-ic" data-del="${u.id}" aria-label="Eliminar">${ic('trash',16)}</button></div></div>`).join('');
   ubicSheet.innerHTML = `<h3>📍 Mis ubicaciones guardadas</h3>
     <div class="step-note" style="margin:0 0 10px;">Guárdalas una vez y elígelas cuando pidas delivery. Puedes tener varias (Casa, Trabajo, Familiar…).</div>
@@ -2276,9 +2304,9 @@ function abrirFormUbic(id, desdeCheckout){
     <input class="form-input" id="ufNombre" placeholder="Ej. Casa de mi mamá" value="${esc(u.nombre)}" maxlength="40">
     <label class="form-label" style="margin-top:10px;">Dirección o referencia</label>
     <textarea class="form-input" id="ufDir" rows="2" placeholder="Calle, número, sector y una referencia" maxlength="200">${esc(u.direccion||'')}</textarea>
-    <label class="form-label" style="margin-top:10px;">Enlace de Google Maps <span id="ufReq" style="font-weight:600; color:var(--principal);">(obligatorio para guardar)</span></label>
+    <label class="form-label" style="margin-top:10px;">Enlace de Google Maps o Waze <span id="ufReq" style="font-weight:600; color:var(--principal);">(obligatorio para guardar)</span></label>
     <input class="form-input" id="ufLink" placeholder="Pega aquí el enlace" value="${esc(u.link||'')}" inputmode="url" autocapitalize="off">
-    <div class="step-note" style="margin-top:4px;">En Google Maps: toca tu ubicación → Compartir → Copiar enlace.</div>
+    <div class="step-note" style="margin-top:4px;">En Google Maps o Waze: Compartir → Copiar enlace.</div>
     <button class="btn-mini" id="ufProbar" style="margin-top:6px;">${ic('ext',13)} Probar enlace</button>
     <div class="uf-err" id="ufErr"></div>
     ${id ? '' : `<label class="uf-check"><input type="checkbox" id="ufGuardar" checked> Guardar para mis próximos pedidos</label>`}
@@ -2292,9 +2320,9 @@ function abrirFormUbic(id, desdeCheckout){
     const nombre = document.getElementById('ufNombre').value.trim(), dir = document.getElementById('ufDir').value.trim(), v = validarMapsLink(document.getElementById('ufLink').value);
     if(!nombre) return err('Ponle un nombre (Casa, Trabajo…).');
     if(!v.ok) return err(v.msg);
-    if(!dir && !v.link) return err('Escribe la dirección o pega el enlace de Google Maps.');
+    if(!dir && !v.link) return err('Escribe la dirección o pega el enlace de Google Maps o Waze.');
     const guardar = id ? true : document.getElementById('ufGuardar').checked;
-    if(guardar && !v.link) return err('Para guardar la ubicación pega el enlace de Google Maps.');
+    if(guardar && !v.link) return err('Para guardar la ubicación pega el enlace de Google Maps o Waze.');
     if(id){ Object.assign(u, {nombre, direccion:dir, link:v.link}); ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación actualizada'); return; }
     if(!guardar){ orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
     const nu = {id:'u' + Date.now().toString(36), nombre, direccion:dir, link:v.link};
@@ -2592,6 +2620,7 @@ async function cargarDatosRemotos(){
       if(d.toppings) OPT_ALL.toppings = mkAg(d.toppings);
       if(d.extras) OPT_ALL.extras = mkAg(d.extras);
       if(d.favoritas) FAVORITAS = fusionarConImagenLocal(d.favoritas, DEFAULT_FAVORITAS);
+      if(!d.descFavV3){ FAVORITAS.forEach(f=>{ if(DESC_FAV[f.id]) f.desc = DESC_FAV[f.id]; }); }          // descripciones: solo base + crema
       if(!d.favoritasV2){                                   // antes de que el panel las guarde, se muestran igual
         ['duopop','la_fit'].forEach(id=>{ if(!FAVORITAS.some(x=>x.id===id)){ const f = DEFAULT_FAVORITAS.find(x=>x.id===id); const k = FAVORITAS.findIndex(x=>x.id==='canasta_pop'); if(f) FAVORITAS.splice(k<0?FAVORITAS.length:k, 0, f); } });
       }
@@ -2614,6 +2643,7 @@ async function cargarDatosRemotos(){
         if(d.textos) ['fav_titulo','fav_sub','pers_titulo','pers_sub','prem_titulo','prem_sub','otros_titulo','otros_sub'].forEach(k=>{ delete d.textos[k]; });
       }
       if(!d.deliveryV2 && d.textos) delete d.textos.delivery_nota;
+      if(!d.textosV4 && d.textos) ['delivery_nota','delivery_ubic_aviso','msg_vip','msg_comprobante','msg_ubicacion','msg_saludo'].forEach(k=>{ delete d.textos[k]; });
     } else {
       await MENU_DOC.set(construirSeedInicial());
     }
