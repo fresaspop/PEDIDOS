@@ -34,7 +34,7 @@ body{
   font-family:'Poppins',sans-serif;
   background:var(--crema);
   color:var(--texto);
-  padding-bottom:100px;
+  padding-bottom:84px;
   overflow-x:hidden;
 }
 h1,h2,h3,h4,.brand-font{font-family:'Baloo 2',sans-serif;}
@@ -127,16 +127,16 @@ img{max-width:100%; display:block;}
 .search-clear{position:absolute; right:7px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%; border:none; background:#f6e6e9; color:var(--vino); font-size:13px; font-weight:700;}
 .top-cats{flex:none; width:42px; height:42px; border-radius:50%; border:1.5px solid var(--principal); background:#fff; color:var(--principal); display:flex; align-items:center; justify-content:center; padding:0;}
 .cats{max-width:560px; margin:0 auto; padding:4px 14px 12px; position:relative;}
-.tabs{display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:196px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px; scrollbar-width:none;}
+.tabs{display:grid; grid-template-columns:1fr 1fr; gap:6px; max-height:140px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px; scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab-btn{display:flex; align-items:center; gap:9px; text-align:left; height:56px; padding:0 11px; border-radius:16px; border:1.5px solid #f0d7dc; background:#fff; color:var(--vino); transition:.15s; min-width:0;}
-.tab-ic{width:32px; height:32px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
-.tab-ic svg{width:19px; height:19px;}
-.tab-txt{display:flex; flex-direction:column; min-width:0; line-height:1.15;}
-.tab-name{font-weight:800; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.tab-desc{display:block; font-size:10.5px; font-weight:500; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;}
-.tab-btn.active{background:var(--principal); border-color:var(--principal); color:#fff; box-shadow:var(--sombra);}
-.tab-btn.active .tab-ic{background:rgba(255,255,255,.22); color:#fff;} .tab-btn.active .tab-desc{color:#ffe1ea;}
+.tab-btn{position:relative; display:flex; align-items:center; justify-content:center; text-align:center; height:40px; padding:0 25px; border-radius:20px; border:1.5px solid #f0d7dc; background:#fff; color:var(--vino); transition:.15s; min-width:0;}
+.tab-ic{position:absolute; left:9px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--principal); opacity:.8; display:flex; align-items:center; justify-content:center;}
+.tab-ic svg{width:16px; height:16px;}
+.tab-txt{display:flex; flex-direction:column; align-items:center; min-width:0; max-width:100%; line-height:1.1;}
+.tab-name{font-weight:800; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+.tab-desc{display:block; font-size:9px; font-weight:500; color:var(--gris); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;}
+.tab-btn.active{background:var(--principal); border-color:var(--principal); color:#fff; box-shadow:0 2px 8px rgba(219,82,117,.28);}
+.tab-btn.active .tab-ic{color:#fff; opacity:.9;} .tab-btn.active .tab-desc{color:#ffe1ea;}
 .tabs .tab-btn:last-child:nth-child(odd){grid-column:1/-1;}
 .cats-hint{display:none; text-align:center; font-size:11px; font-weight:700; color:var(--principal); padding-top:4px;}
 .cats-hint.show{display:block;}
@@ -229,7 +229,7 @@ body.searching .tab-panel{display:none !important;}
 .size-card.selected{border-color:var(--principal); background:#fff5f7; box-shadow:var(--sombra);}
 
 .price-bar{
-  position:sticky; bottom:76px; background:var(--blanco);
+  position:sticky; bottom:62px; background:var(--blanco);
   border-radius:var(--radius); padding:14px 16px;
   display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
   box-shadow:var(--sombra-fuerte); margin-top:6px;
@@ -237,12 +237,12 @@ body.searching .tab-panel{display:none !important;}
 .price-bar .total{font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:800; color:var(--vino);}
 .price-bar .total span{font-size:12px; color:var(--gris); font-weight:500; display:block; font-family:'Poppins',sans-serif;}
 .qty-stepper{display:flex; align-items:center; justify-content:center; gap:18px;}
-.qty-btn{width:40px; height:40px; border-radius:50%; border:none; background:var(--principal); color:#fff; font-size:20px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+.qty-btn{width:34px; height:34px; border-radius:50%; border:none; background:var(--principal); color:#fff; font-size:18px; font-weight:700; display:flex; align-items:center; justify-content:center;}
 .qty-value{font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:800; color:var(--vino); min-width:24px; text-align:center;}
 .btn-add{
   background:var(--principal); color:#fff; border:none;
-  padding:12px 20px; border-radius:14px; font-weight:700; font-size:14px;
-  box-shadow:var(--sombra);
+  padding:9px 16px; border-radius:13px; font-weight:700; font-size:13px;
+  box-shadow:0 2px 8px rgba(219,82,117,.22);
 }
 .btn-add:active{transform:scale(.97);}
 
@@ -300,14 +300,17 @@ body.searching .tab-panel{display:none !important;}
 .xchip .xm, .xchip .xplus{border:none; background:#fff; color:var(--principal); width:20px; height:20px; border-radius:50%; font-size:14px; font-weight:800; line-height:1; padding:0; display:inline-flex; align-items:center; justify-content:center;}
 #ubicOverlay, #resumenOverlay{z-index:75;}
 .entrega-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-.entrega-opt{display:flex; flex-direction:column; align-items:center; gap:3px; padding:12px 8px; border:2px solid #f0d7dc; background:#fff; border-radius:16px; color:var(--vino); text-align:center; transition:.15s;}
-.entrega-opt svg{color:var(--principal);} .entrega-opt b{font-size:13px;} .entrega-opt small{font-size:11px; color:var(--gris);}
+.entrega-opt{display:flex; flex-direction:column; align-items:center; gap:2px; padding:9px 6px; border:1.5px solid #f0d7dc; background:#fff; border-radius:16px; color:var(--vino); text-align:center; transition:.15s;}
+.entrega-opt svg{color:var(--principal);} .entrega-opt b{font-size:12.5px;} .entrega-opt small{font-size:11px; color:var(--gris);}
 .entrega-opt.selected{border-color:var(--principal); background:#fff0f3; box-shadow:0 0 0 3px rgba(219,82,117,.18);}
 .ubic-card, .ubic-item{display:flex; align-items:center; gap:10px; padding:10px 12px; border:2px solid #f0d7dc; border-radius:14px; background:#fff; margin-bottom:8px; cursor:pointer;}
 .ubic-item{cursor:default;}
 .ubic-card.selected{border-color:var(--principal); background:#fff0f3;}
 .ubic-ic{width:34px; height:34px; border-radius:50%; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;} .ubic-card.selected .ubic-ic{background:var(--principal); color:#fff;}
 .ubic-tx{flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3;} .ubic-tx b{font-size:13.5px; color:var(--vino);} .ubic-tx small{font-size:11.5px; color:var(--gris);}
+.ubic-links{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:2px;}
+.copy-link{display:inline-flex; align-items:center; gap:4px; border:1px solid #f0d7dc; background:#fff; color:var(--vino); border-radius:10px; padding:2px 8px; font-size:11px; font-weight:700;}
+.ubic-aviso{margin-top:6px;}
 .ubic-map{font-size:11.5px; font-weight:700; color:var(--principal); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:2px;}
 .ubic-radio{width:20px; height:20px; border-radius:50%; border:2px solid #e3c9cf; flex:none;} .ubic-card.selected .ubic-radio{border-color:var(--principal); background:radial-gradient(circle, var(--principal) 45%, #fff 50%);}
 .ubic-acts{display:flex; gap:6px; flex:none;} .mini-ic{width:32px; height:32px; border-radius:50%; border:1.5px solid #f0d7dc; background:#fff; color:var(--vino); display:flex; align-items:center; justify-content:center;}
@@ -315,11 +318,16 @@ body.searching .tab-panel{display:none !important;}
 .uf-err{color:var(--rojo); font-size:12.5px; font-weight:700; min-height:16px; margin-top:6px;} .uf-check{display:flex; gap:8px; align-items:center; font-size:12.5px; margin-top:8px;}
 .ubic-code{margin-top:12px; padding:10px 12px; background:#fff0f3; border-radius:12px; font-size:12px; word-break:break-all;} .ubic-code small{display:block; color:var(--gris); margin-top:4px;}
 .ubic-rest{margin-top:10px; font-size:12.5px;} .ubic-rest summary{cursor:pointer; color:var(--principal); font-weight:700;}
+.rs-edit{display:block; margin:8px auto 0; background:none; border:none; color:var(--gris); font-size:12.5px; font-weight:600; text-decoration:underline; padding:6px 12px;}
 .rs-box{background:#fffafb; border:1.5px solid #f6dfe4; border-radius:14px; padding:8px 12px; margin-bottom:10px;}
 .rs-item{display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px solid #f6e6e9; font-size:13.5px;} .rs-item:last-child{border:none;} .rs-item small{display:block; color:var(--gris); font-size:11.5px; font-weight:400;}
 .rs-row{display:flex; justify-content:space-between; gap:10px; padding:5px 0; font-size:13px; align-items:center;} .rs-row span{display:inline-flex; gap:6px; align-items:center;}
 .rs-dir{font-size:12.5px; color:var(--texto); padding:4px 0 6px 24px; line-height:1.4;}
 .rs-tot{padding:4px 2px 10px;} .rs-row.total{font-size:17px; font-weight:800; color:var(--vino); border-top:1px solid #f0d7dc; margin-top:4px; padding-top:8px;}
+.extras-card{background:#fff; border-radius:var(--radius); padding:14px 14px 12px; box-shadow:var(--sombra);}
+.extras-card h3{margin:0 0 2px; font-family:'Baloo 2',sans-serif; font-size:16.5px; color:var(--vino);}
+.extras-card p{margin:0 0 10px; font-size:12.5px; color:var(--gris);}
+.extras-card .xchip{background:#fffafb;}
 .extras-intro{margin:26px 0 12px; padding:16px; border-radius:18px; background:linear-gradient(135deg,#fff0f3,#ffe6ec); text-align:center;}
 .extras-intro h3{margin:0 0 4px; font-family:'Baloo 2',sans-serif; font-size:19px; color:var(--vino);}
 .extras-intro p{margin:0 0 8px; font-size:13px; color:var(--texto); line-height:1.45;}
@@ -350,7 +358,7 @@ body.searching .tab-panel{display:none !important;}
 .btn-add:has(svg){display:inline-flex; align-items:center; justify-content:center; gap:7px;}
 .btn-mini{display:inline-flex; align-items:center; gap:6px; 
   background:var(--vino); color:#fff; border:none; border-radius:10px;
-  padding:8px 14px; font-weight:700; font-size:12.5px;
+  padding:6px 11px; font-weight:700; font-size:12px;
 }
 .btn-mini:active{transform:scale(.95);}
 
@@ -441,8 +449,8 @@ body.searching .tab-panel{display:none !important;}
 .form-textarea{resize:vertical; min-height:60px;}
 .choice-row{display:flex; gap:8px;}
 .choice-btn{
-  flex:1; border:2px solid #f0d7dc; background:#fff; border-radius:12px;
-  padding:10px; font-weight:700; font-size:13px; text-align:center;
+  flex:1; border:1.5px solid #f0d7dc; background:#fff; border-radius:12px;
+  padding:8px; font-weight:600; font-size:12.5px; text-align:center;
 }
 .choice-btn.selected{background:var(--principal); border-color:var(--principal); color:#fff;}
 
@@ -471,20 +479,19 @@ body.searching .tab-panel{display:none !important;}
 }
 .btn-whatsapp{
   width:100%; background:#25D366; color:#fff; border:none; border-radius:14px;
-  padding:14px; font-weight:700; font-size:15px; display:flex; align-items:center;
-  justify-content:center; gap:8px; box-shadow:var(--sombra);
+  padding:11px; font-weight:700; font-size:14px; display:flex; align-items:center;
+  justify-content:center; gap:8px; box-shadow:0 2px 8px rgba(37,211,102,.25);
 }
 .btn-whatsapp:disabled{opacity:.5;}
 .btn-whatsapp svg{width:20px; height:20px;}
 
-.cartbar{position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:536px; margin:0 auto; z-index:45; display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:18px; background:var(--vino); color:#fff; box-shadow:0 8px 24px rgba(86,9,31,.35); cursor:pointer; transition:.2s;}
-.cartbar.vacio{background:#fff; color:var(--gris); box-shadow:0 4px 16px rgba(86,9,31,.14); border:1.5px solid #f0d7dc;}
-.cb-ic{position:relative; width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; flex:none;} .cartbar.vacio .cb-ic{background:#fff0f3; color:var(--principal);}
-.cb-n{position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; border-radius:10px; background:var(--principal); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; padding:0 5px; border:2px solid var(--vino);} .cartbar.vacio .cb-n{display:none;}
-.cb-txt{flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.2;} .cb-txt b{font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;} .cb-txt small{font-size:11.5px; opacity:.85;}
-.cb-go{flex:none; background:var(--principal); color:#fff; padding:9px 14px; border-radius:14px; font-weight:800; font-size:12.5px;} .cartbar.vacio .cb-go{display:none;}
+.cartbar{position:fixed; left:14px; right:14px; bottom:calc(10px + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; z-index:45; display:flex; align-items:center; gap:10px; padding:6px 8px 6px 8px; border-radius:18px; background:rgba(255,255,255,.97); color:var(--vino); border:1.5px solid #f3cdd6; box-shadow:0 4px 14px rgba(86,9,31,.12); cursor:pointer; transition:.2s; backdrop-filter:blur(6px);}
+.cartbar.vacio{opacity:.92; color:var(--gris);}
+.cb-ic{width:32px; height:32px; border-radius:11px; background:#fff0f3; color:var(--principal); display:flex; align-items:center; justify-content:center; flex:none;}
+.cb-txt{flex:1; min-width:0; font-size:14px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;} .cartbar.vacio .cb-txt{font-weight:600; font-size:13px;}
+.cb-go{flex:none; background:#fff0f3; color:var(--principal); padding:6px 12px; border-radius:14px; font-weight:700; font-size:12px;} .cartbar.vacio .cb-go{display:none;}
 .toast{
-  position:fixed; bottom:84px; left:50%; transform:translateX(-50%) translateY(260px);
+  position:fixed; bottom:68px; left:50%; transform:translateX(-50%) translateY(260px);
   background:var(--vino); color:#fff; padding:12px 22px; border-radius:30px;
   font-size:13.5px; font-weight:600; z-index:80; transition:.3s; box-shadow:var(--sombra-fuerte);
 }
@@ -529,7 +536,7 @@ body.searching .tab-panel{display:none !important;}
   <button class="tab-btn active" data-tab="favoritas"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.7-9.5-9.4A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.5 4.7c-2 4.7-9.5 9.4-9.5 9.4z"/></svg></span><span class="tab-txt"><span class="tab-name">Favoritas</span><span class="tab-desc">Fresas con crema</span></span></button>
   <button class="tab-btn" data-tab="premium"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-1.6 6L12 21M15 3l1.6 6L12 21"/></svg></span><span class="tab-txt"><span class="tab-name">Fresas Dubai</span><span class="tab-desc">Premium</span></span></button>
   <button class="tab-btn" data-tab="personalizada"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></span><span class="tab-txt"><span class="tab-name">Personalizadas</span><span class="tab-desc">Fresas con crema</span></span></button>
-  <button class="tab-btn" data-tab="otros"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M5 20v-5a7 7 0 0 1 14 0v5"/><path d="M8.5 12c1 1.2 2.2 1.2 3.5 0s2.5-1.2 3.5 0"/></svg></span><span class="tab-txt"><span class="tab-name">Más postres</span><span class="tab-desc">Flan y más</span></span></button>
+  <button class="tab-btn" data-tab="otros"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L21 7l-7 7z"/><path d="M3 11v6l11 3v-6"/><path d="M14 20l7-7V7"/><path d="M3 14l11 3 7-4"/></svg></span><span class="tab-txt"><span class="tab-name">Más postres</span><span class="tab-desc">Flan y más</span></span></button>
   <button class="tab-btn" data-tab="bebidas"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10l-1.3 15.2a2 2 0 0 1-2 1.8h-3.4a2 2 0 0 1-2-1.8z"/><path d="M7.4 9h9.2"/><path d="M13 4l1.2-2.4"/></svg></span><span class="tab-txt"><span class="tab-name">Bebidas</span><span class="tab-desc">Frías y calientes</span></span></button>
   </nav>
   <div class="cats-hint" id="catsHint">Desliza para ver más categorías ↓</div>
@@ -541,13 +548,14 @@ body.searching .tab-panel{display:none !important;}
 <section class="tab-panel active" id="panel-favoritas">
   <div class="section-title"><h2 data-t="fav_titulo">Favoritas</h2><p data-t="fav_sub">Combinaciones especiales, probadas y elegidas por nuestros clientes.</p></div>
   <div class="card-list" id="favoritasList"></div>
-  <div class="extras-intro">
+  <div class="section-title" style="margin-top:22px;"><h2 data-t="extras_titulo">Extras</h2></div>
+  <div class="extras-card">
     <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
     <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos</p>
     <div class="extras-img" data-extras-img></div>
+    <div id="favoritasExtrasList"></div>
+    <div class="extras-sum" id="favoritasExtrasSum"></div>
   </div>
-  <div id="favoritasExtrasList"></div>
-  <div class="extras-sum" id="favoritasExtrasSum"></div>
 </section>
 
 <!-- ================= TAB: PERSONALIZADA ================= -->
@@ -616,13 +624,14 @@ body.searching .tab-panel{display:none !important;}
 <section class="tab-panel" id="panel-premium">
   <div class="section-title"><h2 data-t="prem_titulo">Fresas Dubai</h2><p data-t="prem_sub">Una experiencia especial con pistacho, chocolate y nuestro toque Fresas Pop.</p></div>
   <div class="card-list" id="premiumList"></div>
-  <div class="extras-intro">
+  <div class="section-title" style="margin-top:22px;"><h2 data-t="extras_titulo">Extras</h2></div>
+  <div class="extras-card">
     <h3 data-t="extras_hero">¡Hazlo aún más especial!</h3>
     <p data-t="extras_hero_txt">Agrega tus toppings, salsas y complementos favoritos</p>
     <div class="extras-img" data-extras-img></div>
+    <div id="premiumExtrasList"></div>
+    <div class="extras-sum" id="premiumExtrasSum"></div>
   </div>
-  <div id="premiumExtrasList"></div>
-  <div class="extras-sum" id="premiumExtrasSum"></div>
 </section>
 
 <!-- ================= TAB: OTROS POSTRES ================= -->
@@ -653,6 +662,7 @@ body.searching .tab-panel{display:none !important;}
       <span class="loc-txt"><span id="ubicacionText"></span><small>Toca para abrir en Google Maps</small></span>
       <span class="loc-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
     </a>
+    <div style="text-align:right; margin-top:6px;"><button type="button" class="copy-link" data-copy=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><rect x="9" y="9" width="11" height="11" rx="2.2"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg> Copiar enlace</button></div>
   </div>
 
   <div class="info-block">
@@ -671,8 +681,8 @@ body.searching .tab-panel{display:none !important;}
 <!-- ================= CART DRAWER ================= -->
 <div class="overlay" id="overlay"></div>
 <div class="cartbar" id="cartBar" role="button" tabindex="0" aria-label="Ver mi pedido">
-  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg><span class="cb-n" id="cbN">0</span></span>
-  <span class="cb-txt"><b id="cbT1">Tu carrito está vacío</b><small id="cbT2">Agrega tus postres favoritos</small></span>
+  <span class="cb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></span>
+  <span class="cb-txt" id="cbT1">Tu carrito está vacío</span>
   <span class="cb-go" id="cbGo">Ver pedido ›</span>
 </div>
 <aside class="drawer" id="drawer">
@@ -876,7 +886,7 @@ const IC_P = {
   heart:'<path d="M12 20.5s-7.5-4.7-9.5-9.4A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.5 4.7c-2 4.7-9.5 9.4-9.5 9.4z"/>',
   gem:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-1.6 6L12 21M15 3l1.6 6L12 21"/>',
   spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
-  cake:'<path d="M3 20h18"/><path d="M5 20v-5a7 7 0 0 1 14 0v5"/><path d="M8.5 12c1 1.2 2.2 1.2 3.5 0s2.5-1.2 3.5 0"/>',
+  cake:'<path d="M3 11L21 7l-7 7z"/><path d="M3 11v6l11 3v-6"/><path d="M14 20l7-7V7"/><path d="M3 14l11 3 7-4"/>',
   cup:'<path d="M7 4h10l-1.3 15.2a2 2 0 0 1-2 1.8h-3.4a2 2 0 0 1-2-1.8z"/><path d="M7.4 9h9.2"/><path d="M13 4l1.2-2.4"/>',
   star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
   cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>',
@@ -886,9 +896,12 @@ const IC_P = {
   ext:'<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  slice:'<path d="M3 11L21 7l-7 7z"/><path d="M3 11v6l11 3v-6"/><path d="M14 20l7-7V7"/><path d="M3 14l11 3 7-4"/>',
+  copy:'<rect x="9" y="9" width="11" height="11" rx="2.2"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
 };
 const esc = t=> String(t==null?'':t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icMoto = sz=> `<svg viewBox="0 0 32 24" width="${Math.round(sz*1.33)}" height="${sz}" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="3.5" width="10" height="8.5" rx="2.2" fill="currentColor" stroke="none"/><circle cx="7.5" cy="18.5" r="3.6"/><circle cx="25.5" cy="18.5" r="3.6"/><path d="M11 18.5h7.2l-1.6-6.6H11.2" fill="currentColor" fill-opacity=".18"/><path d="M18.2 18.5l2.4-6.6h3.6l1.3 6.6"/><path d="M24 11.9l-1.7-6h4.7"/></svg>`;
 const ic = (n, sz)=> `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="${sz||18}" height="${sz||18}" aria-hidden="true">${IC_P[n]||''}</svg>`;
 const norm = t=> String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function validarCustom(){        // si lo elegido se agotó, se cambia a la primera opción disponible
@@ -1068,7 +1081,7 @@ function renderPersonalizador(){
     const n = extraCount(opt.id), ch = document.createElement('div');
     if(opt.agotado){ ch.className = 'xchip ag'; ch.innerHTML = `<span class="xn">${nombre}</span><span class="ag-tag">Agotado</span>`; cont.appendChild(ch); return; }
     ch.className = 'xchip' + (n>0 ? ' sel' : '') + (n>1 ? ' multi' : '');
-    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+RD$${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
+    ch.innerHTML = `<span class="xn">${nombre}</span><span class="xp">+${opt.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">${n}</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
     ch.addEventListener('click', e=>{
       if(e.target.closest('.xm')){ removeExtra(opt.id); return; }
       if(e.target.closest('.xplus')){ addExtra(opt.id); return; }
@@ -1228,7 +1241,7 @@ async function refrescarDisponibilidad(){
     if(m.exists){
       const d = m.data(), upd = (arr, rem)=>{ (rem||[]).forEach(r=>{ const x = arr.find(y=>y.id===r.id); if(x) x.agotado = r.disponible===false; }); };
       upd(FAVORITAS, d.favoritas); upd(PREMIUM, d.premium); upd(OTROS, d.otros); upd(BEBIDAS, d.bebidas);
-      (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); });
+      (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); else if(/^bebidas?$/.test(norm(c.nombre))) upd(BEBIDAS, c.items); });
       ['bases','cremas','frutas','toppings','extras'].forEach(k=> upd(OPT_ALL[k], d[k]));
     }
     AUTO_AGOT = a.exists ? a.data() : {}; STOCK = st.exists ? st.data() : {};
@@ -1393,7 +1406,11 @@ function renderSimpleList(contId, lista){
   });
 }
 function renderOtros(){ renderSimpleList('otrosList', OTROS); }
-function renderBebidas(){ renderSimpleList('bebidasList', BEBIDAS); }
+const bebSize = {};
+function renderBebidas(){
+  BEBIDAS.forEach(p=>{ if(!p.sizes || !p.sizes.length) p.sizes = [{id:'u', label:'Único', price:p.price||0}]; if(!(p.id in bebSize)) bebSize[p.id] = p.sizes[0].id; });
+  renderCardList('bebidasList', BEBIDAS, bebSize, 'Agregar');
+}
 
 function extraQty(nm){ return cart.filter(i=>i.nombre===nm && !(i.detalles||[]).length).reduce((a,i)=>a+i.cantidad, 0); }
 function refrescarExtras(){
@@ -1422,7 +1439,7 @@ function renderExtrasStandalone(containerId){
     lista.forEach(x=>{
       const ch = document.createElement('div'); ch.className = 'xchip'; ch.dataset.nm = x.nm;
       if(x.agotado){ ch.classList.add('ag'); ch.innerHTML = `<span class="xn">${x.label}</span><span class="ag-tag">Agotado</span>`; w.appendChild(ch); return; }
-      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+RD$${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
+      ch.innerHTML = `<span class="xn">${x.label}</span><span class="xp">+${x.extra}</span><span class="xctl"><button class="xm" aria-label="Quitar uno">−</button><span class="xq">1</span><button class="xplus" aria-label="Agregar otro">+</button></span>`;
       ch.addEventListener('click', e=>{
         if(e.target.closest('.xm')){                         // − : quitar uno (con 1 se deselecciona)
           const it = cart.find(i=>i.nombre===x.nm && !(i.detalles||[]).length); if(!it) return;
@@ -1766,9 +1783,7 @@ function cartSubtotal(){
 function actualizarCartBar(){
   const n = cart.reduce((a,i)=>a+i.cantidad, 0), bar = document.getElementById('cartBar'); if(!bar) return;
   bar.classList.toggle('vacio', n === 0);
-  document.getElementById('cbN').textContent = n;
-  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : n + (n===1 ? ' producto' : ' productos') + ' · ' + money(cartSubtotal());
-  document.getElementById('cbT2').textContent = n === 0 ? 'Agrega tus postres favoritos' : 'Toca para revisar y enviar tu pedido';
+  document.getElementById('cbT1').textContent = n === 0 ? 'Tu carrito está vacío' : n + '  ·  ' + money(cartSubtotal());
 }
 document.getElementById('cartBar').addEventListener('click', ()=> openDrawer());
 document.getElementById('cartBar').addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openDrawer(); } });
@@ -1832,7 +1847,7 @@ function renderCart(){
     <label class="form-label">¿Cómo quieres recibir tu pedido?</label>
     <div class="entrega-row">
       <button class="entrega-opt" id="delivNo">${ic('store',24)}<b>Retirar en el local</b><small>Sin costo</small></button>
-      <button class="entrega-opt" id="delivSi">${ic('moto',24)}<b>Delivery a domicilio</b><small>+${money(CONFIG.deliveryCost)} · solo Cotuí</small></button>
+      <button class="entrega-opt" id="delivSi">${icMoto(26)}<b>Delivery a domicilio</b><small>Desde ${money(CONFIG.deliveryCost)} · dentro de Cotuí</small></button>
     </div>
   </div>`;
 
@@ -1844,13 +1859,14 @@ function renderCart(){
       ${UBIC.items.map(u=>`
         <div class="ubic-card${sel && sel.id===u.id ? ' selected' : ''}" data-id="${u.id}">
           <span class="ubic-ic">${ic('pin',18)}</span>
-          <span class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</span>
+          <span class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</span>
           <span class="ubic-radio"></span>
         </div>`).join('')}
       ${orderState.ubicacionId==='__temp' && sel ? `<div class="ubic-card selected" data-id="__temp"><span class="ubic-ic">${ic('pin',18)}</span><span class="ubic-tx"><b>${esc(sel.nombre)}</b> <small>(solo este pedido)</small><small>${esc(sel.direccion||'Solo enlace de Google Maps')}</small></span><span class="ubic-radio"></span></div>` : ''}
       ${!UBIC.items.length && !sel ? '<div class="step-note">Aún no tienes ubicaciones guardadas. Agrega la de entrega y la tendrás lista para tus próximos pedidos.</div>' : ''}
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"><button class="btn-mini" id="ubicAdd">+ ${UBIC.items.length ? 'Agregar otra ubicación' : 'Agregar mi ubicación'}</button>${UBIC.items.length ? '<button class="btn-mini" id="ubicManage" style="background:#fff; color:var(--principal); border:1.5px solid var(--principal);">Administrar</button>' : ''}</div>
-      <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 RD${costo} aplica SOLO dentro de COTUÍ. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.').replace('{costo}', CONFIG.deliveryCost)}</div>
+      <div class="step-note" style="margin-top:8px;">${T('delivery_nota','🛵 Dentro de COTUÍ el delivery parte de RD${costo} y puede variar según la distancia del destino. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.').replace('{costo}', CONFIG.deliveryCost)}</div>
+      <div class="step-note ubic-aviso">${T('delivery_ubic_aviso','📍 Si no agregas tu ubicación aquí, envíala por WhatsApp para recibir tu pedido.')}</div>
     </div>`;
   }
 
@@ -1916,7 +1932,7 @@ function renderCart(){
 
   html += `<div class="divider"></div>`;
   html += `<div class="summary-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>`;
-  if(orderState.delivery==='si') html += `<div class="summary-row"><span>Delivery</span><span>${money(CONFIG.deliveryCost)}</span></div>`;
+  if(orderState.delivery==='si') html += `<div class="summary-row"><span>Delivery (desde)</span><span>${money(CONFIG.deliveryCost)}</span></div>`;
   if(descuento) html += `<div class="summary-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>`;
   html += `<div class="summary-row total"><span>Total</span><span>${money(total)}</span></div>`;
 
@@ -1948,7 +1964,7 @@ function renderCart(){
   delivSi.addEventListener('click', ()=>{ orderState.delivery='si'; renderCart(); });
   delivNo.addEventListener('click', ()=>{ orderState.delivery='no'; orderState.ubicacion=''; renderCart(); });
 
-  body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a')) return; orderState.ubicacionId = c.dataset.id; renderCart(); }));
+  body.querySelectorAll('.ubic-card').forEach(c=> c.addEventListener('click', e=>{ if(e.target.closest('a') || e.target.closest('.copy-link')) return; orderState.ubicacionId = c.dataset.id; renderCart(); }));
   const ubAdd = document.getElementById('ubicAdd'); if(ubAdd) ubAdd.addEventListener('click', ()=> abrirFormUbic(null, true));
   const ubMan = document.getElementById('ubicManage'); if(ubMan) ubMan.addEventListener('click', abrirUbicaciones);
   const ubicacionInput = document.getElementById('ubicacionInput');
@@ -2025,7 +2041,6 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   if(!nombre){ showToast('Por favor escribe tu nombre'); document.getElementById('nombreInput')?.focus(); return; }
   if(!orderState.delivery){ showToast('Indica si deseas delivery'); return; }
   if(!orderState.pago){ showToast('Elige un método de pago'); return; }
-  if(orderState.delivery==='si' && !ubicSel() && !(orderState.ubicacion||'').trim()){ showToast('Elige o agrega la ubicación de entrega'); abrirFormUbic(null, true); return; }
   const tel = normTel(orderState.telefono);
   if(tel.length!==10){ showToast('Escribe tu número de WhatsApp (10 dígitos)'); document.getElementById('telefonoInput')?.focus(); return; }
   if(orderState.pago==='efectivo'){
@@ -2055,7 +2070,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   });
   const regalos = regalosPedido();
   if(regalos.length){ msg += `*Regalos / premios:*\n`; regalos.forEach(r=>{ msg += `   • ${r}\n`; }); }
-  msg += `\n*Delivery:* ${orderState.delivery==='si' ? 'Sí (+'+money(CONFIG.deliveryCost)+')' : 'No'}\n`;
+  msg += `\n*Delivery:* ${orderState.delivery==='si' ? 'Sí (desde '+money(CONFIG.deliveryCost)+', varía según la distancia)' : 'No'}\n`;
   if(orderState.delivery==='si'){
     const uSel = ubicSel();
     if(uSel){
@@ -2071,7 +2086,7 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
       : ` — paga con ${money(billeteNum())} · cambio a devolver: ${money(billeteNum()-total)}`;
   }
   msg += `\n\n*Subtotal:* ${money(subtotal)}\n`;
-  if(deliveryFee) msg += `*Delivery:* ${money(deliveryFee)}\n`;
+  if(deliveryFee) msg += `*Delivery (desde):* ${money(deliveryFee)}\n`;
   if(descuento) msg += `*Descuento premio:* -${money(descuento)}\n`;
   msg += `*Total:* ${money(total)}\n`;
   if(orderState.notas && orderState.notas.trim()) msg += `\n*Notas:* ${orderState.notas.trim()}\n`;
@@ -2114,18 +2129,17 @@ function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, continuar)
   sh.innerHTML = `<h3>Revisa tu pedido</h3>
     <div class="rs-box">${cart.map(it=>`<div class="rs-item"><div><b>${it.cantidad}× ${it.nombre}</b>${(it.detalles||[]).map(d=>`<small>${esc(d)}</small>`).join('')}</div><span>${money(it.precioUnit*it.cantidad)}</span></div>`).join('')}</div>
     <div class="rs-box">
-      <div class="rs-row"><span>${orderState.delivery==='si' ? ic('moto',18) : ic('store',18)} Entrega</span><b>${orderState.delivery==='si' ? 'Delivery a domicilio' : 'Retiro en el local'}</b></div>
-      ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</div>` : ''}
+      <div class="rs-row"><span>${orderState.delivery==='si' ? icMoto(17) : ic('store',18)} Entrega</span><b>${orderState.delivery==='si' ? 'Delivery a domicilio' : 'Retiro en el local'}</b></div>
+      ${u ? `<div class="rs-dir"><b>${esc(u.nombre)}</b><br>${esc(u.direccion||'')}${u.link ? `<br><span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>` : ''}
       <div class="rs-row"><span>Pago</span><b>${orderState.pago==='transferencia' ? 'Transferencia' : 'Efectivo'}</b></div>
       ${(orderState.nombre||'').trim() ? `<div class="rs-row"><span>A nombre de</span><b>${esc(orderState.nombre.trim())}</b></div>` : ''}
     </div>
-    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
+    <div class="rs-tot"><div class="rs-row"><span>Subtotal</span><span>${money(subtotal)}</span></div>${deliveryFee ? `<div class="rs-row"><span>Delivery (desde)</span><span>${money(deliveryFee)}</span></div>` : ''}${descuento ? `<div class="rs-row"><span>Premio de la ruleta</span><span>-${money(descuento)}</span></div>` : ''}<div class="rs-row total"><span>Total</span><span>${money(total)}</span></div></div>
+    ${orderState.delivery==='si' ? `<div class="step-note" style="margin:0 0 10px;">El delivery parte de ${money(CONFIG.deliveryCost)} y puede variar según la distancia. Te confirmamos el monto por WhatsApp.${u && u.link ? '' : ' Recuerda enviar tu ubicación por WhatsApp.'}</div>` : ''}
     <button class="btn-whatsapp" id="rsEnviar">Enviar por WhatsApp</button>
-    <div style="display:flex; gap:8px; margin-top:8px;"><button class="choice-btn" id="rsEditar" style="flex:1;">Editar pedido</button><button class="choice-btn" id="rsCopiar" style="flex:1;">Copiar mensaje</button></div>
-    <div class="step-note" style="margin-top:8px; text-align:center;">Se abrirá WhatsApp con tu pedido listo. Si no abre (por ejemplo desde Instagram), toca “Copiar mensaje” y pégalo en el chat.</div>`;
+    <button class="rs-edit" id="rsEditar">Editar pedido</button>`;
   document.getElementById('rsEnviar').addEventListener('click', ()=>{ ov.classList.remove('open'); continuar(); });
   document.getElementById('rsEditar').addEventListener('click', ()=> ov.classList.remove('open'));
-  document.getElementById('rsCopiar').addEventListener('click', ()=>{ try{ navigator.clipboard.writeText(limpiarEmoji(msg)); document.getElementById('rsCopiar').textContent = '¡Copiado!'; }catch(e){ showToast('No se pudo copiar'); } });
   ov.onclick = e=>{ if(e.target===ov) ov.classList.remove('open'); };
   ov.classList.add('open');
 }
@@ -2198,6 +2212,13 @@ function ubicSel(){
   return UBIC.items.find(u=>u.id===orderState.ubicacionId) || null;
 }
 /* ----- enlace de Google Maps: se valida el formato y se evita confundirlo con el del local ----- */
+function copiarTexto(t){
+  const ok = ()=> showToast('Enlace copiado');
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(ok, ()=>copiaAlterna(t)); return; } }catch(e){}
+  copiaAlterna(t);
+}
+function copiaAlterna(t){ const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed; opacity:0;'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); showToast('Enlace copiado'); }catch(e){ showToast('No se pudo copiar'); } ta.remove(); }
+document.addEventListener('click', e=>{ const b = e.target.closest('.copy-link'); if(!b) return; e.preventDefault(); e.stopPropagation(); copiarTexto(b.dataset.copy || CONFIG.ubicacionLink); });
 function validarMapsLink(txt){
   let u = String(txt||'').trim(); if(!u) return {ok:true, link:''};
   const m = u.match(/^(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})$/);                       // también se aceptan coordenadas
@@ -2219,7 +2240,7 @@ const ubicOv = document.getElementById('ubicOverlay'), ubicSheet = document.getE
 ubicOv.addEventListener('click', e=>{ if(e.target===ubicOv) cerrarUbic(); });
 function cerrarUbic(){ ubicOv.classList.remove('open'); }
 function abrirUbicaciones(){
-  const lista = UBIC.items.map(u=>`<div class="ubic-item"><div class="ubic-ic">${ic('pin',18)}</div><div class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a>` : ''}</div>
+  const lista = UBIC.items.map(u=>`<div class="ubic-item"><div class="ubic-ic">${ic('pin',18)}</div><div class="ubic-tx"><b>${esc(u.nombre)}</b><small>${esc(u.direccion||'Solo enlace de Google Maps')}</small>${u.link ? `<span class="ubic-links"><a href="${esc(u.link)}" target="_blank" rel="noopener" class="ubic-map">${ic('ext',12)} Ver en Google Maps</a><button type="button" class="copy-link" data-copy="${esc(u.link)}">${ic('copy',12)} Copiar</button></span>` : ''}</div>
       <div class="ubic-acts"><button class="mini-ic" data-ed="${u.id}" aria-label="Editar">${ic('edit',16)}</button><button class="mini-ic" data-del="${u.id}" aria-label="Eliminar">${ic('trash',16)}</button></div></div>`).join('');
   ubicSheet.innerHTML = `<h3>📍 Mis ubicaciones guardadas</h3>
     <div class="step-note" style="margin:0 0 10px;">Guárdalas una vez y elígelas cuando pidas delivery. Puedes tener varias (Casa, Trabajo, Familiar…).</div>
@@ -2255,7 +2276,7 @@ function abrirFormUbic(id, desdeCheckout){
     <input class="form-input" id="ufNombre" placeholder="Ej. Casa de mi mamá" value="${esc(u.nombre)}" maxlength="40">
     <label class="form-label" style="margin-top:10px;">Dirección o referencia</label>
     <textarea class="form-input" id="ufDir" rows="2" placeholder="Calle, número, sector y una referencia" maxlength="200">${esc(u.direccion||'')}</textarea>
-    <label class="form-label" style="margin-top:10px;">Enlace de Google Maps (opcional)</label>
+    <label class="form-label" style="margin-top:10px;">Enlace de Google Maps <span id="ufReq" style="font-weight:600; color:var(--principal);">(obligatorio para guardar)</span></label>
     <input class="form-input" id="ufLink" placeholder="Pega aquí el enlace" value="${esc(u.link||'')}" inputmode="url" autocapitalize="off">
     <div class="step-note" style="margin-top:4px;">En Google Maps: toca tu ubicación → Compartir → Copiar enlace.</div>
     <button class="btn-mini" id="ufProbar" style="margin-top:6px;">${ic('ext',13)} Probar enlace</button>
@@ -2263,6 +2284,7 @@ function abrirFormUbic(id, desdeCheckout){
     ${id ? '' : `<label class="uf-check"><input type="checkbox" id="ufGuardar" checked> Guardar para mis próximos pedidos</label>`}
     <div style="display:flex; gap:8px; margin-top:12px;"><button class="choice-btn" id="ufCancel" style="flex:1;">Cancelar</button><button class="btn-add" id="ufOk" style="flex:1;">Guardar</button></div>`;
   ubicSheet.querySelectorAll('[data-n]').forEach(b=> b.addEventListener('click', ()=>{ document.getElementById('ufNombre').value = b.dataset.n; }));
+  const gchk = document.getElementById('ufGuardar'); if(gchk) gchk.addEventListener('change', ()=>{ document.getElementById('ufReq').textContent = gchk.checked ? '(obligatorio para guardar)' : '(opcional)'; });
   const err = t=>{ document.getElementById('ufErr').textContent = t || ''; };
   document.getElementById('ufProbar').addEventListener('click', ()=>{ const v = validarMapsLink(document.getElementById('ufLink').value); if(!v.ok) return err(v.msg); if(!v.link) return err('Pega primero el enlace.'); err(''); window.open(v.link, '_blank'); });
   document.getElementById('ufCancel').addEventListener('click', ()=>{ if(id) abrirUbicaciones(); else if(UBIC.items.length && !desdeCheckout) abrirUbicaciones(); else cerrarUbic(); });
@@ -2272,6 +2294,7 @@ function abrirFormUbic(id, desdeCheckout){
     if(!v.ok) return err(v.msg);
     if(!dir && !v.link) return err('Escribe la dirección o pega el enlace de Google Maps.');
     const guardar = id ? true : document.getElementById('ufGuardar').checked;
+    if(guardar && !v.link) return err('Para guardar la ubicación pega el enlace de Google Maps.');
     if(id){ Object.assign(u, {nombre, direccion:dir, link:v.link}); ubicGuardar(); abrirUbicaciones(); renderCart(); showToast('Ubicación actualizada'); return; }
     if(!guardar){ orderState.ubicacionId = '__temp'; orderState.ubicTemp = {id:'__temp', nombre, direccion:dir, link:v.link}; cerrarUbic(); renderCart(); return; }
     const nu = {id:'u' + Date.now().toString(36), nombre, direccion:dir, link:v.link};
@@ -2581,6 +2604,8 @@ async function cargarDatosRemotos(){
       if(d.textos){ TEXTOS = d.textos; aplicarConfigTextos(); }
       if(d.ruleta && d.ruleta.length > 1) RULETA_PREMIOS = d.ruleta;
       if(d.categoriasExtra) CATEGORIAS_EXTRA = d.categoriasExtra;
+      { const dup = CATEGORIAS_EXTRA.filter(c=>/^bebidas?$/.test(norm(c.nombre)));        // si ya existía una categoría "Bebidas" creada desde el panel, es la misma sección
+        if(dup.length){ dup.forEach(c=>(c.items||[]).forEach(i=>{ if(!BEBIDAS.some(b=>b.id===i.id)) BEBIDAS.push({...i, agotado:i.disponible===false}); })); CATEGORIAS_EXTRA = CATEGORIAS_EXTRA.filter(c=>!dup.includes(c)); } }
       if(d.categoriasOrden) CATEGORIAS_ORDEN = d.categoriasOrden;
       if(d.categoriasOcultas) CATEGORIAS_OCULTAS = d.categoriasOcultas;
       if(d.categoriasLabels) CATEGORIAS_LABELS = d.categoriasLabels;
@@ -2588,6 +2613,7 @@ async function cargarDatosRemotos(){
         CATEGORIAS_ORDEN = []; CATEGORIAS_LABELS = {};
         if(d.textos) ['fav_titulo','fav_sub','pers_titulo','pers_sub','prem_titulo','prem_sub','otros_titulo','otros_sub'].forEach(k=>{ delete d.textos[k]; });
       }
+      if(!d.deliveryV2 && d.textos) delete d.textos.delivery_nota;
     } else {
       await MENU_DOC.set(construirSeedInicial());
     }

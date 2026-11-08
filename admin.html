@@ -324,16 +324,17 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 
 /* ---------- CARGA / GUARDADO ---------- */
 const FIXED_TABS = [
-  {key:'favoritas', defaultLabel:'Las favoritas', defaultDesc:'Combinaciones ya creadas'},
-  {key:'personalizada', defaultLabel:'Personalizada', defaultDesc:'Crea tu antojo'},
-  {key:'premium', defaultLabel:'Premium', defaultDesc:'Dubái, chocolosas y más'},
-  {key:'otros', defaultLabel:'Otros postres', defaultDesc:'Brownies y más'},
+  {key:'favoritas', defaultLabel:'Favoritas', defaultDesc:'Fresas con crema'},
+  {key:'premium', defaultLabel:'Fresas Dubai', defaultDesc:'Premium'},
+  {key:'personalizada', defaultLabel:'Personalizadas', defaultDesc:'Fresas con crema'},
+  {key:'otros', defaultLabel:'Más postres', defaultDesc:'Flan y más'},
+  {key:'bebidas', defaultLabel:'Bebidas', defaultDesc:'Frías y calientes'},
 ];
 
 async function cargarMenu(){
   const snap = await MENU_DOC.get();
   menu = snap.exists ? snap.data() : {tamanos:[],bases:[],cremas:[],frutas:[],toppings:[],extras:[],favoritas:[],premium:[],otros:[],faq:[],categoriasExtra:[],categoriasOrden:[],categoriasOcultas:[],categoriasLabels:{}};
-  ['tamanos','bases','cremas','frutas','toppings','extras','favoritas','premium','otros','faq','categoriasExtra'].forEach(k=>{ if(!menu[k]) menu[k]=[]; });
+  ['tamanos','bases','cremas','frutas','toppings','extras','favoritas','premium','otros','bebidas','faq','categoriasExtra'].forEach(k=>{ if(!menu[k]) menu[k]=[]; });
   if(!menu.categoriasOrden || !menu.categoriasOrden.length) menu.categoriasOrden = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id));
   { const validas = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id)); menu.categoriasOrden = menu.categoriasOrden.filter(k=>validas.includes(k)); }
   if(!menu.categoriasOcultas) menu.categoriasOcultas = [];
@@ -361,6 +362,26 @@ async function cargarMenu(){
     menu.favoritasV2 = true;
     guardarMenu();
   }
+  if(!menu.categoriasV3){                                   // nuevos nombres, orden y descripciones de las categorías (una sola vez)
+    menu.categoriasOrden = ['favoritas','premium','personalizada','otros','bebidas'].concat((menu.categoriasExtra||[]).map(c=>'extra_'+c.id));
+    menu.categoriasLabels = {};
+    if(menu.textos) ['fav_titulo','fav_sub','pers_titulo','pers_sub','prem_titulo','prem_sub','otros_titulo','otros_sub'].forEach(k=>{ delete menu.textos[k]; });
+    menu.categoriasV3 = true;
+    guardarMenu();
+  }
+  if(!menu.bebidasV2){                                       // una categoría "Bebidas" creada antes en el panel pasa a ser la sección fija Bebidas (sin duplicados)
+    const nrm = t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const dup = (menu.categoriasExtra||[]).filter(c=>/^bebidas?$/.test(nrm(c.nombre)));
+    dup.forEach(c=>{ (c.items||[]).forEach(i=>{ if(!(menu.bebidas||[]).some(b=>b.id===i.id)){ if(!i.sizes || !i.sizes.length){ i.sizes = [{id:'u', label:'Único', price:i.price||0}]; delete i.price; } menu.bebidas.push(i); } }); });
+    if(dup.length){
+      const ids = dup.map(c=>'extra_'+c.id);
+      menu.categoriasExtra = menu.categoriasExtra.filter(c=>!dup.includes(c));
+      menu.categoriasOrden = (menu.categoriasOrden||[]).filter(k=>!ids.includes(k)); menu.categoriasOcultas = (menu.categoriasOcultas||[]).filter(k=>!ids.includes(k));
+      ids.forEach(k=>{ if(menu.categoriasLabels) delete menu.categoriasLabels[k]; });
+    }
+    menu.bebidasV2 = true; guardarMenu();
+  }
+  if(!menu.deliveryV2){ if(menu.textos) delete menu.textos.delivery_nota; menu.deliveryV2 = true; guardarMenu(); }   // nuevo aviso: el monto puede variar por la distancia
   if(!menu.chocoPopV3){ const cp = (menu.favoritas||[]).find(x=>x.id==='choco_pop'); if(cp && /crema tradicional \+ crema de chocolate/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado'; menu.chocoPopV3 = true; guardarMenu(); }
   if(!menu.textos) menu.textos = {};
   renderTodo();
@@ -384,8 +405,9 @@ const CATS = [
 ];
 const PROD_CATS = [
   {key:'favoritas', label:'Favoritas'},
-  {key:'premium', label:'Premium'},
-  {key:'otros', label:'Otros postres'},
+  {key:'premium', label:'Fresas Dubai'},
+  {key:'otros', label:'Más postres'},
+  {key:'bebidas', label:'Bebidas'},
 ];
 
 function renderTodo(){
@@ -483,6 +505,27 @@ function hintOrden(cont){
   cont.appendChild(h);
 }
 
+/* ----- flan: unidades disponibles (las descuentan los pedidos; las cancelaciones las devuelven) ----- */
+const STOCK_REF = db.collection('menu_data').doc('stock');
+function tarjetaStockFlan(){
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff; border:2px solid #f0d7dc; border-radius:16px; padding:12px 14px; margin:10px 0;';
+  box.innerHTML = `<div style="font-weight:700; color:var(--vino); margin-bottom:6px;">🍮 Flan: porciones disponibles para vender</div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;"><input id="stockFlanInp" type="number" min="0" inputmode="numeric" placeholder="Ej. 12" style="width:90px;"><button class="small-btn btn-edit" id="stockFlanGuardar">Guardar</button><button class="small-btn" style="background:#f0e2e4; color:var(--vino);" id="stockFlanSin">Sin límite</button></div>
+    <div class="empty-note" id="stockFlanInfo" style="padding:6px 0 0; text-align:left;">Cargando…</div>`;
+  const pintar = async ()=>{
+    let n = null; try{ const sn = await STOCK_REF.get(); if(sn.exists && typeof sn.data().flan === 'number') n = sn.data().flan; }catch(e){}
+    const inp = box.querySelector('#stockFlanInp'); if(inp && n !== null) inp.value = n;
+    box.querySelector('#stockFlanInfo').innerHTML = n === null ? 'Sin límite: el flan se puede pedir sin tope. Escribe una cantidad para activar el control.' : (n > 0 ? `Quedan <b>${n}</b> porciones. Cada pedido las descuenta; si cancelas un pedido, se devuelven.` : '<b>Agotado</b>: la web muestra ¡AGOTADO! Cuando prepares más, escribe la nueva cantidad.');
+  };
+  box.querySelector('#stockFlanGuardar').addEventListener('click', async ()=>{
+    const v = box.querySelector('#stockFlanInp').value; const n = Math.floor(Number(v));
+    if(v === '' || !(n >= 0)){ showToast('Escribe una cantidad válida'); return; }
+    await STOCK_REF.set({flan:n}, {merge:true}); showToast('Flan: ' + n + ' porciones'); pintar();
+  });
+  box.querySelector('#stockFlanSin').addEventListener('click', async ()=>{ await STOCK_REF.set({flan:firebase.firestore.FieldValue.delete()}, {merge:true}); box.querySelector('#stockFlanInp').value = ''; showToast('Flan sin límite'); pintar(); });
+  pintar(); return box;
+}
 function renderProductos(){
   const cont = document.getElementById('prodContainer');
   cont.innerHTML = '';
@@ -499,6 +542,7 @@ function renderProductos(){
         async ()=>{ if(confirm(`¿Eliminar "${item.nombre}"?`)){ menu[cat.key].splice(idx,1); await guardarMenu(); renderTodo(); showToast('Producto eliminado'); } }));
     });
     ordenarLista(list, menu[cat.key]);
+    if(cat.key==='otros') cont.appendChild(tarjetaStockFlan());
     const addBtn = document.createElement('button');
     addBtn.className = 'btn-add'; addBtn.textContent = `+ Agregar a ${cat.label}`;
     addBtn.addEventListener('click', ()=> abrirModalProducto(cat.key, null));
@@ -1201,8 +1245,13 @@ async function cancelarPedido(tel, pid){
   if(!confirm('¿Cancelar este pedido? No sumará punto.')) return;
   const ref = CLIENTES.doc(tel);
   const c = (await ref.get()).data();
+  const pd = (await ref.collection('pedidos').doc(pid).get()).data() || {};
   await ref.collection('pedidos').doc(pid).update({estado:'cancelado'});
   await ref.update({pendientes: Math.max(0,(c.pendientes||0)-1)});
+  const flanes = (pd.items||[]).filter(i=>/flan/i.test(i.nombre||'')).reduce((n,i)=>n+(i.cantidad||0), 0);      // las porciones de flan vuelven al inventario
+  if(flanes > 0 && pd.estado === 'pendiente'){
+    try{ await db.runTransaction(async tx=>{ const sn = await tx.get(STOCK_REF); if(sn.exists && typeof sn.data().flan === 'number') tx.update(STOCK_REF, {flan: sn.data().flan + flanes}); }); showToast('Se devolvieron ' + flanes + ' porciones de flan'); }catch(e){}
+  }
   cargarPendientes();
   if(document.getElementById('cliDetalle').innerHTML) abrirCliente(tel);
 }
@@ -1296,7 +1345,7 @@ function copiarEnlaceRuleta(){
 }
 
 /* ---------- TEXTOS DE LA PÁGINA ---------- */
-const TEXTOS_CAT = [["Datos del negocio", "slogan", "Slogan (debajo del logo)", "Aquí se viene a ser feliz", 0], ["Datos del negocio", "horario", "Horario", "Miércoles a domingo, de 2:30 PM a 7:30 PM.", 1], ["Datos del negocio", "ubicacion", "Ubicación (texto)", "\"El Local Rosa\" — Calle Hostos, Cotuí, entre la GBC y Guadalupe, República Dominicana.", 1], ["Datos del negocio", "ubicacion_link", "Ubicación (enlace de Google Maps)", "https://maps.app.goo.gl/vyxMdkXAKkUXSp737", 0], ["Datos del negocio", "instagram", "Enlace de Instagram", "https://www.instagram.com/fresaspop", 0], ["Datos del negocio", "whatsapp", "WhatsApp para pedidos (con código de país)", "18297076263", 0], ["Datos del negocio", "delivery_costo", "Costo del delivery (solo número)", "100", 0], ["Datos del negocio", "titular", "Titular de las cuentas", "Darianny Peguero G.", 0], ["Títulos de las secciones", "fav_titulo", "Favoritas: título", "Favoritas de Fresas Pop", 0], ["Títulos de las secciones", "fav_sub", "Favoritas: subtítulo", "Combinaciones ya creadas", 0], ["Títulos de las secciones", "pers_titulo", "Personalizada: título", "Combina tus Fresas Pop", 0], ["Títulos de las secciones", "pers_sub", "Personalizada: subtítulo", "Tú eliges, nosotros las preparamos", 0], ["Títulos de las secciones", "prem_titulo", "Premium: título", "Línea Premium", 0], ["Títulos de las secciones", "prem_sub", "Premium: subtítulo", "Dubái, chocolosas y más", 0], ["Títulos de las secciones", "otros_titulo", "Otros postres: título", "Otros postres", 0], ["Títulos de las secciones", "extras_titulo", "Extras: título", "Extras", 0], ["Títulos de las secciones", "extras_sub", "Extras: subtítulo", "Agrega un poco más a tu pedido", 0], ["Títulos de las secciones", "salsas_label", "Etiqueta de salsas", "Salsas (2 oz)", 0], ["Títulos de las secciones", "toppings_label", "Etiqueta de toppings", "Toppings (2 oz)", 0], ["Personalizada (pasos)", "paso_tamano", "Paso 1", "Elige el tamaño", 0], ["Personalizada (pasos)", "paso_base", "Paso 2", "Elige 1 base", 0], ["Personalizada (pasos)", "paso_crema", "Paso 3", "Elige tu crema", 0], ["Personalizada (pasos)", "paso_fruta", "Paso 4", "Elige tu fruta", 0], ["Personalizada (pasos)", "paso_topping", "Paso 5", "Elige 1 topping", 0], ["Personalizada (pasos)", "paso_cantidad", "Cantidad", "Cantidad", 0], ["Personalizada (pasos)", "paso_extras", "Extras", "Extras 2 oz (opcional)", 0], ["Personalizada (pasos)", "nota_mixto", "Nota de fruta mixta", "* Mixto solo disponible para vasos (no aplica a Canasta Pop)", 1], ["Personalizada (pasos)", "nota_cortesia", "Nota de regalo (base de pistacho)", "🎁 ¡De regalo! Con base de pistacho, la crema de coco y los toppings con costo (excepto Kataifi) no se cobran.", 1], ["Personalizada (pasos)", "btn_agregar_carrito", "Botón agregar", "Agregar al carrito", 0], ["Más información y pie de página", "info_titulo", "Título de Más información", "Más información", 0], ["Más información y pie de página", "horario_titulo", "Título de horario", "🕒 Horario", 0], ["Más información y pie de página", "ubicacion_titulo", "Título de ubicación", "📍 Ubicación", 0], ["Más información y pie de página", "faq_titulo", "Título de preguntas frecuentes", "❓ Preguntas frecuentes", 0], ["Más información y pie de página", "footer_texto", "Texto del pie de página", "Cotuí, República Dominicana", 0], ["Carrito y pedido", "carrito_titulo", "Título del carrito", "Tu pedido", 0], ["Carrito y pedido", "carrito_vacio", "Carrito vacío", "Tu carrito está vacío 🍓", 0], ["Carrito y pedido", "delivery_pregunta", "Pregunta de delivery", "¿Deseas delivery?", 0], ["Carrito y pedido", "delivery_nota", "Aviso de delivery ({costo} = precio)", "🛵 RD${costo} aplica SOLO dentro de COTUÍ. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.", 1], ["Carrito y pedido", "delivery_ubicacion_nota", "Nota de ubicación", "📍 Debe enviar su ubicación actual para recibir su pedido.", 1], ["Carrito y pedido", "delivery_ubicacion_label", "Campo de ubicación", "Pega aquí el link de tu ubicación (opcional)", 0], ["Carrito y pedido", "horario_nota", "Nota de horario (sin delivery)", "🕢 Recuerde que estamos disponibles hasta las 7:30 p. m. para recibir y entregar pedidos.", 1], ["Carrito y pedido", "pago_titulo", "Título de método de pago", "Método de pago", 0], ["Carrito y pedido", "nota_transferencia", "Nota de transferencia (sin delivery)", "Los pedidos pagados por transferencia se preparan con prioridad y quedan listos para retirar. En caso de no poder pasar a recogerlo, será su responsabilidad.", 1], ["Carrito y pedido", "nota_contraentrega", "Nota de contra entrega (sin delivery)", "Los pedidos contra entrega se preparan y se mantienen reservados durante el horario de atención.", 1], ["Carrito y pedido", "nombre_label", "Campo de nombre", "Tu nombre", 0], ["Carrito y pedido", "tel_label", "Campo de teléfono", "Tu número de WhatsApp", 0], ["Carrito y pedido", "tel_ayuda", "Ayuda del teléfono", "Con tu número acumulas sellos en tu Tarjeta VIP: en tu 5.ª compra giras la ruleta y en la 10.ª te regalamos una mini clásica.", 1], ["Carrito y pedido", "notas_label", "Campo de notas", "Notas / aclaraciones (opcional)", 0], ["Carrito y pedido", "btn_enviar", "Botón de enviar", "Enviar pedido por WhatsApp", 0], ["Mensaje de WhatsApp", "msg_saludo", "Saludo del mensaje", "¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:", 0], ["Mensaje de WhatsApp", "msg_ubicacion", "Aviso final de ubicación", "📍 Si eligió delivery, por favor envíe su ubicación actual.", 1], ["Mensaje de WhatsApp", "msg_vip", "Agradecimiento final (tarjeta VIP)", "Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.", 1], ["Mensaje de WhatsApp", "msg_comprobante", "Aviso final de comprobante", "🧾 Si pagó con transferencia, por favor envíe el comprobante.", 1], ["Fidelidad", "vip_label", "Etiqueta bajo el ícono de usuario", "Tarjeta VIP", 0], ["Fidelidad", "vip_b1", "Beneficio 1 (sellos)", "Cada compra te suma un sello; lo confirmamos al finalizar tu pedido.", 1], ["Fidelidad", "vip_b2", "Beneficio 2 (ruleta)", "Con 5 sellos giras la ruleta y ganas premios.", 1], ["Fidelidad", "vip_b3", "Beneficio 3 (regalo)", "Con 10 sellos te regalamos una mini clásica y tu tarjeta vuelve a empezar.", 1], ["Fidelidad", "regalo10", "Mensaje del regalo (pedido 10)", "¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.", 1]];
+const TEXTOS_CAT = [["Datos del negocio", "slogan", "Slogan (debajo del logo)", "Aquí se viene a ser feliz", 0], ["Datos del negocio", "horario", "Horario", "Miércoles a domingo, de 2:30 PM a 7:30 PM.", 1], ["Datos del negocio", "ubicacion", "Ubicación (texto)", "\"El Local Rosa\" — Calle Hostos, Cotuí, entre la GBC y Guadalupe, República Dominicana.", 1], ["Datos del negocio", "ubicacion_link", "Ubicación (enlace de Google Maps)", "https://maps.app.goo.gl/vyxMdkXAKkUXSp737", 0], ["Datos del negocio", "instagram", "Enlace de Instagram", "https://www.instagram.com/fresaspop", 0], ["Datos del negocio", "whatsapp", "WhatsApp para pedidos (con código de país)", "18297076263", 0], ["Datos del negocio", "delivery_costo", "Costo del delivery (solo número)", "100", 0], ["Datos del negocio", "titular", "Titular de las cuentas", "Darianny Peguero G.", 0], ["Títulos de las secciones", "fav_titulo", "Favoritas: título", "Favoritas", 0], ["Títulos de las secciones", "fav_sub", "Favoritas: subtítulo", "Combinaciones especiales, probadas y elegidas por nuestros clientes.", 1], ["Títulos de las secciones", "pers_titulo", "Personalizadas: título", "Personalizadas", 0], ["Títulos de las secciones", "pers_sub", "Personalizadas: subtítulo", "Crea tu propia combinación y elige tus ingredientes favoritos.", 1], ["Títulos de las secciones", "prem_titulo", "Fresas Dubai: título", "Fresas Dubai", 0], ["Títulos de las secciones", "prem_sub", "Fresas Dubai: subtítulo", "Una experiencia especial con pistacho, chocolate y nuestro toque Fresas Pop.", 1], ["Títulos de las secciones", "otros_titulo", "Más postres: título", "Más postres", 0], ["Títulos de las secciones", "otros_sub", "Más postres: subtítulo", "Descubre nuestros flanes y otros postres disponibles.", 1], ["Títulos de las secciones", "bebidas_titulo", "Bebidas: título", "Bebidas", 0], ["Títulos de las secciones", "bebidas_sub", "Bebidas: subtítulo", "Refresca tu día con nuestras bebidas.", 1], ["Títulos de las secciones", "salsas_label", "Etiqueta de salsas", "Salsas y bases (2 oz)", 0], ["Títulos de las secciones", "toppings_label", "Etiqueta de toppings", "Toppings (2 oz)", 0], ["Personalizada (pasos)", "paso_tamano", "Paso 1", "Elige el tamaño", 0], ["Personalizada (pasos)", "paso_base", "Paso 2", "Elige 1 base", 0], ["Personalizada (pasos)", "paso_crema", "Paso 3", "Elige tu crema", 0], ["Personalizada (pasos)", "paso_fruta", "Paso 4", "Elige tu fruta", 0], ["Personalizada (pasos)", "paso_topping", "Paso 5", "Elige 1 topping", 0], ["Personalizada (pasos)", "paso_cantidad", "Cantidad", "Cantidad", 0], ["Personalizada (pasos)", "paso_extras", "Extras", "Extras 2 oz (opcional)", 0], ["Personalizada (pasos)", "nota_mixto", "Nota de fruta mixta", "* Mixto solo disponible para vasos (no aplica a Canasta Pop)", 1], ["Personalizada (pasos)", "nota_cortesia", "Nota de regalo (base de pistacho)", "🎁 ¡De regalo! Con base de pistacho, la crema de coco y los toppings con costo (excepto Kataifi) no se cobran.", 1], ["Personalizada (pasos)", "btn_agregar_carrito", "Botón agregar", "Agregar al carrito", 0], ["Más información y pie de página", "info_titulo", "Título de Más información", "Más información", 0], ["Más información y pie de página", "horario_titulo", "Título de horario", "🕒 Horario", 0], ["Más información y pie de página", "ubicacion_titulo", "Título de ubicación", "📍 Ubicación", 0], ["Más información y pie de página", "faq_titulo", "Título de preguntas frecuentes", "❓ Preguntas frecuentes", 0], ["Más información y pie de página", "footer_texto", "Texto del pie de página", "Cotuí, República Dominicana", 0], ["Carrito y pedido", "carrito_titulo", "Título del carrito", "Tu pedido", 0], ["Carrito y pedido", "carrito_vacio", "Carrito vacío", "Tu carrito está vacío 🍓", 0], ["Carrito y pedido", "delivery_nota", "Aviso de delivery ({costo} = precio)", "🛵 Dentro de COTUÍ el delivery parte de RD${costo} y puede variar según la distancia del destino. Para otras zonas, consulta disponibilidad y tarifa por WhatsApp.", 1], ["Carrito y pedido", "delivery_ubic_aviso", "Aviso de ubicación (delivery)", "📍 Si no agregas tu ubicación aquí, envíala por WhatsApp para recibir tu pedido.", 1], ["Carrito y pedido", "horario_nota", "Nota de horario (sin delivery)", "🕢 Recuerde que estamos disponibles hasta las 7:30 p. m. para recibir y entregar pedidos.", 1], ["Carrito y pedido", "pago_titulo", "Título de método de pago", "Método de pago", 0], ["Carrito y pedido", "nota_transferencia", "Nota de transferencia (sin delivery)", "Los pedidos pagados por transferencia se preparan con prioridad y quedan listos para retirar. En caso de no poder pasar a recogerlo, será su responsabilidad.", 1], ["Carrito y pedido", "nota_contraentrega", "Nota de contra entrega (sin delivery)", "Los pedidos contra entrega se preparan y se mantienen reservados durante el horario de atención.", 1], ["Carrito y pedido", "nombre_label", "Campo de nombre", "Tu nombre", 0], ["Carrito y pedido", "tel_label", "Campo de teléfono", "Tu número de WhatsApp", 0], ["Carrito y pedido", "tel_ayuda", "Ayuda del teléfono", "Con tu número acumulas sellos en tu Tarjeta VIP: en tu 5.ª compra giras la ruleta y en la 10.ª te regalamos una mini clásica.", 1], ["Carrito y pedido", "notas_label", "Campo de notas", "Notas / aclaraciones (opcional)", 0], ["Carrito y pedido", "btn_enviar", "Botón de enviar", "Enviar pedido por WhatsApp", 0], ["Mensaje de WhatsApp", "msg_saludo", "Saludo del mensaje", "¡Hola Fresas Pop! 🍓 Quiero hacer un pedido:", 0], ["Mensaje de WhatsApp", "msg_ubicacion", "Aviso final de ubicación", "📍 Si eligió delivery, por favor envíe su ubicación actual.", 1], ["Mensaje de WhatsApp", "msg_vip", "Agradecimiento final (tarjeta VIP)", "Gracias por preferir a Fresas Pop, ahora cuentas con una tarjeta VIP, donde vas a poder gozar de beneficios y promociones. 🥰 Puedes revisarla siempre que quieras en nuestra web de pedidos.", 1], ["Mensaje de WhatsApp", "msg_comprobante", "Aviso final de comprobante", "🧾 Si pagó con transferencia, por favor envíe el comprobante.", 1], ["Menú y extras", "explora_titulo", "Título sobre el buscador", "EXPLORA NUESTRO MENÚ", 0], ["Menú y extras", "extras_titulo", "Extras: título de la sección", "Extras", 0], ["Menú y extras", "extras_hero", "Extras: título", "¡Hazlo aún más especial!", 0], ["Menú y extras", "extras_hero_txt", "Extras: invitación", "Agrega tus toppings, salsas y complementos favoritos", 1], ["Fidelidad", "vip_label", "Etiqueta bajo el ícono de usuario", "Tarjeta VIP", 0], ["Fidelidad", "vip_b1", "Beneficio 1 (sellos)", "Cada compra te suma un sello; lo confirmamos al finalizar tu pedido.", 1], ["Fidelidad", "vip_b2", "Beneficio 2 (ruleta)", "Con 5 sellos giras la ruleta y ganas premios.", 1], ["Fidelidad", "vip_b3", "Beneficio 3 (regalo)", "Con 10 sellos te regalamos una mini clásica y tu tarjeta vuelve a empezar.", 1], ["Fidelidad", "regalo10", "Mensaje del regalo (pedido 10)", "¡Gracias por ser parte de Fresas Pop! Queremos premiar tu fidelidad, es un regalo por elegirnos siempre.", 1]];
 const BANCOS_DEFAULT = [
   {nombre:'Banreservas', tipo:'Cuenta Corriente', numero:'9608639353'},
   {nombre:'Banco Popular', tipo:'Cuenta Corriente', numero:'856525936'},

@@ -1424,7 +1424,7 @@ function catalogoVenta(){
     const sizes = (p.sizes && p.sizes.length) ? p.sizes.map(s=>({label:s.label, price:Number(s.price)||0})) : [{label:'Único', price:Number(p.price)||0}];
     out.push({grupo, nombre:p.nombre||p.label, sizes, tipo:'plato'});
   });
-  add('Favoritas', md.favoritas); add('Premium', md.premium); add('Otros postres', md.otros);
+  add('Favoritas', md.favoritas); add('Fresas Dubai', md.premium); add('Más postres', md.otros); add('Bebidas', md.bebidas);
   (md.categoriasExtra||[]).forEach(c=> add(c.nombre, c.items));
   const EXC = ['sin_topping','chispas_color','cono'];
   (md.extras||[]).forEach(e=> out.push({grupo:'Extras · salsas (2 oz)', nombre:e.label, sizes:[{label:'Único', price:Number(e.extra)||0}], tipo:'extra'}));
