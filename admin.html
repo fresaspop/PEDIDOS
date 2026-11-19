@@ -1253,18 +1253,7 @@ async function confirmarPedido(tel, pid){
   const pd = pdSnap.exists ? pdSnap.data() : null;
   await ref.collection('pedidos').doc(pid).update({estado:'confirmado'});
   await ref.update({puntos: nuevo, pendientes: Math.max(0,(c.pendientes||0)-1)});
-  // la venta pasa sola a la app de Finanzas (ingresos, costo e inventario)
-  if(pd && pd.origen !== 'qr-local'){
-    try{
-      const hoyD = new Date(), z = n=> String(n).padStart(2,'0');
-      await db.collection('ventas').doc(pid).set({
-        dia: hoyD.getFullYear()+'-'+z(hoyD.getMonth()+1)+'-'+z(hoyD.getDate()), fecha: firebase.firestore.FieldValue.serverTimestamp(),
-        origen:'web', total: pd.total||0, descuento: pd.descuento||0, pago: pd.pago||'', nombre: c.nombre||'', tel, pedidoId: pid,
-        items: (pd.items||[]).map(i=>({nombre:i.nombre, cantidad:i.cantidad||1, detalles:i.detalles||[], precioUnit:i.precioUnit||0})),
-        procesada:false
-      });
-    }catch(e){ console.warn('No se pudo registrar la venta en Finanzas', e); }
-  }
+  // Finanzas es independiente: confirmar un pedido solo suma el sello; ya no crea ventas en Finanzas.
   showToast('✅ Confirmado' + (hito(nuevo) ? ' · ' + hito(nuevo) : ''), hito(nuevo) ? 4500 : 1800);
   cargarPendientes();
   if(document.getElementById('cliDetalle').innerHTML) abrirCliente(tel);

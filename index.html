@@ -1296,7 +1296,7 @@ async function refrescarDisponibilidad(){
       (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); else if(/^bebidas?$/.test(norm(c.nombre))) upd(BEBIDAS, c.items); });
       ['bases','cremas','frutas','toppings','extras'].forEach(k=> upd(OPT_ALL[k], d[k]));
     }
-    AUTO_AGOT = a.exists ? a.data() : {}; STOCK = st.exists ? st.data() : {};
+    AUTO_AGOT = {}; STOCK = st.exists ? st.data() : {};
     aplicarAutoAgotado(); recomputarOpciones(); validarCustom();
     actualizarDisponibilidadDOM(); renderPersonalizador(); renderExtrasStandalone('favoritasExtrasList'); renderExtrasStandalone('premiumExtrasList'); renderCart();
   }catch(e){}
@@ -2785,7 +2785,7 @@ async function cargarDatosRemotos(){
     [FAVORITAS, PREMIUM, OTROS, BEBIDAS].forEach(l=> l.forEach(p=>{ p.desc = choc(p.desc); }));
     const cp = FAVORITAS.find(x=>x.id==='choco_pop'); if(cp && /^(Choco|Crema de chocolate|Base de Nutella \+ crema tradicional \+ crema de chocolate)/i.test(cp.desc||'')) cp.desc = 'Base de Nutella + crema de chocolate + cono triturado';
   }
-  try{ AUTO_AGOT = (await MENU_DOC.parent.doc('auto').get()).data() || {}; }catch(e){}     // lo que se acabó en el inventario (lo publica Finanzas)
+  AUTO_AGOT = {};     // lo que se acabó en el inventario (lo publica Finanzas)
   try{ STOCK = (await MENU_DOC.parent.doc('stock').get()).data() || {}; }catch(e){}         // unidades disponibles de flan (las pone el panel)
   aplicarAutoAgotado(); recomputarOpciones();
   // reconstruir estados que dependen de los arreglos ya actualizados
