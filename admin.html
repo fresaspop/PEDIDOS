@@ -335,6 +335,7 @@ async function cargarMenu(){
   const snap = await MENU_DOC.get();
   menu = snap.exists ? snap.data() : {tamanos:[],bases:[],cremas:[],frutas:[],toppings:[],extras:[],favoritas:[],premium:[],otros:[],faq:[],categoriasExtra:[],categoriasOrden:[],categoriasOcultas:[],categoriasLabels:{}};
   ['tamanos','bases','cremas','frutas','toppings','extras','favoritas','premium','otros','bebidas','faq','categoriasExtra'].forEach(k=>{ if(!menu[k]) menu[k]=[]; });
+  await cargarStockP();
   if(!menu.categoriasOrden || !menu.categoriasOrden.length) menu.categoriasOrden = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id));
   { const validas = FIXED_TABS.map(f=>f.key).concat(menu.categoriasExtra.map(c=>'extra_'+c.id)); menu.categoriasOrden = menu.categoriasOrden.filter(k=>validas.includes(k)); }
   if(!menu.categoriasOcultas) menu.categoriasOcultas = [];
@@ -500,7 +501,7 @@ function crearSwitch(item){
   });
   return l;
 }
-function filaItem(item, titulo, sub, onEdit, onDel){
+function filaItem(item, titulo, sub, onEdit, onDel, conCantidad){
   const card = document.createElement('div');
   card.className = 'card sort-item'; card.dataset.id = item.id;
   card.innerHTML = `<div class="card-row"><div><div class="item-name">${titulo}</div><div class="item-sub">${sub}</div></div>
@@ -508,6 +509,7 @@ function filaItem(item, titulo, sub, onEdit, onDel){
   card.querySelector('.acts').insertBefore(crearSwitch(item), card.querySelector('.btn-edit'));
   card.querySelector('.btn-edit').addEventListener('click', onEdit);
   card.querySelector('.btn-del').addEventListener('click', onDel);
+  if(conCantidad) card.appendChild(lineaCantidad(item));
   return card;
 }
 function hintOrden(cont){
@@ -516,6 +518,45 @@ function hintOrden(cont){
   cont.appendChild(h);
 }
 
+/* ----- cantidad disponible por producto (jugos, postres nuevos…): la descuentan los pedidos; si cancelas, se devuelve ----- */
+const STOCKP_COL = db.collection('stock_productos'); let stockP = {};
+async function cargarStockP(){ try{ const q = await STOCKP_COL.get(); stockP = {}; q.docs.forEach(d=>{ if(typeof d.data().n === 'number') stockP[d.id] = d.data().n; }); }catch(e){} }
+function lineaCantidad(item){
+  const n = stockP[item.id], d = document.createElement('div');
+  d.style.cssText = 'margin-top:8px; display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--vino);';
+  d.innerHTML = `<span>📦 ${typeof n === 'number' ? (n > 0 ? 'Quedan <b>' + n + '</b> para vender' : '<b>Agotado</b> (0 disponibles)') : 'Sin límite de cantidad'}</span><button class="small-btn" style="background:#f0e2e4; color:var(--vino);">${typeof n === 'number' ? 'Cambiar' : 'Limitar cantidad'}</button>`;
+  d.querySelector('button').addEventListener('click', ()=> editarCantidad(item));
+  return d;
+}
+function editarCantidad(item){
+  const n = stockP[item.id], modal = document.getElementById('modalContent');
+  modal.innerHTML = `<h3>📦 Cantidad disponible</h3><p class="item-sub" style="margin:-4px 0 10px;"><b>${item.nombre}</b>: cada pedido descuenta las unidades; si cancelas un pedido, se devuelven. Al llegar a 0 la web muestra ¡AGOTADO!</p>
+    <div class="field"><label>Unidades para vender</label><input id="f_cant" type="number" min="0" inputmode="numeric" placeholder="Ej. 12" value="${typeof n === 'number' ? n : ''}"></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModal()">Cancelar</button><button class="small-btn" style="background:#f0e2e4; color:var(--vino);" onclick="quitarCantidad('${item.id}')">Sin límite</button><button class="btn-save" onclick="guardarCantidad('${item.id}')">Guardar</button></div>`;
+  document.getElementById('overlay').classList.add('active');
+}
+async function guardarCantidad(id){
+  const v = document.getElementById('f_cant').value, n = Math.floor(Number(v));
+  if(v === '' || !(n >= 0)){ showToast('Escribe una cantidad válida'); return; }
+  await STOCKP_COL.doc(id).set({n}); stockP[id] = n; cerrarModal(); renderTodo(); showToast('Cantidad guardada: ' + n);
+}
+async function quitarCantidad(id){ await STOCKP_COL.doc(id).delete(); delete stockP[id]; cerrarModal(); renderTodo(); showToast('Sin límite de cantidad'); }
+// al cancelar un pedido: devuelve las unidades (en cada producto con cantidad propia o, si es flan, en la cantidad compartida del flan)
+async function devolverStock(items){
+  const todos = PROD_CATS.flatMap(c=>menu[c.key]||[]).concat((menu.categoriasExtra||[]).flatMap(c=>c.items||[]));
+  const nrm2 = t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const por = {}; let flanSuelto = 0;
+  (items||[]).forEach(i=>{ const c = i.cantidad||0; if(!c) return; const p = todos.find(x=>nrm2(x.nombre)===nrm2(i.nombre)); if(p) por[p.id] = {c:(por[p.id]?por[p.id].c:0)+c, flan:/flan/i.test(i.nombre)}; else if(/flan/i.test(i.nombre)) flanSuelto += c; });
+  let devueltos = 0;
+  await db.runTransaction(async tx=>{
+    const ids = Object.keys(por), snaps = {}; for(const id of ids) snaps[id] = await tx.get(STOCKP_COL.doc(id));
+    const sf = await tx.get(STOCK_REF); let flan = flanSuelto; const subir = [];
+    ids.forEach(id=>{ const d = snaps[id].exists ? snaps[id].data() : null; if(d && typeof d.n === 'number'){ subir.push([STOCKP_COL.doc(id), {n:d.n + por[id].c}]); devueltos += por[id].c; } else if(por[id].flan) flan += por[id].c; });
+    if(flan > 0 && sf.exists && typeof sf.data().flan === 'number'){ subir.push([STOCK_REF, {flan:sf.data().flan + flan}]); devueltos += flan; }
+    subir.forEach(([r,d])=>tx.update(r, d));
+  });
+  return devueltos;
+}
 /* ----- flan: unidades disponibles (las descuentan los pedidos; las cancelaciones las devuelven) ----- */
 const STOCK_REF = db.collection('menu_data').doc('stock');
 function tarjetaStockFlan(){
@@ -550,7 +591,7 @@ function renderProductos(){
       const precio = item.price!=null ? `RD$${item.price}` : (item.sizes||[]).map(s=>`${s.label}: RD$${s.price}`).join(' · ');
       list.appendChild(filaItem(item, item.nombre, precio,
         ()=> abrirModalProducto(cat.key, idx),
-        async ()=>{ if(confirm(`¿Eliminar "${item.nombre}"?`)){ menu[cat.key].splice(idx,1); await guardarMenu(); renderTodo(); showToast('Producto eliminado'); } }));
+        async ()=>{ if(confirm(`¿Eliminar "${item.nombre}"?`)){ menu[cat.key].splice(idx,1); await guardarMenu(); renderTodo(); showToast('Producto eliminado'); } }, true));
     });
     ordenarLista(list, menu[cat.key]);
     if(cat.key==='otros') cont.appendChild(tarjetaStockFlan());
@@ -1039,6 +1080,7 @@ function renderCategorias(){
             <button class="small-btn btn-del">Eliminar</button>
           </div>
         </div>`;
+      prodCard.appendChild(lineaCantidad(item));
       { const be = prodCard.querySelector('.btn-edit'); be.parentNode.insertBefore(crearSwitch(item), be); be.parentNode.style.alignItems = 'center'; }
       prodCard.querySelector('.btn-edit').addEventListener('click', ()=> abrirModalProductoCategoria(catIdx, prodIdx));
       prodCard.querySelector('.btn-del').addEventListener('click', async ()=>{
@@ -1265,9 +1307,8 @@ async function cancelarPedido(tel, pid){
   const pd = (await ref.collection('pedidos').doc(pid).get()).data() || {};
   await ref.collection('pedidos').doc(pid).update({estado:'cancelado'});
   await ref.update({pendientes: Math.max(0,(c.pendientes||0)-1)});
-  const flanes = (pd.items||[]).filter(i=>/flan/i.test(i.nombre||'')).reduce((n,i)=>n+(i.cantidad||0), 0);      // las porciones de flan vuelven al inventario
-  if(flanes > 0 && pd.estado === 'pendiente'){
-    try{ await db.runTransaction(async tx=>{ const sn = await tx.get(STOCK_REF); if(sn.exists && typeof sn.data().flan === 'number') tx.update(STOCK_REF, {flan: sn.data().flan + flanes}); }); showToast('Se devolvieron ' + flanes + ' porciones de flan'); }catch(e){}
+  if(pd.estado === 'pendiente'){                         // las unidades reservadas por el pedido vuelven a estar disponibles
+    try{ const n = await devolverStock(pd.items); if(n > 0) showToast('Se devolvieron ' + n + ' unidad(es) al control de cantidad'); }catch(e){}
   }
   cargarPendientes();
   if(document.getElementById('cliDetalle').innerHTML) abrirCliente(tel);

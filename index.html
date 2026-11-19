@@ -951,11 +951,23 @@ function validarCustom(){        // si lo elegido se agotó, se cambia a la prim
 }
 const mkAg = arr=> (arr||[]).map(x=>({...x, agotado: x.disponible===false}));
 let OPT_ALL = {bases:mkAg(DEFAULT_BASES), cremas:mkAg(DEFAULT_CREMAS), frutas:mkAg(DEFAULT_FRUTAS), toppings:mkAg(DEFAULT_TOPPINGS), extras:mkAg(DEFAULT_EXTRAS)};
-let AUTO_AGOT = {}, STOCK = {};
+let AUTO_AGOT = {}, STOCK = {}, STOCKP = {};   // STOCK: flan (grupo) · STOCKP: cantidad por producto {id: n}
 const esAgotado = x=> !!(x && (x.agotado || x.agotadoAuto));
 const stockFlan = ()=> (typeof STOCK.flan === 'number') ? STOCK.flan : null;
 const esFlan = p=> /flan/i.test((p && p.nombre !== undefined ? p.nombre : p) || '');
-const stockDe = p=> esFlan(p) ? stockFlan() : null;
+const todosProductos = ()=> [].concat(FAVORITAS, PREMIUM, OTROS, BEBIDAS, ...CATEGORIAS_EXTRA.map(c=>c.items||[]));
+const prodPorNombre = n=> todosProductos().find(x=>norm(x.nombre)===norm(n));
+// "grupo de stock" de un producto: su cantidad propia (p:id) o, si es flan sin cantidad propia, la cantidad compartida del flan
+function grupoStock(p){
+  const real = (p && p.id) ? p : prodPorNombre(p && p.nombre);
+  if(real && typeof STOCKP[real.id] === 'number') return 'p:' + real.id;
+  if(esFlan(p) && stockFlan() !== null) return 'flan';
+  return null;
+}
+const stockG = g=> g===null ? null : (g==='flan' ? stockFlan() : STOCKP[g.slice(2)]);
+const stockDe = p=> stockG(grupoStock(p));
+const enCarritoG = g=> cart.filter(i=>grupoStock({nombre:i.nombre})===g).reduce((a,i)=>a+i.cantidad, 0);
+const nombreGrupo = (g, nombre)=> g==='flan' ? 'porciones de flan' : 'unidades' ;
 const productoAgotado = p=> esAgotado(p) || (stockDe(p)!==null && stockDe(p) <= 0);
 const sinAg = arr=>{ const r = arr.filter(x=>!esAgotado(x)); return r.length ? r : arr; };
 function recomputarOpciones(){ BASES = sinAg(OPT_ALL.bases); CREMAS = sinAg(OPT_ALL.cremas); FRUTAS = sinAg(OPT_ALL.frutas); TOPPINGS = sinAg(OPT_ALL.toppings); EXTRAS = OPT_ALL.extras.filter(x=>!esAgotado(x)); }
@@ -1242,11 +1254,10 @@ function resolveVariante(v){
   return v.options || [];
 }
 
-function stockToast(s){ window.__stkTs = Date.now(); showToast(s>0 ? 'Solo quedan ' + s + ' porciones de flan' : 'El flan está agotado'); }
-const flanEnCarrito = ()=> cart.filter(i=>esFlan(i.nombre)).reduce((a,i)=>a+i.cantidad, 0);
+function stockToast(s, nombre){ window.__stkTs = Date.now(); const flan = esFlan(nombre||''); showToast(s>0 ? (s===1 ? 'Solo queda 1' : 'Solo quedan ' + s) + (flan ? ' porciones de flan' : (nombre ? ' de ' + nombre : ' unidades')) : (nombre ? nombre + ' está agotado' : 'Agotado')); }
 function addToCart(item){
-  const lim = stockDe({nombre:item.nombre});
-  if(lim!==null && flanEnCarrito() + item.cantidad > lim){ stockToast(Math.max(0, lim - flanEnCarrito())); return; }
+  const gs = grupoStock({nombre:item.nombre}), lim = stockG(gs);
+  if(lim!==null && enCarritoG(gs) + item.cantidad > lim){ stockToast(Math.max(0, lim - enCarritoG(gs)), item.nombre); return; }
   const key = JSON.stringify([item.nombre, item.detalles, item.precioUnit]);
   const ex = cart.find(i=> JSON.stringify([i.nombre, i.detalles, i.precioUnit])===key);
   if(ex) ex.cantidad += item.cantidad; else cart.push(item);
@@ -1272,12 +1283,12 @@ function marcarCard(wrap, p){
     if(antes){ wrap.querySelectorAll('button,select').forEach(el=>{ if(el.dataset.agPrev !== '1') el.disabled = false; }); if(add && add.dataset.txt) (add.querySelector('.lbl') || add).textContent = add.dataset.txt; }
   }
   const s = stockDe(p); let nota = wrap.querySelector('.stock-note');
-  if(s!==null && s>0 && s<=5){ if(!nota){ nota = document.createElement('div'); nota.className = 'stock-note'; (wrap.querySelector('.pcard-body')||wrap).appendChild(nota); } nota.textContent = s===1 ? '¡Queda 1 porción!' : '¡Quedan solo ' + s + ' porciones!'; }
+  if(s!==null && s>0 && s<=5){ if(!nota){ nota = document.createElement('div'); nota.className = 'stock-note'; (wrap.querySelector('.pcard-body')||wrap).appendChild(nota); } nota.textContent = esFlan(p) ? (s===1 ? '¡Queda 1 porción!' : '¡Quedan solo ' + s + ' porciones!') : (s===1 ? '¡Queda 1!' : '¡Quedan solo ' + s + '!'); }
   else if(nota) nota.remove();
 }
 function actualizarDisponibilidadDOM(){ document.querySelectorAll('.pcard[data-pid]').forEach(w=>{ const p = buscarProductoPorId(w.dataset.pid); if(p) marcarCard(w, p); }); }
 function lineaAgotada(it){
-  if(esFlan(it.nombre)){ const s = stockFlan(); if(s!==null && cart.filter(i=>esFlan(i.nombre)).reduce((a,i)=>a+i.cantidad,0) > s) return true; }
+  { const g = grupoStock({nombre:it.nombre}), s = stockG(g); if(s!==null && enCarritoG(g) > s) return true; }
   const n = norm(it.nombre);
   for(const l of [FAVORITAS, PREMIUM, OTROS, BEBIDAS]){ const p = l.find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
   for(const c of CATEGORIAS_EXTRA){ const p = (c.items||[]).find(x=>norm(x.nombre)===n); if(p && productoAgotado(p)) return true; }
@@ -1285,18 +1296,18 @@ function lineaAgotada(it){
   const m = /^Topping extra: (.*) 2oz$/.exec(it.nombre); if(m){ const t = OPT_ALL.toppings.find(x=>x.label===m[1]); if(t && esAgotado(t)) return true; }
   return false;
 }
-function textoAgotada(it){ const s = esFlan(it.nombre) ? stockFlan() : null; return (s!==null && s>0) ? 'Solo quedan ' + s + ' porciones. Ajusta la cantidad para continuar.' : '¡AGOTADO! Quítalo para continuar con tu pedido.'; }
+function textoAgotada(it){ const s = stockDe({nombre:it.nombre}); return (s!==null && s>0) ? 'Solo quedan ' + s + (esFlan(it.nombre) ? ' porciones' : ' unidades') + '. Ajusta la cantidad para continuar.' : '¡AGOTADO! Quítalo para continuar con tu pedido.'; }
 /* ----- sincronización en vivo: cambios del panel / inventario mientras el cliente navega ----- */
 async function refrescarDisponibilidad(){
   try{
-    const [m, a, st] = await Promise.all([MENU_DOC.get(), MENU_DOC.parent.doc('auto').get(), MENU_DOC.parent.doc('stock').get()]);
+    const [m, st, sp] = await Promise.all([MENU_DOC.get(), MENU_DOC.parent.doc('stock').get(), db.collection('stock_productos').get().catch(()=>null)]);
     if(m.exists){
       const d = m.data(), upd = (arr, rem)=>{ (rem||[]).forEach(r=>{ const x = arr.find(y=>y.id===r.id); if(x) x.agotado = r.disponible===false; }); };
       upd(FAVORITAS, d.favoritas); upd(PREMIUM, d.premium); upd(OTROS, d.otros); upd(BEBIDAS, d.bebidas);
       (d.categoriasExtra||[]).forEach(c=>{ const mine = CATEGORIAS_EXTRA.find(z=>z.id===c.id); if(mine) upd(mine.items||[], c.items); else if(/^bebidas?$/.test(norm(c.nombre))) upd(BEBIDAS, c.items); });
       ['bases','cremas','frutas','toppings','extras'].forEach(k=> upd(OPT_ALL[k], d[k]));
     }
-    AUTO_AGOT = {}; STOCK = st.exists ? st.data() : {};
+    AUTO_AGOT = {}; STOCK = st.exists ? st.data() : {}; STOCKP = {}; if(sp) sp.docs.forEach(d=>{ if(typeof d.data().n === 'number') STOCKP[d.id] = d.data().n; });
     aplicarAutoAgotado(); recomputarOpciones(); validarCustom();
     actualizarDisponibilidadDOM(); renderPersonalizador(); renderExtrasStandalone('favoritasExtrasList'); renderExtrasStandalone('premiumExtrasList'); renderCart();
   }catch(e){}
@@ -1304,14 +1315,14 @@ async function refrescarDisponibilidad(){
 setInterval(()=>{ if(!document.hidden) refrescarDisponibilidad(); }, 30000);
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) refrescarDisponibilidad(); });
 const unitState = {};
-function topeUnidades(p){ const lim = stockDe(p); return lim !== null ? Math.max(0, lim - flanEnCarrito()) : 20; }
+function topeUnidades(p){ const g = grupoStock(p), lim = stockG(g); return lim !== null ? Math.max(0, lim - enCarritoG(g)) : 20; }
 function qmHTML(p){ return `<div class="qm"><button class="qm-m" aria-label="Menos">−</button><span class="qm-n">1</span><button class="qm-p" aria-label="Más">+</button></div>`; }
 function ligarStepper(wrap, p, precioFn){
   const n = wrap.querySelector('.qm-n'), pr = wrap.querySelector('.pcard-price'), m = wrap.querySelector('.qm-m'), pl = wrap.querySelector('.qm-p');
   const pintar = ()=>{ const tope = topeUnidades(p); let q = unitState[p.id] || 1; if(q > Math.max(1, tope)) q = Math.max(1, tope); unitState[p.id] = q;
     n.textContent = q; m.disabled = q <= 1; pl.disabled = q >= tope; pr.textContent = money(precioFn() * q); };
   m.addEventListener('click', ()=>{ if((unitState[p.id]||1) > 1){ unitState[p.id]--; pintar(); } });
-  pl.addEventListener('click', ()=>{ if((unitState[p.id]||1) < topeUnidades(p)){ unitState[p.id] = (unitState[p.id]||1) + 1; pintar(); } else if(stockDe(p) !== null) stockToast(topeUnidades(p)); });
+  pl.addEventListener('click', ()=>{ if((unitState[p.id]||1) < topeUnidades(p)){ unitState[p.id] = (unitState[p.id]||1) + 1; pintar(); } else if(stockDe(p) !== null) stockToast(topeUnidades(p), p.nombre); });
   wrap._pintarQty = pintar; pintar();
 }
 function ajustarSteppers(){ document.querySelectorAll('.pcard[data-pid]').forEach(w=>{ if(w._pintarQty) w._pintarQty(); }); }
@@ -2065,7 +2076,7 @@ function renderCart(){
   body.querySelectorAll('.cart-item').forEach(row=>{
     const itemUid = row.dataset.uid;
     row.querySelector('.qty-plus').addEventListener('click', ()=>{
-      const it = cart.find(i=>i.uid===itemUid); const lim = stockDe({nombre:it.nombre}); if(lim!==null && flanEnCarrito() + 1 > lim){ stockToast(Math.max(0, lim - flanEnCarrito())); return; } it.cantidad++; renderCart();
+      const it = cart.find(i=>i.uid===itemUid); const gs = grupoStock({nombre:it.nombre}), lim = stockG(gs); if(lim!==null && enCarritoG(gs) + 1 > lim){ stockToast(Math.max(0, lim - enCarritoG(gs)), it.nombre); return; } it.cantidad++; renderCart();
     });
     row.querySelector('.qty-minus').addEventListener('click', ()=>{
       const it = cart.find(i=>i.uid===itemUid);
@@ -2181,11 +2192,11 @@ document.getElementById('sendBtn').addEventListener('click', async ()=>{
   const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
   if(!window.__resumenOK){ mostrarResumen(msg, subtotal, deliveryFee, descuento, total, window.__bloqueEntrega, ()=>{ window.__resumenOK = true; document.getElementById('sendBtn').click(); }); return; }
   window.__resumenOK = false;
-  const needFlan = flanEnCarrito();
-  if(needFlan > 0 && stockFlan() !== null){                       // las porciones de flan se reservan de verdad (transacción); si ya no alcanzan, no se envía
+  const need = {}; cart.forEach(it=>{ const g = grupoStock({nombre:it.nombre}); if(g!==null) need[g] = (need[g]||0) + it.cantidad; });
+  if(Object.keys(need).length){                                    // las unidades se reservan de verdad (transacción); si ya no alcanzan, no se envía
     const w = window.open('', '_blank');
-    try{ await reservarFlan(needFlan); }
-    catch(e){ if(w) w.close(); await refrescarDisponibilidad(); showToast(e && e.restante !== undefined ? (e.restante>0 ? 'Solo quedan ' + e.restante + ' porciones de flan' : 'El flan se agotó') : 'No pudimos confirmar el flan. Intenta de nuevo.'); return; }
+    try{ await reservarStock(need); }
+    catch(e){ if(w) w.close(); await refrescarDisponibilidad(); showToast(e && e.restante !== undefined ? (e.restante>0 ? 'Solo quedan ' + e.restante + (e.nombre ? ' de ' + e.nombre : ' unidades') : (e.nombre ? e.nombre + ' se agotó' : 'Se agotó un producto')) : 'No pudimos confirmar la cantidad. Intenta de nuevo.'); return; }
     if(w) w.location.href = url; else { const w2 = window.open(url, '_blank'); if(!w2) location.href = url; }
   } else window.open(url, '_blank');
 
@@ -2219,15 +2230,21 @@ function mostrarResumen(msg, subtotal, deliveryFee, descuento, total, bloque, co
   ov.onclick = e=>{ if(e.target===ov) ov.classList.remove('open'); };
   ov.classList.add('open');
 }
-async function reservarFlan(n){
-  const ref = MENU_DOC.parent.doc('stock');
+async function reservarStock(need){
+  const refs = {}; Object.keys(need).forEach(g=>{ refs[g] = g==='flan' ? MENU_DOC.parent.doc('stock') : db.collection('stock_productos').doc(g.slice(2)); });
   const res = await db.runTransaction(async tx=>{
-    const sn = await tx.get(ref), d = sn.exists ? sn.data() : {};
-    if(typeof d.flan !== 'number') return null;                     // sin límite configurado
-    if(n > d.flan){ const e = new Error('SIN_STOCK'); e.restante = d.flan; throw e; }
-    tx.update(ref, {flan: d.flan - n}); return d.flan - n;
+    const snaps = {}; for(const g of Object.keys(need)) snaps[g] = await tx.get(refs[g]);      // primero todas las lecturas
+    const nuevos = {};
+    for(const g of Object.keys(need)){
+      const d = snaps[g].exists ? snaps[g].data() : {}, actual = g==='flan' ? d.flan : d.n;
+      if(typeof actual !== 'number') continue;                     // sin límite configurado
+      if(need[g] > actual){ const e = new Error('SIN_STOCK'); e.restante = actual; const p = g==='flan' ? null : todosProductos().find(x=>x.id===g.slice(2)); e.nombre = g==='flan' ? 'el flan' : (p ? p.nombre : ''); throw e; }
+      nuevos[g] = actual - need[g];
+    }
+    Object.keys(nuevos).forEach(g=> tx.update(refs[g], g==='flan' ? {flan:nuevos[g]} : {n:nuevos[g]}));
+    return nuevos;
   });
-  if(res !== null) STOCK.flan = res;
+  Object.keys(res).forEach(g=>{ if(g==='flan') STOCK.flan = res[g]; else STOCKP[g.slice(2)] = res[g]; });
   return res;
 }
 // Los emojis llegan como "?" a WhatsApp desde algunos navegadores (p. ej. el de Instagram): se quitan solo del mensaje.
@@ -2787,6 +2804,7 @@ async function cargarDatosRemotos(){
   }
   AUTO_AGOT = {};     // lo que se acabó en el inventario (lo publica Finanzas)
   try{ STOCK = (await MENU_DOC.parent.doc('stock').get()).data() || {}; }catch(e){}         // unidades disponibles de flan (las pone el panel)
+  try{ STOCKP = {}; (await db.collection('stock_productos').get()).docs.forEach(d=>{ if(typeof d.data().n === 'number') STOCKP[d.id] = d.data().n; }); }catch(e){}   // cantidad disponible por producto
   aplicarAutoAgotado(); recomputarOpciones();
   // reconstruir estados que dependen de los arreglos ya actualizados
   FAVORITAS.forEach(f=>{ if(!(f.id in favSize)) favSize[f.id]=f.sizes[0].id; if(!(f.id in favTopping)) favTopping[f.id]=f.toppingDefault; });
