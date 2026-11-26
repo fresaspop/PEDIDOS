@@ -2090,6 +2090,12 @@ function vAjustes(){
       <button class="btn red" style="margin-top:8px;" onclick="deshacerImportacion()">Deshacer importación</button>
       <div id="impOut" class="sub" style="margin-top:8px;"></div>
     </div>
+    <div class="title" style="margin-top:26px;">Quitar ventas que vinieron de la web</div><div class="card">
+      <div class="sub" style="margin-bottom:8px;">Si ya registraste esas ventas en otra app, aquí las quitas para que no se cuenten dos veces. Primero te muestro cuántas son; antes de borrar se guarda una copia por si las quieres devolver. Tus ventas hechas a mano y las importadas no se tocan.</div>
+      <button class="btn" onclick="revisarVentasWeb()">Buscar ventas de la web</button>
+      <button class="btn sec" style="margin-top:8px;" onclick="restaurarVentasWeb()">Devolver las que quité</button>
+      <div id="vwOut" class="sub" style="margin-top:8px;"></div>
+    </div>
     <div class="title" style="margin-top:26px;">Respaldo y exportación</div><div class="card">
       <div class="sub" style="margin-bottom:8px;">Todo ya vive en la nube y lo ves desde cualquier celular. Estos archivos son tu copia extra: se abren en Excel o Google Sheets. Te recomiendo bajar el respaldo completo una vez al mes.</div>
       <div class="grid2"><div class="field"><label>Desde</label><input type="date" id="exDesde" value="${iso(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}"></div><div class="field"><label>Hasta</label><input type="date" id="exHasta" value="${iso(new Date())}"></div></div>
@@ -2127,6 +2133,42 @@ async function deshacerImportacion(){
     n += s.docs.length;
   }
   out.textContent = 'Se borraron ' + n + ' registros importados.'; toast('Importación deshecha');
+}
+async function revisarVentasWeb(){
+  const out = $('#vwOut'); out.textContent = 'Buscando…';
+  try{
+    const sn = await db.collection('ventas').where('origen','==','web').get(), L = sn.docs.map(d=>({id:d.id, ...d.data()}));
+    window.__vw = L;
+    if(!L.length){ out.textContent = 'No hay ventas de la web registradas. No hay nada que quitar.'; return; }
+    const dias = L.map(v=>v.dia).sort();
+    out.innerHTML = `Encontré <b>${L.length}</b> ventas de la web, del ${dias[0]} al ${dias[dias.length-1]}, que suman <b>${money(sum(L, v=>v.total||0))}</b>.<div class="acts"><button class="btn red" onclick="quitarVentasWeb()">Quitar estas ${L.length} ventas</button></div>`;
+  }catch(e){ out.textContent = 'No se pudo buscar. Revisa tu conexión.'; }
+}
+async function quitarVentasWeb(){
+  const L = window.__vw || [], out = $('#vwOut'); if(!L.length) return;
+  if(!confirm('¿Quitar ' + L.length + ' ventas de la web de Finanzas? Se guarda una copia para poder devolverlas.')) return;
+  const lote = Date.now();
+  try{
+    for(let i=0; i<L.length; i+=150) await db.collection('respaldos').doc('ventasweb_' + lote + '_' + (i/150)).set({tipo:'ventas_web', lote, ts:FV.serverTimestamp(), docs:L.slice(i, i+150).map(v=>JSON.stringify(v))});
+    for(let i=0; i<L.length; i+=400){ const b = db.batch(); L.slice(i, i+400).forEach(v=> b.delete(db.collection('ventas').doc(v.id))); await b.commit(); }
+    window.__vw = []; out.textContent = '✅ Quité ' + L.length + ' ventas de la web. Ya no se cuentan en Finanzas.'; toast('Ventas de la web quitadas ✅', 3000);
+  }catch(e){ out.textContent = 'No se pudo completar. Si algo se borró a medias, usa «Devolver las que quité».'; }
+}
+async function restaurarVentasWeb(){
+  const out = $('#vwOut');
+  try{
+    const sn = await db.collection('respaldos').where('tipo','==','ventas_web').get(); if(sn.empty){ out.textContent = 'No hay ventas quitadas para devolver.'; return; }
+    const lote = Math.max(...sn.docs.map(d=>d.data().lote)), docs = sn.docs.filter(d=>d.data().lote===lote); let n = 0;
+    if(!confirm('¿Devolver las ventas de la web que quitaste?')) return;
+    for(const d of docs){
+      const b = db.batch();
+      d.data().docs.forEach(t=>{ const v = JSON.parse(t), id = v.id; delete v.id;
+        Object.keys(v).forEach(k=>{ const x = v[k]; if(x && typeof x==='object' && typeof x.seconds==='number' && typeof x.nanoseconds==='number') v[k] = new firebase.firestore.Timestamp(x.seconds, x.nanoseconds); });
+        b.set(db.collection('ventas').doc(id), v); n++; });
+      await b.commit(); await d.ref.delete();
+    }
+    out.textContent = '✅ Devolví ' + n + ' ventas de la web.'; toast('Ventas devueltas', 3000);
+  }catch(e){ out.textContent = 'No se pudo devolver.'; }
 }
 async function guardarAjustes(){ await guardarCfg(); toast('Ajustes guardados ✅'); }
 let estGs = [];
