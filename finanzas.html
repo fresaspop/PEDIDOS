@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#56091f">
 <title>Finanzas | Fresas Pop</title>
 <link rel="manifest" href="manifest-finanzas.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fresas Pop">
+<meta name="mobile-web-app-capable" content="yes">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
@@ -137,10 +143,11 @@ details.grp{background:#fff; border-radius:14px; box-shadow:var(--sombra); margi
     <button data-v="ventas" class="m d"><span class="ic">🧾</span>Ventas</button>
     <button data-v="gastos" class="d"><span class="ic">➖</span>Gastos</button>
     <button data-v="ingresos" class="d"><span class="ic">➕</span>Ingresos</button>
-    <button data-v="flujo" class="m d"><span class="ic">📒</span>Flujo de caja</button>
+    <button data-v="flujo" class="d"><span class="ic">📒</span>Flujo de caja</button>
+    <button data-v="movs" class="m"><span class="ic">📒</span>Trans.</button>
     <button data-v="costos" class="d"><span class="ic">🧮</span>Costos y recetas</button>
-    <button data-v="estad" class="m d"><span class="ic">📊</span>Estadísticas</button>
-    <button data-v="cuentas" class="d"><span class="ic">🏦</span>Cuentas</button>
+    <button data-v="estad" class="m d"><span class="ic">📊</span>Estad.</button>
+    <button data-v="cuentas" class="m d"><span class="ic">🏦</span>Cuentas</button>
     <button data-v="compromisos" class="d"><span class="ic">📅</span>Compromisos</button>
     <button data-v="inventario" class="d"><span class="ic">📦</span>Inventario</button>
     <button data-v="ajustes" class="d"><span class="ic">⚙️</span>Configuración</button>
@@ -486,10 +493,10 @@ async function iniciar(){
 }
 $('#nav').addEventListener('click', e=>{ const b = e.target.closest('button'); if(b) ir(b.dataset.v); });
 const ALIAS = {resumen:'estad'};
-const MAPA_NAV = {movs:'flujo', produccion:'inventario', costos:'costos', calendario:'compromisos', deudas:'compromisos', calculadora:'costos', cierre:'mas', proveedores:'mas', presupuestos:'mas', favoritos:'mas', estad:'estad', cuentas:'cuentas', ajustes:'ajustes'};
+const MAPA_NAV = {fichas:'costos', inventario_old:'inventario', movs:'movs', produccion:'inventario', costos:'costos', calendario:'compromisos', deudas:'compromisos', calculadora:'costos', cierre:'mas', proveedores:'mas', presupuestos:'mas', favoritos:'mas', estad:'estad', cuentas:'cuentas', ajustes:'ajustes'};
 function ir(v){
   v = ALIAS[v] || v; vistaActual = v;
-  const RUTAS = {inicio:vInicio, ventas:vVentas, gastos:()=>vLista('gasto'), ingresos:()=>vLista('ingreso'), flujo:vFlujo, compromisos:vCompromisos, movs:vMovs, inventario:vInventario, produccion:vProduccion, costos:vCostos, estad:vEstad, cuentas:vCuentas, ajustes:vAjustes, mas:vMas, calendario:vCalendario, calculadora:vCalculadora, cierre:vCierre, proveedores:vProveedores, deudas:vDeudas, presupuestos:vPresupuestos, favoritos:vFavoritos};
+  const RUTAS = {inicio:vInicio, ventas:vVentas, gastos:()=>vLista('gasto'), ingresos:()=>vLista('ingreso'), flujo:vFlujo, compromisos:vCompromisos, movs:vMovs, inventario:vMP, inventario_old:vInventario, fichas:vFichas, produccion:vProduccion, costos:vCostos, estad:vEstad, cuentas:vCuentas, ajustes:vAjustes, mas:vMas, calendario:vCalendario, calculadora:vCalculadora, cierre:vCierre, proveedores:vProveedores, deudas:vDeudas, presupuestos:vPresupuestos, favoritos:vFavoritos};
   const btns = [...document.querySelectorAll('#nav button')];
   btns.forEach(t=>t.classList.remove('active'));
   let a = btns.find(t=>t.dataset.v===v && t.offsetParent!==null) || btns.find(t=>t.dataset.v===MAPA_NAV[v] && t.offsetParent!==null) || btns.find(t=>t.dataset.v==='inventario' && MAPA_NAV[v]==='inventario');
@@ -557,14 +564,14 @@ async function guardarNotaDia(){
 }
 async function vMovs(){
   const [y, m] = movMes.split('-').map(Number), usaRango = (movF.desde || movF.hasta) && movTab!=='mensual' && movTab!=='calendario';
-  const desde = usaRango ? (movF.desde || '2000-01-01') : (movTab==='mensual' ? movAnio+'-01-01' : movMes+'-01'), hasta = usaRango ? (movF.hasta || '2100-12-31') : (movTab==='mensual' ? movAnio+'-12-31' : movMes+'-'+z2(new Date(y, m, 0).getDate()));
-  const etiqueta = usaRango ? 'Filtrado por fecha' : (movTab==='mensual' ? String(movAnio) : NOM_MES[m-1] + ' ' + y);
+  const desde = usaRango ? (movF.desde || '2000-01-01') : (movTab==='total' ? '2000-01-01' : movTab==='mensual' ? movAnio+'-01-01' : movMes+'-01'), hasta = usaRango ? (movF.hasta || '2100-12-31') : (movTab==='total' ? '2100-12-31' : movTab==='mensual' ? movAnio+'-12-31' : movMes+'-'+z2(new Date(y, m, 0).getDate()));
+  const etiqueta = usaRango ? 'Filtrado por fecha' : (movTab==='total' ? 'Todo el historial' : movTab==='mensual' ? String(movAnio) : NOM_MES[m-1] + ' ' + y);
   const cabecera = `<div class="fecha"><button class="mini" onclick="movNav(-1)">◀</button><div class="name" style="flex:1; text-align:center;">${etiqueta}</div><button class="mini" onclick="movNav(1)">▶</button><button class="mini" onclick="movMes=hoyIso().slice(0,7); movAnio=new Date().getFullYear(); movDia=hoyIso(); vMovs()">Hoy</button></div>
-    <div class="chips sub-tabs">${[['diario','Diario'],['semanal','Semanal'],['calendario','Calend.'],['mensual','Mensual']].map(([k,t])=>`<div class="chip ${movTab===k?'on':''}" onclick="movTab='${k}'; vMovs()">${t}</div>`).join('')}</div>`;
+    <div class="chips sub-tabs">${[['diario','Diario'],['calendario','Calend.'],['mensual','Mensual'],['total','Total'],['nota','Nota']].map(([k,t])=>`<div class="chip ${movTab===k?'on':''}" onclick="movTab='${k}'; vMovs()">${t}</div>`).join('')}</div>`;
   $('#vista').innerHTML = cabecera + '<div class="empty">Cargando…</div>';
   const safe = p=> p.catch(()=>[]);
   const todos = await cargarMovs(desde, hasta);
-  if(movTab==='calendario'){ movNotas = {}; (await safe(qRango('notas', {desde, hasta}))).forEach(n=> movNotas[n.dia] = n.texto); }
+  if(movTab==='calendario' || movTab==='nota'){ movNotas = {}; (await safe(qRango('notas', {desde, hasta}))).forEach(n=> movNotas[n.dia] = n.texto); }
   movItems = todos; const items = aplicarFiltros(todos);
   const ing = sum(items.filter(i=>i.inc===true), i=>i.monto), gas = sum(items.filter(i=>i.inc===false), i=>i.monto);
   const buscador = (movTab==='diario' || movTab==='semanal') ? `<div style="display:flex; gap:6px; margin-bottom:8px;"><input type="search" placeholder="🔎 Buscar por nombre, categoría o nota…" value="${esc(movF.q)}" onchange="movF.q=this.value; vMovs()" style="flex:1;"><button class="mini ${hayFiltros()?'':'sec'}" style="${hayFiltros()?'background:var(--principal); color:#fff;':''}" onclick="filtrosMov()">Filtros${hayFiltros()?' ●':''}</button></div>` : '';
@@ -585,6 +592,12 @@ async function vMovs(){
     }
     const sel = items.filter(i=>i.dia===movDia);
     cuerpo = `<div class="cal">${cel}</div>` + (movDia.startsWith(movMes) ? cabDia(movDia, sel) + (sel.length ? sel.map(filaMov).join('') : '<div class="empty" style="padding:10px;">Nada este día.</div>') + `<div class="field" style="margin-top:10px;"><label>📝 Nota del día</label><textarea id="notaDia" rows="2" style="width:100%; border:2px solid #f0d7dc; border-radius:12px; padding:8px; font-family:inherit;">${esc(movNotas[movDia]||'')}</textarea></div><div style="display:flex; gap:8px;"><button class="mini" onclick="guardarNotaDia()">Guardar nota</button><button class="mini" onclick="nuevoMov('gasto')">+ Registrar este día</button></div>` : '');
+  } else if(movTab==='total'){
+    const sc = await saldosCuentas(), porCat = {}; items.filter(i=>i.inc===false).forEach(i=>{ porCat[i.cat] = (porCat[i.cat]||0) + i.monto; });
+    cuerpo = `<div class="title">Dinero por cuenta</div>` + cuentas().map(c=>`<div class="mv" style="grid-template-columns:minmax(0,1fr) auto; cursor:default;"><b>${c.icono||''} ${esc(c.nombre)}</b><b>${money((sc.s[c.id]||{saldo:0}).saldo)}</b></div>`).join('') + `<div class="title">Gastos por categoría</div>` + (Object.keys(porCat).sort((a,b)=>porCat[b]-porCat[a]).map(k=>`<div class="mv" style="grid-template-columns:minmax(0,1fr) auto; cursor:default;"><span>${esc(k)}</span><span class="out">${money(porCat[k])}</span></div>`).join('') || '<div class="empty">Sin gastos.</div>');
+  } else if(movTab==='nota'){
+    const ks = Object.keys(movNotas).sort().reverse();
+    cuerpo = `<div class="field"><label>📝 Nota del día ${esc(movDia)}</label><textarea id="notaDia" rows="3" style="width:100%; border:2px solid #f0d7dc; border-radius:12px; padding:8px; font-family:inherit;">${esc(movNotas[movDia]||'')}</textarea><button class="btn" style="margin-top:6px;" onclick="guardarNotaDia()">Guardar nota</button></div>` + (ks.map(k=>`<div class="mv" style="grid-template-columns:92px minmax(0,1fr); cursor:pointer;" onclick="movDia='${k}'; vMovs()"><b>${k.slice(8)}/${k.slice(5,7)}</b><span>${esc(movNotas[k])}</span></div>`).join('') || '<div class="empty">No hay notas este mes.</div>');
   } else {
     cuerpo = NOM_MES.map((nm,k)=>{ const its = items.filter(i=>i.dia.slice(5,7)===z2(k+1)), a = sum(its.filter(i=>i.inc===true), i=>i.monto), g = sum(its.filter(i=>i.inc===false), i=>i.monto);
       return `<div class="mv" style="grid-template-columns:70px 1fr auto auto; cursor:pointer;" onclick="movMes='${movAnio}-${z2(k+1)}'; movTab='diario'; vMovs()"><b>${nm.slice(0,3).toLowerCase()}</b><span></span><span class="in">${a?money(a):''}</span><span class="out" style="margin-left:10px;">${g?money(g)+'<br><span class="sub" style="color:var(--gris);">'+money(a-g)+'</span>':''}</span></div>`; }).join('');
@@ -753,23 +766,6 @@ async function moverFavorito(i, d){ const l = cfg.favoritos, j = i + d; if(j<0 |
 async function borrarFavorito(i){ if(!confirm('¿Borrar este favorito?')) return; cfg.favoritos.splice(i,1); await guardarCfg(); vFavoritos(); }
 /* ================= CIERRE DE CAJA ================= */
 const montoEnCuenta = (v, id)=> Array.isArray(v.pagos) && v.pagos.length ? sum(v.pagos.filter(p=>cuentaDe(p.cuenta)===id), p=>p.monto) : (cuentaDe(v.pago)===id ? (Number(v.total)||0) : 0);
-async function vCierre(){
-  $('#vista').innerHTML = navDia() + '<div class="empty">Cargando…</div>';
-  const r = {desde:diaSel, hasta:diaSel}, safe = p=> p.catch(()=>[]), [vs, gs, is] = await Promise.all([qRango('ventas', r), qRango('gastos', r), safe(qRango('ingresos', r))]);
-  const cs = await db.collection('cierres').doc(diaSel).get(), c = cs.exists ? cs.data() : {};
-  const brutas = sum(vs, v=>(v.total||0)+(v.descuento||0)), desc = sum(vs, v=>v.descuento||0), netas = sum(vs, v=>v.total), gastos = sum(gs.filter(g=>!esAhorro(g)), g=>g.monto), gastosEf = sum(gs.filter(g=>cuentaDe(g.pago)==='efectivo'), g=>g.monto);
-  const efV = sum(vs, v=>montoEnCuenta(v,'efectivo')) + sum(vs, v=>cuentaDe(v.pago)==='efectivo' ? (v.propina||0) : 0) + sum(is.filter(x=>cuentaDe(x.pago)==='efectivo'), x=>x.monto);
-  const trf = sum(cuentas().filter(x=>x.id!=='efectivo'), cu=> sum(vs, v=>montoEnCuenta(v, cu.id)) + sum(is.filter(x=>cuentaDe(x.pago)===cu.id), x=>x.monto));
-  const esperado = num(c.inicial) + efV - gastosEf, dif = (c.final!==undefined && c.final!=='') ? num(c.final) - esperado : null;
-  $('#vista').innerHTML = navDia() + `<div class="card"><div class="title" style="margin-top:0;">Cierre del día</div>
-    <div class="row"><span class="sub">Ventas brutas</span><b>${money(brutas)}</b></div><div class="row"><span class="sub">Descuentos</span><b>−${money(desc)}</b></div><div class="row tot"><span>Ventas netas</span><span>${money(netas)}</span></div>
-    <div class="row"><span class="sub">Gastos del día</span><b class="out">${money(gastos)}</b></div><div class="row"><span class="sub">Transferencias recibidas</span><b>${money(trf)}</b></div>
-    <div class="grid2" style="margin-top:8px;"><div class="field"><label>Efectivo inicial</label><input id="cInicial" type="number" inputmode="decimal" value="${c.inicial??''}"></div><div class="field"><label>Efectivo final (contado)</label><input id="cFinal" type="number" inputmode="decimal" value="${c.final??''}"></div></div>
-    <div class="sub">Ventas en efectivo (con propinas): ${money(efV)} · Gastos en efectivo: ${money(gastosEf)}</div><div class="row tot"><span>Efectivo esperado</span><span>${money(esperado)}</span></div>
-    ${dif!==null ? `<div class="row ${dif>=0?'pos':'neg'}"><span>Diferencia de caja</span><b>${money(dif)}</b></div>` : ''}
-    <button class="btn" style="margin-top:10px;" onclick="guardarCierre(${brutas},${desc},${netas},${gastos},${esperado},${trf})">Guardar cierre</button><div class="sub" style="margin-top:6px;">Cada cierre queda guardado: cambia la fecha arriba para consultar otros días.</div></div>`;
-  $('#vista').insertAdjacentHTML('afterbegin', `<a class="back" onclick="ir('mas')">‹ Más</a>`);
-}
 async function guardarCierre(brutas, desc, netas, gastos, esperado, trf){
   const fin = $('#cFinal').value;
   await db.collection('cierres').doc(diaSel).set({inicial:$('#cInicial').value, final:fin, brutas, descuentos:desc, netas, gastos, esperado, transferencias:trf, diferencia: fin==='' ? null : Math.round((num(fin)-esperado)*100)/100, guardado:iso(new Date())}, {merge:true});
@@ -855,7 +851,7 @@ function vMas(){
   const it = (ic, t, s, fn)=> `<div class="menu-item" onclick="${fn}"><span class="ic">${ic}</span><div><b>${t}</b><span class="s">${s}</span></div></div>`;
   $('#vista').innerHTML = it('➖','Gastos','Compras, pagos y servicios',"ir('gastos')") + it('➕','Ingresos','Dinero que entra aparte de las ventas',"ir('ingresos')") + it('🏦','Cuentas','Saldos, transferencias e historial',"ir('cuentas')") + it('🧮','Costos y recetas','Costo, precio y ganancia de cada producto',"ir('costos')") + it('📦','Inventario','Ingredientes, compras y producción',"ir('inventario')") +
     it('📅','Compromisos y pagos pendientes','Calendario, deudas y cuentas por pagar',"ir('compromisos')") + it('🎯','Presupuestos','Límites mensuales por categoría',"ir('presupuestos')") + it('⭐','Favoritos','Movimientos que repites seguido',"ir('favoritos')") + it('🚚','Proveedores','Quién te vende qué y a cómo',"ir('proveedores')") +
-    it('💵','Cierre de caja','Efectivo del día y diferencias',"ir('cierre')") + it('⚙️','Configuración','Categorías, respaldo y ajustes',"ir('ajustes')") + it('🚪','Cerrar sesión','',"salir()");
+    it('💵','Cierre de caja','Efectivo del día y descuento de inventario',"ir('cierre')") + it('📋','Fichas técnicas','Costo, precio y margen de cada producto',"ir('fichas')") + it('📦','Inventario','Materia prima, empaques y limpieza',"ir('inventario')") + it('🗃','Inventario anterior','El inventario viejo (por porciones)',"ir('inventario_old')") + it('⚙️','Configuración','Categorías, respaldo y ajustes',"ir('ajustes')") + it('🚪','Cerrar sesión','',"salir()");
 }
 function menuFab(){
   abrir(`<h3>¿Qué quieres registrar?</h3>
@@ -868,7 +864,7 @@ function menuFab(){
 /* ----- INICIO: menú de accesos rápidos ----- */
 async function vInicio(){
   const c = (ic, t, sub, v)=>`<div class="hc" onclick="ir('${v}')"><span class="ic">${ic}</span><div><b>${t}</b><span class="s">${sub}</span></div></div>`;
-  $('#vista').innerHTML = `<div class="hgrid">${c('🧾','Ventas','Registrar el día','ventas')}${c('➖','Gastos','Compras y pagos','gastos')}${c('➕','Ingresos','Otras entradas','ingresos')}${c('📒','Flujo de caja','Entradas y salidas','flujo')}${c('🧮','Costos y recetas','Precio y ganancia','costos')}${c('📊','Estadísticas','Gráficas del negocio','estad')}${c('🏦','Cuentas','Saldos','cuentas')}${c('📅','Compromisos','Pagos pendientes','compromisos')}${c('📦','Inventario','Ingredientes','inventario')}${c('⚙️','Configuración','Categorías y respaldo','ajustes')}</div><div id="inResumen"></div>`;
+  $('#vista').innerHTML = `<div class="hgrid">${c('🧾','Ventas','Registrar el día','ventas')}${c('➖','Gastos','Compras y pagos','gastos')}${c('➕','Ingresos','Otras entradas','ingresos')}${c('📒','Flujo de caja','Entradas y salidas','flujo')}${c('🧮','Costos y recetas','Precio y ganancia','costos')}${c('📊','Estadísticas','Gráficas del negocio','estad')}${c('🏦','Cuentas','Saldos','cuentas')}${c('📅','Compromisos','Pagos pendientes','compromisos')}${c('💵','Cierre de caja','Cerrar el día','cierre')}${c('📦','Inventario','Materia prima y empaques','inventario')}${c('📋','Fichas técnicas','Costo y margen','fichas')}${c('⚙️','Configuración','Categorías y respaldo','ajustes')}</div><div id="inResumen"></div>`;
   try{
     const r = rangoDe('mes', hoyIso()), safe = p=> p.catch(()=>[]);
     const [vs, gs, is] = await Promise.all([qRango('ventas', r), qRango('gastos', r), safe(qRango('ingresos', r))]);
@@ -2406,6 +2402,379 @@ async function borrarItemCalc(i){
   if(!confirm('¿Borrar ' + it.nombre + '?')) return; c.catalogo.splice(i,1); await guardarCfg(); catalogoCalc();
 }
 
+/* ================= MÓDULO NUEVO: inventario en gramos · fichas técnicas · cierre de caja =================
+   Datos en finanzas_config/mp (documento aparte: el stock nunca se pisa con la configuración general). */
+const MPREF = db.collection('finanzas_config').doc('mp');
+let MP = {items:[], prep:[], fichas:[]}, mpListo = false;
+const MP_GRUPOS = {A:'Materia prima', B:'Empaques y desechables', C:'Limpieza e higiene', D:'Otros suministros'};
+/* [id, nombre, grupo, unidad base, precio de compra, cuántas unidades base trae cada compra, se compra por, nota] */
+const MP_SEED = [
+ ['dulce_leche','Dulce de leche','A','g',1750,4990,'cubo 11 lb','11 lb ≈ 4,990 g (dato tuyo)'],
+ ['pistacho_crunch','Pistacho Carabella Crunch','A','g',6910,4990,'cubo 11 lb',''],
+ ['pistacho_gran','Carabella Gran Pistacho','A','g',4860,4990,'cubo 11 lb',''],
+ ['nutella','Nutella','A','g',2760,4990,'cubo 11 lb',''],
+ ['crema_leche','Crema para batir Danica (sin azúcar)','A','ml',3360/12,1000,'litro','Caja de 12 litros a RD$3,360'],
+ ['fresas','Fresas limpias','A','g',110,260,'paquete','Paquete a RD$100–120 (uso 110). Pesa ~300 g sin limpiar y rinde ~260 g limpias'],
+ ['vainilla','Vainilla','A','ml',240,3115,'galón',''],
+ ['esencia_coco','Esencia de coco','A','ml',180,60,'frasco 2 fl oz',''],
+ ['azucar_glass','Azúcar glass','A','g',310,2268,'funda 5 lb',''],
+ ['coco_rallado','Coco rallado','A','g',700,1134,'funda 2.5 lb',''],
+ ['sal','Sal','A','g',35,454,'libra',''],
+ ['cocoa','Cocoa amarga','A','g',510,450,'bolsa',''],
+ ['leche_condensada','Leche condensada','A','g',4650/48,397,'lata','Caja de 48 latas a RD$4,650'],
+ ['kataifi','Kataifi (antes de tostar)','A','lb',885,1,'libra','1 libra rinde 450 g tostado'],
+ ['mantequilla','Mantequilla','A','barra',100,1,'barra','1 barra tuesta 5 libras de kataifi'],
+ ['granola','Granola','A','g',95,453,'libra',''],
+ ['galleta_choco','Galletas de chocolate','A','g',120,220,'paquete de 10','Cada galleta pesa 22 g'],
+ ['chispas_color','Chispas de colores','A','g',3286,9979,'caja 22 lb','22 lb ≈ 9,979 g'],
+ ['chispas_choco','Chispas de chocolate','A','g',4130,10000,'caja 22 lb (10 kg)',''],
+ ['choco_blanco','Chocolate blanco (discos)','A','g',3840,9979,'caja 22 lb','22 lb ≈ 9,979 g'],
+ ['choco_negro','Chocolate negro (discos)','A','g',4250,9979,'caja 22 lb','22 lb ≈ 9,979 g'],
+ ['syrup_caramelo','Syrup de caramelo','A','g',405,623,'botella 22 oz',''],
+ ['agua','Agua','A','ml',35,19000,'botellón 19 L',''],
+ ['azucar_morena','Azúcar morena','A','g',75,454,'libra',''],
+ ['azucar_blanca','Azúcar blanca','A','g',260,2268,'funda 5 lb',''],
+ ['leche_evaporada','Leche evaporada','A','ml',70,350,'cartón 350 ml',''],
+ ['huevos','Huevos','A','unidad',200,30,'cartón de 30',''],
+ ['maicena','Maicena','A','g',132,425,'unidad',''],
+ ['leche_polvo','Leche en polvo Rica','A','g',700,1000,'bolsa 1000 g',''],
+ ['guantes','Guantes','B','unidad',60,100,'paquete de 100',''],
+ ['bolsa_craft','Bolsa craft 7k','B','unidad',8,1,'unidad',''],
+ ['vaso12','Vaso 12 oz','B','unidad',215,50,'paquete de 50',''],
+ ['vaso9','Vaso 9 oz','B','unidad',200,50,'paquete de 50',''],
+ ['vaso2','Vaso 2 oz','B','unidad',190,100,'paquete de 100',''],
+ ['tapa_domo','Tapa domo (sin hoyo)','B','unidad',185,100,'paquete de 100',''],
+ ['tapa2','Tapa 2 oz','B','unidad',210,100,'paquete de 100',''],
+ ['cuchara','Cuchara','B','unidad',750,1000,'caja (40 paq. de 25)',''],
+ ['servilleta','Servilleta','B','unidad',165,500,'paquete de 500',''],
+ ['gorros','Gorros','B','unidad',250,250,'paquete de 250',''],
+ ['mascarillas','Mascarillas (reutilizables)','B','unidad',300,10,'paquete de 10',''],
+ ['pote12','Pote 12 oz','B','unidad',15,1,'unidad',''],
+ ['stickers','Stickers','B','unidad',2,1,'unidad',''],
+ ['bandeja','Bandeja transparente','B','unidad',8,1,'unidad',''],
+ ['bandeja_tri','Bandeja triangular transparente','B','unidad',10,1,'unidad',''],
+ ['canastas','Canasta','B','unidad',650,50,'caja de 50',''],
+ ['papel_toalla','Papel toalla','C','unidad',70,1,'unidad',''],
+ ['toallas_humedas','Toallas húmedas','C','unidad',115,1,'unidad',''],
+ ['cloro','Cloro','C','unidad',120,1,'medio galón',''],
+ ['mistolin','Mistolín','C','unidad',150,1,'medio galón',''],
+ ['jabon_fregar','Jabón de fregar','C','unidad',150,1,'medio galón',''],
+ ['limpia_cristales','Limpia cristales','C','unidad',250,1,'unidad',''],
+];
+/* preparaciones: se arman con ingredientes; rinde en gramos */
+const PREP_SEED = [
+ {id:'crema_trad', n:'Crema tradicional', rinde:1050, comps:[['crema_leche',1000],['leche_condensada',132],['azucar_glass',40],['sal',6],['vainilla',5]], pend:''},
+ {id:'crema_coco', n:'Crema de coco', rinde:1050, comps:[['crema_leche',1000],['leche_condensada',132],['azucar_glass',40],['sal',6],['coco_rallado',25],['esencia_coco',1.5]], pend:''},
+ {id:'crema_choco', n:'Crema de chocolate', rinde:1050, comps:[['crema_leche',1000],['leche_condensada',132],['azucar_glass',40],['sal',6],['cocoa',35]], pend:''},
+ {id:'pistacho_mezcla', n:'Pistacho (mezcla de los 2 cubos)', rinde:10004, comps:[['pistacho_crunch',4990],['pistacho_gran',4990],['sal',24]], pend:''},
+ {id:'kataifi_tostado', n:'Kataifi tostado', rinde:450, comps:[['kataifi',1],['mantequilla',0.2]], pend:''},
+ {id:'topping_prom', n:'Topping (el cliente lo elige · promedio)', rinde:4, comps:[['granola',1],['galleta_choco',1],['chispas_choco',1],['chispas_color',1]], pend:'Cada cliente elige su topping (10 g). Se costea con el promedio de granola, galleta, chispas de chocolate y chispas de colores.'},
+ {id:'flan_tanda', n:'Flan (tanda)', rinde:8, comps:[['leche_evaporada',700],['leche_condensada',595],['agua',700],['maicena',14],['sal',8],['leche_polvo',37],['huevos',10],['vainilla',30]], pend:'Rinde en PORCIONES: 8 por molde #22 (dato anterior). Si una tanda no llena un molde, cámbialo.'},
+];
+function fichasDef(){
+  const F = [], E12 = [['vaso12',1],['tapa_domo',1],['servilleta',2],['cuchara',1],['bolsa_craft',1]], E9 = [['vaso9',1],['tapa_domo',1],['servilleta',2],['cuchara',1],['bolsa_craft',1]];
+  const L = (arr, r)=> arr.map(([id,q])=>({id, q, r}));
+  // clave, nombre, base, [g12,g9], syrup, [g12,g9], crema, [p12,p9], pendiente
+  const fav = [
+    ['clasica','La Clásica','dulce_leche',[35,25],'dulce_leche',[10,10],'crema_trad',[350,250],'Syrup = dulce de leche (igual que la base). Si lleva syrup de caramelo, cámbialo en la ficha.'],
+    ['balance','Balance','leche_condensada',[35,25],'leche_condensada',[10,10],'crema_trad',[350,250],'Syrup = leche condensada (igual que la base).'],
+    ['paradise','Paradise','pistacho_mezcla',[35,35],'pistacho_mezcla',[35,35],'crema_choco',[450,350],''],
+    ['duopop','DuoPop','pistacho_mezcla',[35,35],'pistacho_mezcla',[35,35],'crema_trad',[450,350],''],
+    ['oasis','Oasis','pistacho_mezcla',[35,35],'pistacho_mezcla',[35,35],'crema_coco',[450,350],''],
+    ['chocopop','Choco Pop','nutella',[40,35],'nutella',[20,20],'crema_choco',[400,300],''],
+    ['nutipop','Nutipop','nutella',[40,35],'nutella',[20,20],'crema_trad',[400,300],''],
+  ];
+  fav.forEach(([k,n,base,bg,syr,sg,cre,pr,pend])=>{
+    [[12,0,105,240,E12],[9,1,70,200,E9]].forEach(([t,ix,cg,fg,emp])=>{
+      F.push({k:k+t, n, t:t+' oz', precio:pr[ix], pend:[],
+        lineas:[{id:base,q:bg[ix],r:'Base'},{id:cre,q:cg,r:'Crema'},{id:'fresas',q:fg,r:'Fresas'},{id:syr,q:sg[ix],r:'Syrup'},{id:'topping_prom',q:10,r:'Topping'}].concat(L(emp,'Empaque'))});
+    });
+  });
+  [[12,0,180,315,60,E12,700],[9,1,140,210,50,E9,550]].forEach(([t,ix,p,f,nu,emp,pr])=>{
+    F.push({k:'dubai'+t, n:'Dubái', t:t+' oz', precio:pr, pend:[],
+      lineas:[{id:'pistacho_mezcla',q:p,r:'Pistacho'},{id:'fresas',q:f,r:'Fresas'},{id:'nutella',q:nu,r:'Nutella'},{id:'kataifi_tostado',q:10,r:'Kataifi'}].concat(L(emp,'Empaque'))});
+  });
+  F.push({k:'canasta', n:'Canasta Pop', t:'única', precio:175, pend:[],
+    lineas:[{id:'crema_trad',q:40,r:'Crema'},{id:'fresas',q:80,r:'Fresas'},{id:'dulce_leche',q:10,r:'Syrup'},{id:'topping_prom',q:10,r:'Topping'}].concat(L([['canastas',1],['bandeja',1],['servilleta',3],['cuchara',1],['bolsa_craft',1]],'Empaque'))});
+  [['nutella','Nutella',75],['dulce_leche','Dulce de leche',65],['leche_condensada','Leche condensada',70],['pistacho_mezcla','Pistacho',75],['chispas_choco','Chispas de chocolate',40],['granola','Granola',35],['kataifi_tostado','Kataifi',15],['galleta_choco','Galletas de chocolate',25]].forEach(([id,n,g])=>{
+    const pv = {nutella:50, pistacho_mezcla:100, dulce_leche:25, leche_condensada:25, granola:25, galleta_choco:25, kataifi_tostado:30, chispas_choco:25}[id] ?? null;
+    F.push({k:'extra_'+id, n:'Extra '+n, t:'2 oz', precio:pv, pend:pv==null?['Falta el precio de venta de este extra.']:[], lineas:[{id,q:g,r:n}].concat(L([['vaso2',1],['tapa2',1]],'Empaque'))});
+  });
+  F.push({k:'flan', n:'Flan', t:'porción', precio:200, pend:[], lineas:[{id:'flan_tanda',q:1,r:'Porción (1/8 del molde)'}]});
+  return F;
+}
+const r3b = x=> Math.round(x*1000)/1000;
+async function mpCargar(forzar){
+  if(mpListo && !forzar) return;
+  const s = await MPREF.get();
+  if(s.exists && (s.data().items||[]).length){
+    MP = {items:s.data().items||[], prep:s.data().prep||[], fichas:s.data().fichas||[]};
+    if((s.data().v||1) < 2){                       // v2: precios de extras, flan, leche en polvo y notas ya resueltas
+      const lp = mpItem('leche_polvo'); if(lp){ lp.n = 'Leche en polvo Rica'; lp.precio = 700; lp.cant = 1000; lp.compra = 'bolsa 1000 g'; lp.nota = ''; }
+      PREP_SEED.forEach(p=>{ const e = mpPrep(p.id); if(e){ e.pend = p.pend; e.n = p.n; } else MP.prep.push({...p, comps:p.comps.map(([id,q])=>({id,q}))}); });
+      MP.fichas = MP.fichas.filter(f=>f.k!=='extra_coco_rallado');
+      fichasDef().forEach(f=>{ const e = MP.fichas.find(x=>x.k===f.k); if(!e) MP.fichas.push(f); else { e.pend = f.pend; if(e.precio==null) e.precio = f.precio; } });
+      await MPREF.set({...MP, v:2});
+    }
+  }
+  else {
+    MP = {items: MP_SEED.map(r=>({id:r[0], n:r[1], g:r[2], ub:r[3], precio:r[4], cant:r[5], compra:r[6], nota:r[7], stock:null, min:null, hist:[]})),
+          prep: PREP_SEED.map(p=>({...p, comps:p.comps.map(([id,q])=>({id,q}))})), fichas: fichasDef()};
+    await MPREF.set({...MP, v:2});
+  }
+  mpListo = true;
+}
+const mpGuardar = ()=> MPREF.set({...MP, v:2});
+const mpItem = id=> MP.items.find(x=>x.id===id), mpPrep = id=> MP.prep.find(x=>x.id===id);
+function cpu(id, prof){                                   // costo por unidad base (null si falta algún precio)
+  prof = prof||0; if(prof>6) return null;
+  const m = mpItem(id); if(m) return (m.precio!=null && m.cant) ? m.precio/m.cant : null;
+  const p = mpPrep(id); if(!p) return null; let t = 0;
+  for(const c of p.comps){ const x = cpu(c.id, prof+1); if(x===null) return null; t += x*c.q; }
+  return t/p.rinde;
+}
+function expandir(id, q, out, prof){
+  prof = prof||0; if(prof>6) return out;
+  if(mpItem(id)){ out[id] = (out[id]||0) + q; return out; }
+  const p = mpPrep(id); if(p) p.comps.forEach(c=> expandir(c.id, c.q*q/p.rinde, out, prof+1));
+  return out;
+}
+const nombreMP = id=> (mpItem(id)||mpPrep(id)||{n:id}).n;
+const ubMP = id=> (mpItem(id)||{ub:'g'}).ub;
+const fq = n=>{ const v = Math.round(n*100)/100; return v.toLocaleString('es-DO',{maximumFractionDigits:2}); };
+const fcu = c=> c===null ? '—' : (c>=1 ? money(c) : 'RD$' + c.toFixed(4));
+function costoFicha(f){
+  let t = 0, falta = [];
+  f.lineas.forEach(l=>{ const c = cpu(l.id); if(c===null) falta.push(nombreMP(l.id)); else t += c*l.q; });
+  const gan = (f.precio!=null && !falta.length) ? f.precio - t : null;
+  return {costo:t, falta, ganancia:gan, margen:(gan!==null && f.precio) ? gan/f.precio*100 : null, pctCosto:(f.precio && !falta.length) ? t/f.precio*100 : null};
+}
+/* ---------- INVENTARIO ---------- */
+let mpTab = 'A', mpQ = '';
+async function vMP(){ $('#vista').innerHTML = '<div class="empty">Cargando…</div>'; try{ await mpCargar(); }catch(e){ $('#vista').innerHTML = '<div class="empty">No se pudo cargar el inventario. Revisa las reglas de Firestore.</div>'; return; } pintarMP(); }
+function pintarMP(){
+  const tabs = Object.keys(MP_GRUPOS).map(k=>`<div class="chip ${mpTab===k?'on':''}" onclick="mpTab='${k}'; pintarMP()">${MP_GRUPOS[k]}</div>`).join('');
+  const L = MP.items.filter(i=>i.g===mpTab && (!mpQ || sinAcentos(i.n).includes(sinAcentos(mpQ)))), bajos = MP.items.filter(i=>i.stock!=null && i.min!=null && i.stock<=i.min);
+  $('#vista').innerHTML = `<div class="chips sub-tabs">${tabs}</div>` +
+    (bajos.length ? `<div class="alerta" style="background:#ffe9e9; border-color:#f0a0a0; color:#8a1f1f;">⚠️ Por reponer: ${bajos.map(i=>esc(i.n)).join(', ')}</div>` : '') +
+    `<input type="search" placeholder="🔎 Buscar…" value="${esc(mpQ)}" onchange="mpQ=this.value; pintarMP()" style="width:100%; margin-bottom:8px;">` +
+    (L.length ? L.map(i=>{ const c = (i.precio!=null && i.cant) ? i.precio/i.cant : null, bajo = i.stock!=null && i.min!=null && i.stock<=i.min;
+      return `<div class="mv" style="grid-template-columns:minmax(0,1fr) auto;" onclick="mpAbrir('${i.id}')"><div><b>${esc(i.n)}</b><div class="sub">${c===null?'⚠️ falta precio':fcu(c)+' por '+esc(i.ub)} · compra: ${esc(i.compra||'')}</div></div><div style="text-align:right;"><b class="${bajo?'out':''}">${i.stock==null?'sin contar':fq(i.stock)+' '+esc(i.ub)}</b></div></div>`; }).join('') : '<div class="empty">Nada aquí todavía.</div>') +
+    `<div class="acts"><button class="btn" onclick="mpAbrir('')">+ Nuevo artículo</button></div>`;
+}
+function mpAbrir(id){
+  const i = id ? mpItem(id) : {id:'', n:'', g:mpTab, ub:'g', precio:'', cant:'', compra:'', stock:null, min:null, nota:'', hist:[]};
+  abrir(`<h3>${id?esc(i.n):'Nuevo artículo'}</h3>
+    <div class="field"><label>Nombre</label><input id="mpN" value="${esc(i.n)}"></div>
+    <div class="grid2"><div class="field"><label>Grupo</label><select id="mpG">${Object.keys(MP_GRUPOS).map(k=>`<option value="${k}" ${i.g===k?'selected':''}>${MP_GRUPOS[k]}</option>`).join('')}</select></div>
+      <div class="field"><label>Unidad de control</label><select id="mpU">${['g','ml','unidad','lb','barra'].map(u=>`<option ${i.ub===u?'selected':''}>${u}</option>`).join('')}</select></div></div>
+    <div class="grid2"><div class="field"><label>Precio de cada compra (RD$)</label><input id="mpP" type="text" inputmode="decimal" value="${i.precio??''}"></div>
+      <div class="field"><label>Cuánto trae cada compra (en la unidad de control)</label><input id="mpC" type="text" inputmode="decimal" value="${i.cant??''}"></div></div>
+    <div class="field"><label>Se compra por (ej. cubo 11 lb, caja, paquete)</label><input id="mpCo" value="${esc(i.compra)}"></div>
+    <div class="grid2"><div class="field"><label>Stock actual (conteo)</label><input id="mpS" type="text" inputmode="decimal" value="${i.stock??''}" placeholder="sin contar"></div>
+      <div class="field"><label>Stock mínimo</label><input id="mpM" type="text" inputmode="decimal" value="${i.min??''}"></div></div>
+    <div class="field"><label>Nota</label><input id="mpNo" value="${esc(i.nota)}"></div>
+    ${id && (i.hist||[]).length ? `<div class="sub" style="margin-bottom:8px;">Historial de precios: ${(i.hist||[]).slice(-5).reverse().map(h=>h.d+' · '+money(h.p)).join(' · ')}</div>` : ''}
+    <div class="acts">${id?`<button class="btn sec" onclick="mpCompra('${id}')">🛒 Registrar compra</button>`:''}<button class="btn" onclick="mpGuardarItem('${id}')">Guardar</button></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cerrar</button>${id?`<button class="btn red" onclick="mpBorrar('${id}')">Borrar</button>`:''}</div>`);
+}
+async function mpGuardarItem(id){
+  const n = $('#mpN').value.trim(); if(!n){ toast('Ponle un nombre'); return; }
+  const v = x=> { const t = String(x).trim(); return t==='' ? null : num(t); };
+  const d = {n, g:$('#mpG').value, ub:$('#mpU').value, precio:v($('#mpP').value), cant:v($('#mpC').value), compra:$('#mpCo').value.trim(), stock:v($('#mpS').value), min:v($('#mpM').value), nota:$('#mpNo').value.trim()};
+  if(id){
+    const it = mpItem(id), antes = it.stock;
+    if(it.precio!==d.precio && d.precio!=null) it.hist = (it.hist||[]).concat([{d:hoyIso(), p:d.precio, q:1}]).slice(-30);
+    Object.assign(it, d);
+    if(d.stock!==antes && d.stock!=null){ const mid = nuevoId('aj'); await db.collection('movimientos').doc(mid).set({insumoId:id, tipo:'ajuste', cantidad:Math.abs(d.stock-(antes||0)), delta:antes==null?d.stock:r3b(d.stock-antes), dia:hoyIso(), ts:FV.serverTimestamp(), origen:'conteo', nota:'Conteo de inventario', stockAntes:antes, stockDespues:d.stock}); }
+  } else { MP.items.push({id:'u_' + Date.now().toString(36), hist:[], ...d}); }
+  await mpGuardar(); cerrar(); toast('Guardado ✅'); pintarMP();
+}
+async function mpBorrar(id){
+  if(MP.fichas.some(f=>f.lineas.some(l=>l.id===id)) || MP.prep.some(p=>p.comps.some(c=>c.id===id))){ toast('Está en una receta: quítalo de ahí primero', 3500); return; }
+  if(!confirm('¿Borrar este artículo?')) return; MP.items = MP.items.filter(x=>x.id!==id); await mpGuardar(); cerrar(); pintarMP();
+}
+let comprando = false;
+function mpCompra(id){
+  const i = mpItem(id);
+  abrir(`<h3>Compra · ${esc(i.n)}</h3><div class="sub" style="margin-bottom:8px;">Suma al inventario y registra <b>un solo gasto</b>. Se compra por: ${esc(i.compra||'unidad')}.</div>
+    <div class="grid2"><div class="field"><label>Cuántas compró</label><input id="cpQ" type="text" inputmode="decimal" placeholder="1"></div><div class="field"><label>Total pagado (RD$)</label><input id="cpT" type="text" inputmode="decimal"></div></div>
+    <div class="grid2"><div class="field"><label>Fecha</label><input id="cpD" type="date" value="${hoyIso()}"></div><div class="field"><label>Pagó con</label><select id="cpP">${opcionesCuenta('efectivo')}</select></div></div>
+    <div class="acts"><button class="btn sec" onclick="mpAbrir('${id}')">Atrás</button><button class="btn" onclick="mpGuardarCompra('${id}')">Guardar compra</button></div>`);
+}
+async function mpGuardarCompra(id){
+  if(comprando) return; const q = num($('#cpQ').value), tot = num($('#cpT').value), dia = $('#cpD').value || hoyIso(), pago = $('#cpP').value;
+  if(!(q>0) || !(tot>0)){ toast('Pon cuántas compró y el total pagado'); return; }
+  comprando = true; const cid = nuevoId('cmp');
+  try{
+    await db.runTransaction(async tx=>{
+      const s = await tx.get(MPREF), d = s.data(), it = d.items.find(x=>x.id===id), add = q*(it.cant||1);
+      if(it.stock!=null) it.stock = r3b(it.stock + add);
+      it.precio = Math.round(tot/q*100)/100; it.hist = (it.hist||[]).concat([{d:dia, p:it.precio, q}]).slice(-30);
+      const cat = (CATEGORIAS_GASTO.find(c=>c.includes({A:'Materia prima',B:'Empaques',C:'Limpieza',D:'Otros'}[it.g])) || CATEGORIAS_GASTO[0]);
+      tx.set(MPREF, d);
+      tx.set(db.collection('gastos').doc(cid), {dia, fecha:FV.serverTimestamp(), categoria:cat, subcategoria:'', descripcion:q + ' × ' + it.n, monto:tot, pago, proveedor:'', origen:'compra', insumoId:id});
+      tx.set(db.collection('movimientos').doc(cid), {insumoId:id, tipo:'compra', cantidad:add, delta:it.stock==null?add:add, dia, ts:FV.serverTimestamp(), origen:'compra', ref:cid, nota:'Compra', total:tot});
+    });
+    await mpCargar(true); cerrar(); toast('Compra guardada ✅'); pintarMP();
+  }catch(e){ toast('No se pudo guardar la compra', 3500); }
+  finally{ comprando = false; }
+}
+/* ---------- FICHAS TÉCNICAS ---------- */
+async function vFichas(){
+  $('#vista').innerHTML = '<div class="empty">Cargando…</div>'; try{ await mpCargar(); }catch(e){ $('#vista').innerHTML = '<div class="empty">No se pudo cargar.</div>'; return; }
+  const nombres = [...new Set(MP.fichas.map(f=>f.n))];
+  $('#vista').innerHTML = `<div class="sub" style="margin-bottom:8px;">Costo = lo que gastas en ingredientes y empaque de cada producto, con tus precios actuales. Toca uno para ver y corregir el detalle.</div>` +
+    nombres.map(n=>`<details class="grp"><summary>${esc(n)}</summary>${MP.fichas.filter(f=>f.n===n).map(f=>{ const c = costoFicha(f);
+      return `<div class="mv" style="grid-template-columns:minmax(0,1fr) auto;" onclick="fichaAbrir('${f.k}')"><div><b>${esc(f.t)}</b><div class="sub">${f.precio!=null?'Precio '+money(f.precio):'⚠️ sin precio'} · ${c.falta.length?'⚠️ faltan precios':'Costo '+money(c.costo)}${f.pend && f.pend.length?' · ⚠️ pendiente':''}</div></div><div style="text-align:right;">${c.ganancia!==null?`<b class="${c.ganancia>=0?'in':'out'}">${money(c.ganancia)}</b><div class="sub">${Math.round(c.margen)}% margen</div>`:''}</div></div>`; }).join('')}</details>`).join('') +
+    `<div class="title" style="margin-top:16px;">Recetas base</div>` + MP.prep.map(p=>{ const c = cpu(p.id); return `<div class="mv" style="grid-template-columns:minmax(0,1fr) auto;" onclick="prepAbrir('${p.id}')"><div><b>${esc(p.n)}</b><div class="sub">Rinde ${fq(p.rinde)} ${p.id==='topping_prom'?'partes':'g'}${p.pend?' · ⚠️ pendiente':''}</div></div><b>${c===null?'—':fcu(c)+'/g'}</b></div>`; }).join('');
+}
+function fichaAbrir(k){
+  const f = MP.fichas.find(x=>x.k===k), c = costoFicha(f);
+  abrir(`<h3>${esc(f.n)} · ${esc(f.t)}</h3>
+    ${f.lineas.map((l,ix)=>{ const u = cpu(l.id); return `<div class="row" style="padding:4px 0; font-size:13px;"><span style="flex:1;">${esc(l.r)}: ${esc(nombreMP(l.id))}</span><input type="text" inputmode="decimal" value="${l.q}" style="width:64px; text-align:right;" onchange="fichaQ('${k}',${ix},this.value)"> <span class="sub" style="width:34px;">${esc(ubMP(l.id)==='g'||mpPrep(l.id)?'g':ubMP(l.id))}</span><b style="width:70px; text-align:right;">${u===null?'—':money(u*l.q)}</b></div>`; }).join('')}
+    <div class="row tot"><span>Costo total</span><span>${c.falta.length?'faltan precios':money(c.costo)}</span></div>
+    <div class="field" style="margin-top:8px;"><label>Precio de venta (RD$)</label><input id="fcP" type="text" inputmode="decimal" value="${f.precio??''}" placeholder="pendiente"></div>
+    ${c.ganancia!==null?`<div class="row"><span class="sub">Ganancia bruta</span><b>${money(c.ganancia)}</b></div><div class="row"><span class="sub">Margen</span><b>${c.margen.toFixed(1)}%</b></div><div class="row"><span class="sub">Costo sobre el precio</span><b>${c.pctCosto.toFixed(1)}%</b></div>`:''}
+    ${c.falta.length?`<div class="alerta">Falta precio en: ${c.falta.map(esc).join(', ')}</div>`:''}
+    ${(f.pend||[]).map(t=>`<div class="sub" style="color:#8a5a00; margin-top:4px;">⚠️ ${esc(t)}</div>`).join('')}
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cerrar</button><button class="btn" onclick="fichaPrecio('${k}')">Guardar precio</button></div>`);
+}
+async function fichaQ(k, ix, v){ const f = MP.fichas.find(x=>x.k===k); f.lineas[ix].q = num(v); await mpGuardar(); fichaAbrir(k); }
+async function fichaPrecio(k){ const f = MP.fichas.find(x=>x.k===k), t = $('#fcP').value.trim(); f.precio = t==='' ? null : num(t); if(f.precio!=null) f.pend = (f.pend||[]).filter(x=>!/precio de venta/i.test(x)); await mpGuardar(); cerrar(); toast('Guardado ✅'); vFichas(); }
+function prepAbrir(id){
+  const p = mpPrep(id), c = cpu(id);
+  abrir(`<h3>${esc(p.n)}</h3>${p.comps.map((x,ix)=>`<div class="row" style="padding:4px 0; font-size:13px;"><span style="flex:1;">${esc(nombreMP(x.id))}</span><input type="text" inputmode="decimal" value="${x.q}" style="width:70px; text-align:right;" onchange="prepQ('${id}',${ix},this.value)"> <span class="sub" style="width:34px;">${esc(ubMP(x.id))}</span></div>`).join('')}
+    <div class="field" style="margin-top:8px;"><label>Cuánto rinde la tanda (${id==='topping_prom'?'partes':'gramos'})</label><input id="ppR" type="text" inputmode="decimal" value="${p.rinde}"></div>
+    <div class="row tot"><span>Costo por ${id==='topping_prom'?'parte (1 g)':'gramo'}</span><span>${c===null?'faltan precios':fcu(c)}</span></div>
+    ${p.pend?`<div class="sub" style="color:#8a5a00; margin-top:6px;">⚠️ ${esc(p.pend)}</div>`:''}
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cerrar</button><button class="btn" onclick="prepRinde('${id}')">Guardar rendimiento</button></div>`);
+}
+async function prepQ(id, ix, v){ mpPrep(id).comps[ix].q = num(v); await mpGuardar(); prepAbrir(id); }
+async function prepRinde(id){ const p = mpPrep(id), v = num($('#ppR').value); if(!(v>0)){ toast('Pon un número'); return; } if(v!==p.rinde) p.pend = ''; p.rinde = v; await mpGuardar(); cerrar(); toast('Guardado ✅'); vFichas(); }
+/* ---------- CIERRE DE CAJA (efectivo + inventario) ---------- */
+const normN = t=> sinAcentos(t||'');
+function fichaDeItem(it){
+  const n = normN(it.nombre), tam = /12|grande/.test(n) ? 12 : (/\b9\b|peque/.test(n) ? 9 : 0);
+  if(/\bextra\b/.test(n)){
+    const m = [['nutella','nutella'],['dulce de leche','dulce_leche'],['condensada','leche_condensada'],['pistacho','pistacho_mezcla'],['chispas','chispas_choco'],['granola','granola'],['katai','kataifi_tostado'],['galleta','galleta_choco']].find(([w])=>n.includes(w));
+    return m ? MP.fichas.find(f=>f.k==='extra_'+m[1]) : null;
+  }
+  if(/canasta/.test(n)) return MP.fichas.find(f=>f.k==='canasta');
+  if(/\bflan\b/.test(n)) return MP.fichas.find(f=>f.k==='flan');
+  const key = /dubai/.test(n) ? 'dubai' : /clasica/.test(n) ? 'clasica' : /balance/.test(n) ? 'balance' : /paradise/.test(n) ? 'paradise' : /duo ?pop/.test(n) ? 'duopop' : /oasis/.test(n) ? 'oasis' : /choco ?pop/.test(n) ? 'chocopop' : /nut(i|t?y) ?pop/.test(n) ? 'nutipop' : null;
+  return (key && tam) ? MP.fichas.find(f=>f.k===key+tam) : null;
+}
+function calcularConsumo(vs){
+  const cons = {}, prods = {}, sinFicha = {};
+  vs.forEach(v=>(v.items||[]).forEach(it=>{
+    const c = Number(it.cantidad)||0; if(!c) return;
+    if(v.origen==='importado') return;
+    const f = fichaDeItem(it);
+    if(!f){ sinFicha[it.nombre] = (sinFicha[it.nombre]||0) + c; return; }
+    prods[f.n + ' ' + f.t] = (prods[f.n + ' ' + f.t]||0) + c;
+    f.lineas.forEach(l=> expandir(l.id, l.q*c, cons));
+  }));
+  Object.keys(cons).forEach(k=> cons[k] = r3b(cons[k]));
+  return {cons, prods, sinFicha};
+}
+let cierreMerma = [], cierreDia = '';
+async function vCierre(){
+  $('#vista').innerHTML = navDia() + '<div class="empty">Cargando…</div>';
+  try{ await mpCargar(); }catch(e){}
+  const r = {desde:diaSel, hasta:diaSel}, safe = p=> p.catch(()=>[]), [vs, gs, is] = await Promise.all([qRango('ventas', r), qRango('gastos', r), safe(qRango('ingresos', r))]);
+  const cs = await db.collection('cierres').doc(diaSel).get(), c = cs.exists ? cs.data() : {}, inv = c.inv || {estado:'borrador', rev:0};
+  if(cierreDia !== diaSel){ cierreDia = diaSel; cierreMerma = (inv.estado==='confirmado' ? inv.mermas : inv.mermas) || []; }
+  const brutas = sum(vs, v=>(v.total||0)+(v.descuento||0)), desc = sum(vs, v=>v.descuento||0), netas = sum(vs, v=>v.total), gastos = sum(gs.filter(g=>!esAhorro(g)), g=>g.monto), gastosEf = sum(gs.filter(g=>cuentaDe(g.pago)==='efectivo'), g=>g.monto);
+  const efV = sum(vs, v=>montoEnCuenta(v,'efectivo')) + sum(vs, v=>cuentaDe(v.pago)==='efectivo' ? (v.propina||0) : 0) + sum(is.filter(x=>cuentaDe(x.pago)==='efectivo'), x=>x.monto);
+  const trf = sum(cuentas().filter(x=>x.id!=='efectivo'), cu=> sum(vs, v=>montoEnCuenta(v, cu.id)) + sum(is.filter(x=>cuentaDe(x.pago)===cu.id), x=>x.monto));
+  const esperado = num(c.inicial) + efV - gastosEf, dif = (c.final!==undefined && c.final!=='') ? num(c.final) - esperado : null;
+  const calc = calcularConsumo(vs), conf = inv.estado==='confirmado', consumos = conf ? inv.consumos : calc.cons;
+  const total = {...consumos}; (cierreMerma||[]).forEach(m=>{ total[m.id] = r3b((total[m.id]||0) + num(m.q)); });
+  const cambio = conf && JSON.stringify(calc.cons) !== JSON.stringify(inv.consumos);
+  const filas = Object.keys(total).sort((a,b)=>nombreMP(a).localeCompare(nombreMP(b))).map(id=>{ const it = mpItem(id) || {}, q = total[id], st = it.stock, falta = !conf && st!=null && st < q;
+    return `<div class="row" style="font-size:13px; padding:3px 0;"><span style="flex:1;">${esc(nombreMP(id))}</span><span style="width:90px; text-align:right;">${fq(q)} ${esc(ubMP(id))}</span><span class="${falta?'out':'sub'}" style="width:100px; text-align:right;">${conf ? '' : (st==null ? 'sin contar' : 'queda ' + fq(Math.max(0, st-q)))}</span></div>`; }).join('');
+  const avisos = [];
+  Object.keys(calc.sinFicha).forEach(n=> avisos.push(`“${esc(n)}” ×${calc.sinFicha[n]}: no tiene ficha, no descuenta inventario`));
+  if(!conf) Object.keys(total).forEach(id=>{ const it = mpItem(id); if(it && it.stock==null) avisos.push(`${esc(it.n)}: sin stock contado, no se descuenta`); else if(it && it.stock<total[id]) avisos.push(`${esc(it.n)}: el stock (${fq(it.stock)}) no alcanza para ${fq(total[id])}`); });
+  if(cambio) avisos.push('Las ventas del día cambiaron después de confirmar el cierre. Revierte el cierre y confírmalo otra vez.');
+  const mermaHtml = (cierreMerma||[]).map((m,ix)=>`<div class="row" style="font-size:13px;"><span style="flex:1;">${esc({merma:'Merma',desperdicio:'Desperdicio',interno:'Consumo interno'}[m.tipo])}: ${esc(nombreMP(m.id))} · ${fq(m.q)} ${esc(ubMP(m.id))}</span>${conf?'':`<button class="mini sec" onclick="mermaQuitar(${ix})">✕</button>`}</div>`).join('');
+  $('#vista').innerHTML = navDia() + `<div class="card"><div class="title" style="margin-top:0;">Cierre del día ${conf?'· ✅ confirmado':'· borrador'}</div>
+    <div class="row"><span class="sub">Ventas brutas</span><b>${money(brutas)}</b></div><div class="row"><span class="sub">Descuentos</span><b>−${money(desc)}</b></div><div class="row tot"><span>Ventas netas</span><span>${money(netas)}</span></div>
+    <div class="row"><span class="sub">Gastos del día</span><b class="out">${money(gastos)}</b></div><div class="row"><span class="sub">Transferencias recibidas</span><b>${money(trf)}</b></div>
+    <div class="grid2" style="margin-top:8px;"><div class="field"><label>Efectivo inicial</label><input id="cInicial" type="number" inputmode="decimal" value="${c.inicial??''}"></div><div class="field"><label>Efectivo final (contado)</label><input id="cFinal" type="number" inputmode="decimal" value="${c.final??''}"></div></div>
+    <div class="sub">Ventas en efectivo (con propinas): ${money(efV)} · Gastos en efectivo: ${money(gastosEf)}</div><div class="row tot"><span>Efectivo esperado</span><span>${money(esperado)}</span></div>
+    ${dif!==null ? `<div class="row ${dif>=0?'pos':'neg'}"><span>Diferencia de caja</span><b>${money(dif)}</b></div>` : ''}
+    <button class="btn" style="margin-top:10px;" onclick="guardarCierre(${brutas},${desc},${netas},${gastos},${esperado},${trf})">Guardar efectivo</button></div>
+    <div class="card"><div class="title" style="margin-top:0;">Lo vendido hoy</div>${Object.keys(calc.prods).length ? Object.keys(calc.prods).map(k=>`<div class="row" style="font-size:13px;"><span>${esc(k)}</span><b>${calc.prods[k]}</b></div>`).join('') : '<div class="sub">No hay ventas con ficha este día.</div>'}</div>
+    <div class="card"><div class="title" style="margin-top:0;">Inventario que se descuenta</div>${filas || '<div class="sub">Nada que descontar.</div>'}
+      ${mermaHtml ? `<div class="sub" style="margin-top:8px;">Aparte de las ventas:</div>${mermaHtml}` : ''}
+      ${conf ? '' : `<button class="btn sec" style="margin-top:8px;" onclick="mermaNueva()">+ Merma, desperdicio o consumo interno</button>`}
+      ${avisos.length ? `<div class="alerta" style="margin-top:8px;">${avisos.map(a=>'⚠️ '+a).join('<br>')}</div>` : ''}
+      <div class="acts" style="margin-top:10px;">${conf ? `<button class="btn red" onclick="revertirCierre()">Revertir cierre</button>` : `<button class="btn sec" onclick="guardarBorradorInv()">Guardar borrador</button><button class="btn" onclick="confirmarCierre()">Confirmar cierre</button>`}</div>
+      <div class="sub" style="margin-top:6px;">El inventario se descuenta <b>una sola vez</b>, cuando confirmas. ${conf ? 'Confirmado el ' + esc(inv.dia||'') + '. Si te equivocaste, revierte y vuelve a confirmar.' : 'Mientras no confirmes, puedes editar las ventas del día.'}</div></div>`;
+  $('#vista').insertAdjacentHTML('afterbegin', `<a class="back" onclick="ir('mas')">‹ Más</a>`);
+}
+function mermaNueva(){
+  abrir(`<h3>Merma, desperdicio o consumo interno</h3><div class="field"><label>Tipo</label><select id="mmT"><option value="merma">Merma</option><option value="desperdicio">Desperdicio</option><option value="interno">Consumo interno</option></select></div>
+    <div class="field"><label>Artículo</label><select id="mmI">${MP.items.map(i=>`<option value="${i.id}">${esc(i.n)} (${esc(i.ub)})</option>`).join('')}</select></div>
+    <div class="field"><label>Cantidad (en la unidad del artículo)</label><input id="mmQ" type="text" inputmode="decimal"></div>
+    <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="mermaAgregar()">Agregar</button></div>`);
+}
+function mermaAgregar(){ const q = num($('#mmQ').value); if(!(q>0)){ toast('Pon la cantidad'); return; } cierreMerma.push({tipo:$('#mmT').value, id:$('#mmI').value, q}); cerrar(); vCierre(); }
+function mermaQuitar(ix){ cierreMerma.splice(ix,1); vCierre(); }
+async function guardarBorradorInv(){ const r = db.collection('cierres').doc(diaSel), sn = await r.get(), inv = (sn.exists && sn.data().inv) || {}, d = {inv:{estado:'borrador', rev:inv.rev||0, mermas:cierreMerma, dia:diaSel}}; if(sn.exists) await r.update(d); else await r.set(d); toast('Borrador guardado'); vCierre(); }
+let cerrandoInv = false;
+async function confirmarCierre(){
+  if(cerrandoInv) return;
+  const vs = await qRango('ventas', {desde:diaSel, hasta:diaSel}), calc = calcularConsumo(vs);
+  const total = {...calc.cons}; cierreMerma.forEach(m=>{ total[m.id] = r3b((total[m.id]||0) + num(m.q)); });
+  if(!Object.keys(total).length){ toast('No hay nada que descontar'); return; }
+  if(!confirm('¿Confirmar el cierre del ' + diaSel + '? El inventario se descuenta una sola vez.')) return;
+  cerrandoInv = true; const dia = diaSel, CREF = db.collection('cierres').doc(dia);
+  try{
+    await db.runTransaction(async tx=>{
+      const cs = await tx.get(CREF), inv = (cs.exists && cs.data().inv) || {};
+      if(inv.estado==='confirmado') throw new Error('YA');
+      const ms = await tx.get(MPREF), d = ms.data(), rev = (inv.rev||0) + 1, aplicado = {};
+      Object.keys(total).forEach(id=>{
+        const it = d.items.find(x=>x.id===id); if(!it) return;
+        if(it.stock==null){ aplicado[id] = 0; return; }
+        const nuevo = Math.max(0, r3b(it.stock - total[id])); aplicado[id] = r3b(it.stock - nuevo); it.stock = nuevo;
+        tx.set(db.collection('movimientos').doc('cierre_' + dia + '_' + rev + '_' + id), {insumoId:id, tipo:'cierre', cantidad:total[id], delta:-aplicado[id], dia, ts:FV.serverTimestamp(), origen:'cierre', ref:dia, nota:'Cierre de caja ' + dia, stockDespues:nuevo});
+      });
+      tx.set(MPREF, d);
+      const nuevoInv = {inv:{estado:'confirmado', rev, dia:iso(new Date()), consumos:calc.cons, mermas:cierreMerma, aplicado, total, ventas:calc.prods}};
+      if(cs.exists) tx.update(CREF, nuevoInv); else tx.set(CREF, nuevoInv);
+    });
+    await mpCargar(true); toast('Cierre confirmado ✅', 3000);
+  }catch(e){ toast(e.message==='YA' ? 'Ese cierre ya estaba confirmado' : 'No se pudo confirmar el cierre', 3500); }
+  finally{ cerrandoInv = false; }
+  vCierre();
+}
+async function revertirCierre(){
+  if(cerrandoInv) return; if(!confirm('¿Revertir el cierre? El inventario vuelve a como estaba antes de confirmarlo.')) return;
+  cerrandoInv = true; const dia = diaSel, CREF = db.collection('cierres').doc(dia);
+  try{
+    await db.runTransaction(async tx=>{
+      const cs = await tx.get(CREF), inv = (cs.exists && cs.data().inv) || {};
+      if(inv.estado!=='confirmado') throw new Error('NO');
+      const ms = await tx.get(MPREF), d = ms.data();
+      Object.keys(inv.aplicado||{}).forEach(id=>{
+        const it = d.items.find(x=>x.id===id), a = inv.aplicado[id]; if(!it || !a || it.stock==null) return;
+        it.stock = r3b(it.stock + a);
+        tx.set(db.collection('movimientos').doc('cierre_' + dia + '_' + inv.rev + '_' + id + '_rev'), {insumoId:id, tipo:'reversa', cantidad:a, delta:a, dia, ts:FV.serverTimestamp(), origen:'cierre', ref:dia, nota:'Reversa del cierre ' + dia, stockDespues:it.stock});
+      });
+      tx.set(MPREF, d);
+      tx.update(CREF, {inv:{estado:'borrador', rev:inv.rev, dia, mermas:inv.mermas||[], revertido:iso(new Date())}});
+    });
+    await mpCargar(true); cierreDia = ''; toast('Cierre revertido', 3000);
+  }catch(e){ toast('No se pudo revertir', 3500); }
+  finally{ cerrandoInv = false; }
+  vCierre();
+}
+
 </script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));</script>
 </body>
 </html>
