@@ -543,7 +543,7 @@ async function iniciar(){
     await cargarAgenda();
     await cargarProveedores(); await cargarDeudas();
   }catch(e){ toast('No se pudo cargar. Revisa las reglas de Firestore.', 4000); }
-  alertas(); ir(vistaActual);
+  alertas(); ir(vistaActual); try{ eqArranque(); }catch(e){}
 }
 $('#nav').addEventListener('click', e=>{ const b = e.target.closest('button'); if(b) ir(b.dataset.v); });
 const ALIAS = {resumen:'estad'};
@@ -1430,6 +1430,7 @@ const nombreLinea = (c, s)=> (c.tipo==='plato' && c.sizes.length > 1) ? c.nombre
 const qtyLinea = (c, s)=>{ const l = ventaLineas.find(x=>x.key === nombreLinea(c,s) + '|' + s.price); return l ? l.cantidad : 0; };
 async function vVentas(){
   $('#vista').innerHTML = navDia() + '<div class="empty">Cargando…</div>';
+  try{ await eqImportarVentas(); }catch(e){}
   const vs = await qRango('ventas', {desde:diaSel, hasta:diaSel});
   const cat = catalogoVenta(), grupos = [];
   cat.forEach((c,ci)=>{ let g = grupos.find(x=>x.n===c.grupo); if(!g){ g = {n:c.grupo, o:[]}; grupos.push(g); } g.o.push({c, ci}); });
@@ -2144,6 +2145,7 @@ function vAjustes(){
       <button class="btn red" style="margin-top:8px;" onclick="deshacerImportacion()">Deshacer importación</button>
       <div id="impOut" class="sub" style="margin-top:8px;"></div>
     </div>
+    <div class="title" style="margin-top:26px;">Equipo</div><div class="card"><div class="sub" style="margin-bottom:8px;">Personas que ayudan en el local. Cada una entra con su propio correo en una página sencilla y solo ve lo que tú le des: contar inventario y registrar las ventas del día. No ven finanzas, gastos ni costos.</div><div id="eqBox"></div></div>
     <div class="title" style="margin-top:26px;">PIN de acceso</div><div class="card">
       <div class="sub" style="margin-bottom:8px;">Un PIN de 4 números que se pide cada vez que abres Finanzas o el panel de pedidos (el mismo para los dos).</div>
       <button class="btn" onclick="pinConfigurar()">Crear o cambiar PIN</button>
@@ -2163,6 +2165,7 @@ function vAjustes(){
         <button class="mini" onclick="exportarTarjetas()">⬇ Tarjetas de fidelidad</button></div>
       <button class="btn" style="margin-top:10px;" onclick="respaldoCompleto()">⬇ Respaldo completo (todo en un archivo)</button>
     </div>`;
+  try{ eqRender(); }catch(e){}
 }
 async function importarRegistro(){
   const inp = $('#impFile'), out = $('#impOut');
@@ -2631,9 +2634,9 @@ async function mpCargar(forzar){
           prep: PREP_SEED.map(p=>({...p, comps:p.comps.map(([id,q])=>({id,q}))})), fichas: fichasDef()};
     await MPREF.set({...MP, v:4});
   }
-  mpListo = true;
+  mpListo = true; if(typeof eqSoon==='function') eqSoon();
 }
-const mpGuardar = ()=> MPREF.set({...MP, v:4});
+const mpGuardar = async ()=>{ await MPREF.set({...MP, v:4}); if(typeof eqSoon==='function') eqSoon(); };
 const mpItem = id=> MP.items.find(x=>x.id===id), mpPrep = id=> MP.prep.find(x=>x.id===id);
 function cpu(id, prof){                                   // costo por unidad base (null si falta algún precio)
   prof = prof||0; if(prof>6) return null;
@@ -2850,6 +2853,7 @@ let cierreMerma = [], cierreDia = '';
 async function vCierre(){
   $('#vista').innerHTML = navDia() + '<div class="empty">Cargando…</div>';
   try{ await mpCargar(); }catch(e){}
+  try{ await eqImportarVentas(); await eqSync(); }catch(e){}
   const r = {desde:diaSel, hasta:diaSel}, safe = p=> p.catch(()=>[]), [vs, gs, is] = await Promise.all([qRango('ventas', r), qRango('gastos', r), safe(qRango('ingresos', r))]);
   const cs = await db.collection('cierres').doc(diaSel).get(), c = cs.exists ? cs.data() : {}, inv = c.inv || {estado:'borrador', rev:0};
   if(cierreDia !== diaSel){ cierreDia = diaSel; cierreMerma = (inv.estado==='confirmado' ? inv.mermas : inv.mermas) || []; }
@@ -2942,6 +2946,95 @@ async function revertirCierre(){
   vCierre();
 }
 
+</script>
+<!-- ===== EQUIPO: personas con permisos, lista de inventario sin precios, ventas del equipo ===== -->
+<script>
+(function(){
+  const URL_EQUIPO = 'https://fresaspop.github.io/PEDIDOS/equipo.html';
+  const PERMISOS = [['inventario','Inventario (contar)'],['ventas','Ventas del día (registrar)']];
+  let personas = [], cache = null, ocupado = false, timer = null, modoVista = false;
+  const norm = c=> String(c||'').trim().toLowerCase();
+  window.eqRender = async function(){
+    const box = document.getElementById('eqBox'); if(!box) return;
+    box.innerHTML = '<div class="sub">Cargando…</div>';
+    try{ const s = await db.collection('equipo').get(); personas = s.docs.map(d=>({id:d.id, ...d.data()})); }catch(e){ box.innerHTML = '<div class="sub">No se pudo cargar. Revisa que las reglas nuevas estén publicadas.</div>'; return; }
+    box.innerHTML = (personas.length ? personas.map(p=>`<div class="mv" style="grid-template-columns:minmax(0,1fr) auto;" onclick="eqAbrir('${esc(p.id)}')"><div><b>${esc(p.nombre||p.id)}</b><div class="sub">${esc(p.id)} · ${(p.permisos||[]).map(x=>(PERMISOS.find(q=>q[0]===x)||[0,x])[1].split(' (')[0]).join(', ')||'sin permisos'}</div></div><div style="text-align:right;"><b class="${p.activo?'':'out'}">${p.activo?'Activa':'Pausada'}</b></div></div>`).join('') : '<div class="empty">Todavía no hay nadie en el equipo.</div>')
+      + `<div class="acts"><button class="btn sec" onclick="eqCopiarLink()">Copiar enlace del equipo</button><button class="btn" onclick="eqAbrir('')">+ Agregar persona</button></div>`;
+  };
+  window.eqCopiarLink = ()=>{ try{ navigator.clipboard.writeText(URL_EQUIPO); toast('Enlace copiado ✅'); }catch(e){ prompt('Copia este enlace:', URL_EQUIPO); } };
+  window.eqAbrir = function(id){
+    const p = id ? personas.find(x=>x.id===id) : {nombre:'', activo:true, permisos:['inventario','ventas']};
+    abrir(`<h3>${id?esc(p.nombre||id):'Agregar persona'}</h3>
+      ${id?'':`<div class="alerta" style="margin-bottom:8px;">Antes de guardar, crea su cuenta en Firebase: <b>Authentication → Users → Add user</b>, con este mismo correo y una contraseña que le des.</div>`}
+      <div class="field"><label>Nombre</label><input id="eqN" value="${esc(p.nombre||'')}"></div>
+      <div class="field"><label>Correo (con el que entra)</label><input id="eqC" type="email" value="${esc(id)}" ${id?'disabled':''}></div>
+      <div class="sub" style="margin-bottom:4px;">Qué puede hacer</div>
+      ${PERMISOS.map(([k,l])=>`<label style="display:flex; gap:8px; align-items:center; margin:6px 0;"><input type="checkbox" id="eqP_${k}" ${(p.permisos||[]).includes(k)?'checked':''}> ${l}</label>`).join('')}
+      <label style="display:flex; gap:8px; align-items:center; margin:10px 0;"><input type="checkbox" id="eqA" ${p.activo?'checked':''}> Cuenta activa (si la desmarcas, pierde el acceso de inmediato)</label>
+      <div class="acts"><button class="btn sec" onclick="cerrar()">Cancelar</button><button class="btn" onclick="eqGuardar('${esc(id)}')">Guardar</button></div>
+      ${id?`<div class="acts"><button class="btn red" onclick="eqQuitar('${esc(id)}')">Quitar de la lista</button></div>`:''}`);
+  };
+  window.eqGuardar = async function(id){
+    const correo = id || norm(document.getElementById('eqC').value), nombre = document.getElementById('eqN').value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)){ toast('Escribe un correo válido'); return; }
+    if(!nombre){ toast('Escribe su nombre'); return; }
+    const permisos = PERMISOS.map(x=>x[0]).filter(k=>document.getElementById('eqP_'+k).checked), activo = document.getElementById('eqA').checked;
+    try{ await db.collection('equipo').doc(correo).set({nombre, permisos, activo, actualizado:new Date().toISOString()}); }catch(e){ toast('No se pudo guardar. ¿Publicaste las reglas nuevas?', 4000); return; }
+    cerrar(); toast('Guardado ✅'); eqRender(); eqSoon(true);
+  };
+  window.eqQuitar = async function(id){ if(!confirm('¿Quitar a esta persona? Ya no podrá entrar.')) return; await db.collection('equipo').doc(id).delete(); cerrar(); eqRender(); };
+
+  /* ----- lista de inventario SIN precios para el equipo + aplicar conteos que ellas anotan ----- */
+  const campos = i=> ({n:i.n, g:i.g, ub:i.ub, compra:i.compra||'', cant:(i.cant>0?i.cant:1), stock:(i.stock==null?null:i.stock)});
+  window.eqSoon = function(ya){ if(typeof MP==='undefined' || !MP || !MP.items) return; clearTimeout(timer); timer = setTimeout(eqSync, ya?200:1500); };
+  window.eqSync = async function(){
+    if(ocupado || typeof MP==='undefined' || !MP || !MP.items || !MP.items.length) return; ocupado = true;
+    try{
+      const pe = await db.collection('equipo').limit(1).get(); const hay = !pe.empty;
+      const snap = await db.collection('equipo_inventario').get(); if(!hay && snap.empty) return;
+      const docs = {}; snap.docs.forEach(d=>docs[d.id] = d.data());
+      let cambio = false;
+      for(const id of Object.keys(docs)){                                   // 1) conteos anotados por el equipo → inventario real
+        const d = docs[id], it = mpItem(id); if(d.pendiente!==true || !it) continue;
+        const nuevo = Math.round(Number(d.conteo)*1000)/1000; if(!(nuevo>=0)) continue;
+        const antes = it.stock; it.stock = nuevo; cambio = true;
+        try{ await db.collection('movimientos').doc(nuevoId('aj')).set({insumoId:id, tipo:'ajuste', cantidad:Math.abs(nuevo-(antes||0)), delta:antes==null?nuevo:Math.round((nuevo-antes)*1000)/1000, dia:hoyIso(), ts:FV.serverTimestamp(), origen:'conteo', nota:'Conteo de ' + (d.conteoPor||'equipo'), stockAntes:antes, stockDespues:nuevo}); }catch(e){}
+      }
+      if(cambio){ await MPREF.set({...MP, v:4}); }
+      const ops = [];                                                       // 2) lista sin precios al día
+      MP.items.forEach(i=>{ const w = campos(i), d = docs[i.id];
+        if(!d || d.pendiente===true || ['n','g','ub','compra','cant','stock'].some(k=> JSON.stringify(d[k]===undefined?null:d[k]) !== JSON.stringify(w[k]))) ops.push(['set', i.id, {...w, pendiente:false, conteo:w.stock}]); });
+      Object.keys(docs).forEach(id=>{ if(!MP.items.some(i=>i.id===id)) ops.push(['del', id]); });
+      for(let k=0; k<ops.length; k+=400){ const b = db.batch(); ops.slice(k,k+400).forEach(o=> o[0]==='set' ? b.set(db.collection('equipo_inventario').doc(o[1]), o[2]) : b.delete(db.collection('equipo_inventario').doc(o[1]))); await b.commit(); }
+      if(cambio && typeof pintarMP==='function' && vistaActual==='inventario') pintarMP();
+    }catch(e){ console.warn('eqSync', e); }
+    finally{ ocupado = false; }
+  };
+
+  /* ----- ventas que registra el equipo → ventas reales (la dueña luego hace el cierre) ----- */
+  window.eqImportarVentas = async function(){
+    let q; try{ q = await db.collection('ventas_equipo').where('estado','==','nuevo').get(); }catch(e){ return 0; }
+    if(q.empty) return 0; let n = 0;
+    for(const d of q.docs){
+      const v = d.data();
+      const items = (v.items||[]).map(l=>({producto:clasificar(l.pers?'Fresas Pop personalizada':l.nombre, l.tam?['Tamaño: '+l.tam]:[]), nombre:String(l.nombre||'Producto'), cantidad:Math.max(1,Math.round(Number(l.cantidad)||1)), precio:Number(l.precio)||0, crema:l.crema?(CREMA_INSUMO[l.crema]||null):null, base:l.base?(BASE_INSUMO[l.base]||null):null, complemento:null}));
+      const subtotal = sum(items, l=>l.cantidad*l.precio), desc = Math.min(Math.max(Number(v.descuento)||0,0), subtotal), descs = desc>0 ? [{monto:desc, motivo:String(v.motivoDescuento||'Otro')}] : [], total = subtotal - desc;
+      const pago = cuentaDe(v.pago), {cons, costo, manoObra} = consumosDe(items), hayReceta = items.some(i=>cfg.recetas[i.producto]);
+      try{
+        await db.collection('ventas').doc('eq_'+d.id).set({dia:v.dia, fecha:FV.serverTimestamp(), origen:'mostrador', equipo:true, por:v.por||'', items, subtotal, descuento:desc, descuentos:descs, motivoDescuento:descs.map(x=>x.motivo).join(' · '), descuentoVip:sum(descs.filter(x=>/vip/i.test(x.motivo)), x=>x.monto), propina:0, total, pago, pagos:null, costo:hayReceta?costo:null, manoObra:hayReceta?manoObra:null, consumos:cons, procesada:true});
+        await d.ref.update({estado:'importado'}); n++;
+      }catch(e){ console.warn('eqImportar', e); }
+    }
+    if(n) toast(n + (n===1 ? ' venta del equipo importada' : ' ventas del equipo importadas') + ' ✅', 3500);
+    return n;
+  };
+  window.eqArranque = async function(){
+    try{ await mpCargar(); }catch(e){}
+    try{ const n = await eqImportarVentas(); if(n && ['ventas','inicio','cierre'].includes(vistaActual)) ir(vistaActual); }catch(e){}
+    eqSoon(true);
+    setInterval(()=>{ if(!document.hidden){ eqSync(); eqImportarVentas().then(n=>{ if(n && ['ventas','inicio','cierre'].includes(vistaActual)) ir(vistaActual); }); } }, 180000);
+  };
+})();
 </script>
 <!-- ===== PIN de 4 dígitos (se pide cada vez que se abre, y al volver tras 5 min) ===== -->
 <style>
